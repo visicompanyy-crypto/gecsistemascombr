@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { FinancialSummaryCards } from "./FinancialSummaryCards";
 import { FinanceChartSection } from "./FinanceChartSection";
 import { FinancePieCharts } from "./FinancePieCharts";
@@ -24,7 +24,15 @@ export function FinanceView() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
   const [costCenterFilter, setCostCenterFilter] = useState("all");
-  const [currentMonth] = useState(new Date());
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const handlePreviousMonth = () => {
+    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  };
 
   const { data: transactions, refetch: refetchTransactions } = useQuery({
     queryKey: ['financial-transactions'],
@@ -207,10 +215,34 @@ export function FinanceView() {
           teamToolExpensesDoMes={teamToolExpensesDoMes}
         />
 
-        <Button onClick={() => setModalOpen(true)} className="gap-2 shadow-sm">
-          <Plus className="h-4 w-4" />
-          Novo Lançamento
-        </Button>
+        <div className="flex items-center gap-4">
+          <Button onClick={() => setModalOpen(true)} className="gap-2 shadow-sm">
+            <Plus className="h-4 w-4" />
+            Novo Lançamento
+          </Button>
+
+          <div className="flex items-center gap-2 bg-card border border-border rounded-lg px-4 py-2 shadow-sm">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={handlePreviousMonth}
+              className="h-8 w-8"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm font-medium min-w-[140px] text-center">
+              {currentMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+            </span>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={handleNextMonth}
+              className="h-8 w-8"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
 
         <Card className="p-8 space-y-6 shadow-sm">
           <div>
