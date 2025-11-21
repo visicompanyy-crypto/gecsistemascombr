@@ -129,19 +129,28 @@ export type Database = {
           description: string
           document_number: string | null
           due_date: string | null
+          first_installment_date: string | null
           id: string
+          installment_number: number | null
+          is_installment: boolean | null
           is_recurring: boolean | null
           metadata: Json | null
           notes: string | null
+          parent_transaction_id: string | null
           payment_date: string | null
           payment_method: string | null
+          pix_key: string | null
+          pix_recipient_name: string | null
           project_id: string | null
+          purchase_date: string | null
           recurrence_end_date: string | null
           recurrence_frequency: string | null
           responsible_user_id: string | null
           status: string
           tags: string[] | null
           team_member_id: string | null
+          total_installments: number | null
+          transaction_classification: string | null
           transaction_date: string
           transaction_type: string
           updated_at: string | null
@@ -158,19 +167,28 @@ export type Database = {
           description: string
           document_number?: string | null
           due_date?: string | null
+          first_installment_date?: string | null
           id?: string
+          installment_number?: number | null
+          is_installment?: boolean | null
           is_recurring?: boolean | null
           metadata?: Json | null
           notes?: string | null
+          parent_transaction_id?: string | null
           payment_date?: string | null
           payment_method?: string | null
+          pix_key?: string | null
+          pix_recipient_name?: string | null
           project_id?: string | null
+          purchase_date?: string | null
           recurrence_end_date?: string | null
           recurrence_frequency?: string | null
           responsible_user_id?: string | null
           status: string
           tags?: string[] | null
           team_member_id?: string | null
+          total_installments?: number | null
+          transaction_classification?: string | null
           transaction_date: string
           transaction_type: string
           updated_at?: string | null
@@ -187,25 +205,41 @@ export type Database = {
           description?: string
           document_number?: string | null
           due_date?: string | null
+          first_installment_date?: string | null
           id?: string
+          installment_number?: number | null
+          is_installment?: boolean | null
           is_recurring?: boolean | null
           metadata?: Json | null
           notes?: string | null
+          parent_transaction_id?: string | null
           payment_date?: string | null
           payment_method?: string | null
+          pix_key?: string | null
+          pix_recipient_name?: string | null
           project_id?: string | null
+          purchase_date?: string | null
           recurrence_end_date?: string | null
           recurrence_frequency?: string | null
           responsible_user_id?: string | null
           status?: string
           tags?: string[] | null
           team_member_id?: string | null
+          total_installments?: number | null
+          transaction_classification?: string | null
           transaction_date?: string
           transaction_type?: string
           updated_at?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "financial_transactions_parent_transaction_id_fkey"
+            columns: ["parent_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "financial_transactions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "fk_cost_center"
             columns: ["cost_center_id"]
@@ -274,6 +308,139 @@ export type Database = {
           role?: string | null
           salary?: number | null
           termination_date?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      team_tool_expenses: {
+        Row: {
+          amount: number
+          cost_center_id: string | null
+          created_at: string | null
+          deleted_at: string | null
+          description: string
+          entity_name: string
+          expense_date: string
+          expense_type: string
+          id: string
+          metadata: Json | null
+          notes: string | null
+          payment_method: string | null
+          status: string
+          team_member_id: string | null
+          tool_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          cost_center_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description: string
+          entity_name: string
+          expense_date: string
+          expense_type: string
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          payment_method?: string | null
+          status: string
+          team_member_id?: string | null
+          tool_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          cost_center_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string
+          entity_name?: string
+          expense_date?: string
+          expense_type?: string
+          id?: string
+          metadata?: Json | null
+          notes?: string | null
+          payment_method?: string | null
+          status?: string
+          team_member_id?: string | null
+          tool_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_tool_expenses_cost_center_id_fkey"
+            columns: ["cost_center_id"]
+            isOneToOne: false
+            referencedRelation: "cost_centers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_tool_expenses_team_member_id_fkey"
+            columns: ["team_member_id"]
+            isOneToOne: false
+            referencedRelation: "team_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_tool_expenses_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "tools_software"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tools_software: {
+        Row: {
+          billing_frequency: string | null
+          category: string | null
+          cost_per_license: number | null
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          license_type: string | null
+          metadata: Json | null
+          name: string
+          provider: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          billing_frequency?: string | null
+          category?: string | null
+          cost_per_license?: number | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          license_type?: string | null
+          metadata?: Json | null
+          name: string
+          provider?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          billing_frequency?: string | null
+          category?: string | null
+          cost_per_license?: number | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          license_type?: string | null
+          metadata?: Json | null
+          name?: string
+          provider?: string | null
           updated_at?: string | null
           user_id?: string
         }
