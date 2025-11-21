@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus } from "lucide-react";
 import { FinancialSummaryCards } from "./FinancialSummaryCards";
 import { FinanceChartSection } from "./FinanceChartSection";
 import { FinancePieCharts } from "./FinancePieCharts";
@@ -12,11 +12,10 @@ import { FinancialFilters } from "./FinancialFilters";
 import { NewTransactionModal } from "./NewTransactionModal";
 import { useFinancialSummary } from "@/hooks/useFinancialSummary";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { Header } from "./Header";
 
 export function FinanceView() {
   const { toast } = useToast();
-  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,11 +39,6 @@ export function FinanceView() {
   });
 
   const summary = useFinancialSummary(transactions);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
-  };
 
   const handleEdit = (transaction: any) => {
     setSelectedTransaction(transaction);
@@ -96,27 +90,9 @@ export function FinanceView() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto p-8 space-y-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-semibold text-foreground">Financeiro</h1>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 bg-card rounded-xl px-4 py-2 shadow-sm border">
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <span className="text-sm font-medium text-muted-foreground min-w-[140px] text-center">
-                {currentMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
-              </span>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-            <Button variant="outline" onClick={handleLogout} size="sm" className="shadow-sm">
-              <LogOut className="mr-2 h-4 w-4" />
-              Sair
-            </Button>
-          </div>
-        </div>
+      <Header currentMonth={currentMonth} />
+      
+      <div className="max-w-7xl mx-auto p-8 space-y-8 mt-8">
 
         <FinancialSummaryCards
           totalReceitas={summary.totalReceitas}
