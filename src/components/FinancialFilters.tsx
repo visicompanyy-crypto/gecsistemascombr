@@ -27,22 +27,22 @@ export function FinancialFilters({
   onClearFilters,
 }: FinancialFiltersProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
-        <label className="text-sm font-medium mb-2 block">Buscar por nome</label>
+        <label className="text-sm font-medium mb-3 block text-secondary">Buscar por nome</label>
         <Input
           placeholder="Digite o nome do lançamento..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="max-w-md"
+          className="max-w-md shadow-sm"
         />
       </div>
       
       <div className="grid gap-4 md:grid-cols-3">
         <div>
-          <label className="text-sm font-medium mb-2 block">Tipo</label>
+          <label className="text-sm font-medium mb-3 block text-secondary">Tipo</label>
           <Select value={typeFilter} onValueChange={onTypeFilterChange}>
-            <SelectTrigger className="bg-primary text-primary-foreground">
+            <SelectTrigger className="bg-primary text-primary-foreground shadow-sm">
               <SelectValue placeholder="Todas" />
             </SelectTrigger>
             <SelectContent>
@@ -54,9 +54,9 @@ export function FinancialFilters({
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">Forma de pagamento</label>
+          <label className="text-sm font-medium mb-3 block text-secondary">Forma de pagamento</label>
           <Select value={paymentMethodFilter} onValueChange={onPaymentMethodFilterChange}>
-            <SelectTrigger className="bg-primary text-primary-foreground">
+            <SelectTrigger className="bg-primary text-primary-foreground shadow-sm">
               <SelectValue placeholder="Todas" />
             </SelectTrigger>
             <SelectContent>
@@ -69,9 +69,9 @@ export function FinancialFilters({
         </div>
 
         <div>
-          <label className="text-sm font-medium mb-2 block">Centro de custo</label>
+          <label className="text-sm font-medium mb-3 block text-secondary">Centro de custo</label>
           <Select value={costCenterFilter} onValueChange={onCostCenterFilterChange}>
-            <SelectTrigger className="bg-primary text-primary-foreground">
+            <SelectTrigger className="bg-primary text-primary-foreground shadow-sm">
               <SelectValue placeholder="Todos" />
             </SelectTrigger>
             <SelectContent>
@@ -86,7 +86,7 @@ export function FinancialFilters({
       </div>
 
       <div className="flex justify-end">
-        <Button variant="default" size="sm" onClick={onClearFilters} className="gap-2">
+        <Button variant="default" size="sm" onClick={onClearFilters} className="gap-2 shadow-sm">
           <X className="h-4 w-4" />
           Limpar Filtros
         </Button>
