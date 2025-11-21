@@ -11,6 +11,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import logo from "@/assets/logo.png";
 
 interface HeaderProps {
   currentMonth: Date;
@@ -34,9 +35,7 @@ export function Header({ currentMonth, onMonthChange }: HeaderProps) {
         {/* Logo e Navegação */}
         <div className="flex items-center gap-12">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-primary-foreground font-semibold text-lg">F</span>
-            </div>
+            <img src={logo} alt="Logo" className="w-11 h-11" />
             <h1 className="text-xl font-semibold text-foreground">Finance</h1>
           </div>
 
