@@ -24,7 +24,7 @@ export function FinanceView() {
   const [costCenterFilter, setCostCenterFilter] = useState("all");
   const [currentMonth] = useState(new Date());
 
-  const { data: transactions, refetch } = useQuery({
+  const { data: transactions, refetch: refetchTransactions } = useQuery({
     queryKey: ['financial-transactions'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -38,9 +38,23 @@ export function FinanceView() {
     },
   });
 
+  const { data: teamToolExpenses, refetch: refetchTeamToolExpenses } = useQuery({
+    queryKey: ['team-tool-expenses'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('team_tool_expenses')
+        .select('*')
+        .is('deleted_at', null)
+        .order('expense_date', { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Realtime subscription para atualização automática
   useEffect(() => {
-    const channel = supabase
+    const transactionsChannel = supabase
       .channel('financial-transactions-changes')
       .on(
         'postgres_changes',
@@ -51,17 +65,45 @@ export function FinanceView() {
         },
         (payload) => {
           console.log('Transação atualizada em tempo real:', payload);
-          refetch();
+          refetchTransactions();
+        }
+      )
+      .subscribe();
+
+    const expensesChannel = supabase
+      .channel('team-tool-expenses-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'team_tool_expenses'
+        },
+        (payload) => {
+          console.log('Despesa de equipe/ferramenta atualizada em tempo real:', payload);
+          refetchTeamToolExpenses();
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(transactionsChannel);
+      supabase.removeChannel(expensesChannel);
     };
-  }, [refetch]);
+  }, [refetchTransactions, refetchTeamToolExpenses]);
 
-  const summary = useFinancialSummary(transactions);
+  const hoje = new Date();
+  const mesAtual = hoje.getMonth();
+  const anoAtual = hoje.getFullYear();
+  const primeiroDiaDoMes = new Date(anoAtual, mesAtual, 1);
+  const ultimoDiaDoMes = new Date(anoAtual, mesAtual + 1, 0);
+
+  const teamToolExpensesDoMes = teamToolExpenses?.filter(e => {
+    const dataExpense = new Date(e.expense_date);
+    return dataExpense >= primeiroDiaDoMes && dataExpense <= ultimoDiaDoMes;
+  });
+
+  const summary = useFinancialSummary(transactions, teamToolExpenses);
 
   const handleEdit = (transaction: any) => {
     setSelectedTransaction(transaction);
@@ -81,7 +123,7 @@ export function FinanceView() {
         title: "Transação excluída",
         description: "A transação foi excluída com sucesso.",
       });
-      refetch();
+      refetchTransactions();
     } catch (error: any) {
       toast({
         title: "Erro",
@@ -118,13 +160,18 @@ export function FinanceView() {
       <div className="max-w-7xl mx-auto p-8 space-y-8 mt-8">
 
         <FinancialSummaryCards
-          totalReceitas={summary.totalReceitas}
-          totalDespesas={summary.totalDespesas}
-          saldo={summary.saldo}
+          saldoProjetado={summary.saldoProjetado}
+          receitaTotalRecebida={summary.receitaTotalRecebida}
           receitasFuturas={summary.receitasFuturas}
           despesasFuturas={summary.despesasFuturas}
           receitasDoMes={summary.receitasDoMes}
-          despesasDoMes={summary.despesasDoMes}
+          totalAPagarNoMes={summary.totalAPagarNoMes}
+          listaReceitaTotalRecebida={summary.listaReceitaTotalRecebida}
+          listaReceitasFuturas={summary.listaReceitasFuturas}
+          listaDespesasFuturas={summary.listaDespesasFuturas}
+          listaReceitasDoMes={summary.listaReceitasDoMes}
+          listaDespesasDoMes={summary.listaDespesasDoMes}
+          teamToolExpensesDoMes={teamToolExpensesDoMes}
         />
 
         <Button onClick={() => setModalOpen(true)} className="gap-2 shadow-sm">
@@ -158,31 +205,22 @@ export function FinanceView() {
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="p-8 bg-gradient-to-br from-card to-muted/30 shadow-sm border-border/50">
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-secondary uppercase tracking-wide">Total de Receitas</h3>
+              <h3 className="text-sm font-medium text-secondary uppercase tracking-wide">Total de Receitas Pagas</h3>
               <p className="text-4xl font-semibold text-primary">
-                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.totalReceitas)}
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.receitaTotalRecebida)}
               </p>
             </div>
           </Card>
 
           <Card className="p-8 bg-gradient-to-br from-card to-muted/30 shadow-sm border-border/50">
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-secondary uppercase tracking-wide">Total de Despesas</h3>
+              <h3 className="text-sm font-medium text-secondary uppercase tracking-wide">Total a Pagar no Mês</h3>
               <p className="text-4xl font-semibold text-destructive">
-                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.totalDespesas)}
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.totalAPagarNoMes)}
               </p>
             </div>
           </Card>
         </div>
-
-        <Card className="p-8 bg-gradient-to-br from-secondary/10 to-secondary/20 shadow-sm border-secondary/30">
-          <div className="space-y-3">
-            <h3 className="text-sm font-medium text-secondary uppercase tracking-wide">Saldo Líquido</h3>
-            <p className="text-5xl font-semibold text-primary">
-              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.saldo)}
-            </p>
-          </div>
-        </Card>
 
         <FinancePieCharts data={summary.transactionsByCategory} />
 
@@ -190,7 +228,7 @@ export function FinanceView() {
           open={modalOpen}
           onOpenChange={handleModalClose}
           onSuccess={() => {
-            refetch();
+            refetchTransactions();
             handleModalClose();
           }}
           transaction={selectedTransaction}
