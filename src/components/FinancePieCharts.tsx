@@ -12,7 +12,14 @@ interface FinancePieChartsProps {
   data: CategoryData;
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d'];
+const COLORS = [
+  'hsl(128, 42%, 40%)',  // Verde primário
+  'hsl(49, 11%, 61%)',   // Bege secundário
+  'hsl(128, 42%, 50%)',  // Verde mais claro
+  'hsl(38, 92%, 50%)',   // Amarelo
+  'hsl(199, 89%, 48%)',  // Azul
+  'hsl(0, 84.2%, 60.2%)' // Vermelho
+];
 
 export function FinancePieCharts({ data }: FinancePieChartsProps) {
   const receitasData = Object.entries(data)
@@ -37,9 +44,9 @@ export function FinancePieCharts({ data }: FinancePieChartsProps) {
   };
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Receitas por Categoria</h3>
+    <div className="grid gap-6 md:grid-cols-2">
+      <Card className="p-8 shadow-sm border-border/50 bg-card">
+        <h3 className="text-lg font-semibold mb-6 text-secondary">Receitas por Categoria</h3>
         {receitasData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -49,7 +56,7 @@ export function FinancePieCharts({ data }: FinancePieChartsProps) {
                 cy="50%"
                 labelLine={false}
                 label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                outerRadius={80}
+                outerRadius={90}
                 fill="#8884d8"
                 dataKey="value"
               >
@@ -57,7 +64,16 @@ export function FinancePieCharts({ data }: FinancePieChartsProps) {
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value: number) => formatCurrency(value)} />
+              <Tooltip 
+                formatter={(value: number) => formatCurrency(value)}
+                contentStyle={{
+                  backgroundColor: 'hsl(0, 0%, 100%)',
+                  border: '1px solid hsl(49, 11%, 90%)',
+                  borderRadius: '0.875rem',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  fontFamily: 'Inter'
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
         ) : (
@@ -67,8 +83,8 @@ export function FinancePieCharts({ data }: FinancePieChartsProps) {
         )}
       </Card>
 
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Despesas por Categoria</h3>
+      <Card className="p-8 shadow-sm border-border/50 bg-card">
+        <h3 className="text-lg font-semibold mb-6 text-secondary">Despesas por Categoria</h3>
         {despesasData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -78,7 +94,7 @@ export function FinancePieCharts({ data }: FinancePieChartsProps) {
                 cy="50%"
                 labelLine={false}
                 label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                outerRadius={80}
+                outerRadius={90}
                 fill="#8884d8"
                 dataKey="value"
               >
@@ -86,7 +102,16 @@ export function FinancePieCharts({ data }: FinancePieChartsProps) {
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip formatter={(value: number) => formatCurrency(value)} />
+              <Tooltip 
+                formatter={(value: number) => formatCurrency(value)}
+                contentStyle={{
+                  backgroundColor: 'hsl(0, 0%, 100%)',
+                  border: '1px solid hsl(49, 11%, 90%)',
+                  borderRadius: '0.875rem',
+                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  fontFamily: 'Inter'
+                }}
+              />
             </PieChart>
           </ResponsiveContainer>
         ) : (

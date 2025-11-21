@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 200 14% 97%;
     --foreground: 128 15% 20%;
 
     --card: 0 0% 100%;
@@ -17,13 +17,13 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 128 15% 20%;
 
-    --primary: 128 42% 48%;
+    --primary: 128 42% 40%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 49 11% 61%;
     --secondary-foreground: 128 15% 20%;
 
-    --muted: 200 14% 95%;
+    --muted: 200 14% 96%;
     --muted-foreground: 49 8% 45%;
 
     --accent: 49 11% 61%;
@@ -32,8 +32,8 @@ All colors MUST be HSL.
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 49 11% 85%;
-    --input: 200 14% 95%;
+    --border: 49 11% 90%;
+    --input: 0 0% 98%;
     --ring: 128 42% 40%;
 
     --success: 128 42% 40%;
@@ -46,12 +46,12 @@ All colors MUST be HSL.
     --info-foreground: 0 0% 100%;
 
     --chart-1: 128 42% 40%;
-    --chart-2: 128 42% 45%;
+    --chart-2: 128 42% 50%;
     --chart-3: 0 84.2% 60.2%;
     --chart-4: 38 92% 50%;
     --chart-5: 49 11% 61%;
 
-    --radius: 0.75rem;
+    --radius: 0.875rem;
 
     --sidebar-background: 0 0% 100%;
 
@@ -61,11 +61,11 @@ All colors MUST be HSL.
 
     --sidebar-primary-foreground: 0 0% 100%;
 
-    --sidebar-accent: 200 14% 95%;
+    --sidebar-accent: 200 14% 96%;
 
     --sidebar-accent-foreground: 128 15% 20%;
 
-    --sidebar-border: 49 11% 85%;
+    --sidebar-border: 49 11% 90%;
 
     --sidebar-ring: 128 42% 40%;
   }
@@ -130,6 +130,6 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
 }

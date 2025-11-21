@@ -45,22 +45,22 @@ export function FinancialTransactionsTable({
   };
 
   return (
-    <div className="rounded-lg border bg-card overflow-hidden">
+    <div className="rounded-xl border bg-card overflow-hidden shadow-sm">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted/50">
-              <TableHead className="w-[80px]">Alerta</TableHead>
-              <TableHead>Data de Pagamento</TableHead>
-              <TableHead>Data de Entrada</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Nome</TableHead>
-              <TableHead>Centro de Custo</TableHead>
-              <TableHead>Forma de Pagamento</TableHead>
-              <TableHead>Variante</TableHead>
-              <TableHead className="text-right">Valor</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-center">Ações</TableHead>
+            <TableRow className="bg-muted/30 border-b">
+              <TableHead className="w-[80px] font-semibold text-secondary">Alerta</TableHead>
+              <TableHead className="font-semibold text-secondary">Data de Pagamento</TableHead>
+              <TableHead className="font-semibold text-secondary">Data de Entrada</TableHead>
+              <TableHead className="font-semibold text-secondary">Tipo</TableHead>
+              <TableHead className="font-semibold text-secondary">Nome</TableHead>
+              <TableHead className="font-semibold text-secondary">Centro de Custo</TableHead>
+              <TableHead className="font-semibold text-secondary">Forma de Pagamento</TableHead>
+              <TableHead className="font-semibold text-secondary">Variante</TableHead>
+              <TableHead className="text-right font-semibold text-secondary">Valor</TableHead>
+              <TableHead className="font-semibold text-secondary">Status</TableHead>
+              <TableHead className="text-center font-semibold text-secondary">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -69,7 +69,7 @@ export function FinancialTransactionsTable({
               const alertBadge = getAlertBadge(transaction.status, daysOverdue);
               
               return (
-                <TableRow key={transaction.id} className="hover:bg-muted/50">
+                <TableRow key={transaction.id} className="hover:bg-muted/30 transition-colors border-b border-border/50">
                   <TableCell>
                     {alertBadge || (
                       <div className="flex items-center justify-center">
