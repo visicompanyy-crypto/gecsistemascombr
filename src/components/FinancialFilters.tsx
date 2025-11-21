@@ -42,7 +42,7 @@ export function FinancialFilters({
         <div>
           <label className="text-sm font-medium mb-2 block">Tipo</label>
           <Select value={typeFilter} onValueChange={onTypeFilterChange}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-primary text-primary-foreground">
               <SelectValue placeholder="Todas" />
             </SelectTrigger>
             <SelectContent>
@@ -56,7 +56,7 @@ export function FinancialFilters({
         <div>
           <label className="text-sm font-medium mb-2 block">Forma de pagamento</label>
           <Select value={paymentMethodFilter} onValueChange={onPaymentMethodFilterChange}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-primary text-primary-foreground">
               <SelectValue placeholder="Todas" />
             </SelectTrigger>
             <SelectContent>
@@ -71,7 +71,7 @@ export function FinancialFilters({
         <div>
           <label className="text-sm font-medium mb-2 block">Centro de custo</label>
           <Select value={costCenterFilter} onValueChange={onCostCenterFilterChange}>
-            <SelectTrigger>
+            <SelectTrigger className="bg-primary text-primary-foreground">
               <SelectValue placeholder="Todos" />
             </SelectTrigger>
             <SelectContent>
@@ -86,7 +86,7 @@ export function FinancialFilters({
       </div>
 
       <div className="flex justify-end">
-        <Button variant="ghost" size="sm" onClick={onClearFilters} className="gap-2">
+        <Button variant="default" size="sm" onClick={onClearFilters} className="gap-2">
           <X className="h-4 w-4" />
           Limpar Filtros
         </Button>
