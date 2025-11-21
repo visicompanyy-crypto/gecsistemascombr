@@ -1,7 +1,8 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Pencil, Trash2, Eye, CheckCircle2, AlertTriangle } from "lucide-react";
+import { format } from "date-fns";
 
 interface Transaction {
   id: string;
@@ -9,15 +10,16 @@ interface Transaction {
   amount: number;
   transaction_type: string;
   transaction_date: string;
+  category: string | null;
   status: string;
-  category?: string | null;
   payment_method?: string | null;
+  cost_center_id?: string | null;
 }
 
 interface FinancialTransactionsTableProps {
   transactions: Transaction[];
-  onEdit?: (transaction: Transaction) => void;
-  onDelete?: (id: string) => void;
+  onEdit: (transaction: Transaction) => void;
+  onDelete: (id: string) => void;
 }
 
 export function FinancialTransactionsTable({
@@ -32,89 +34,119 @@ export function FinancialTransactionsTable({
     }).format(value);
   };
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('pt-BR');
-  };
-
-  const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive"> = {
-      pago: 'default',
-      pendente: 'secondary',
-      atrasado: 'destructive',
-      cancelado: 'destructive',
-    };
-    return <Badge variant={variants[status] || 'default'}>{status}</Badge>;
-  };
-
-  const getTypeBadge = (type: string) => {
-    return (
-      <Badge variant={type === 'receita' ? 'default' : 'secondary'}>
-        {type === 'receita' ? 'Receita' : 'Despesa'}
-      </Badge>
-    );
+  const getAlertBadge = (status: string, daysOverdue: number = 0) => {
+    if (status === 'pendente' && daysOverdue > 20) {
+      return <Badge variant="danger" className="rounded-full">ATRASADO {daysOverdue}</Badge>;
+    }
+    if (status === 'pendente' && daysOverdue > 10) {
+      return <Badge variant="warning" className="rounded-full">URGENTE {daysOverdue}</Badge>;
+    }
+    return null;
   };
 
   return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Data</TableHead>
-            <TableHead>Descrição</TableHead>
-            <TableHead>Categoria</TableHead>
-            <TableHead>Tipo</TableHead>
-            <TableHead>Valor</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {transactions.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={7} className="text-center text-muted-foreground">
-                Nenhuma transação encontrada
-              </TableCell>
+    <div className="rounded-lg border bg-card overflow-hidden">
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              <TableHead className="w-[80px]">Alerta</TableHead>
+              <TableHead>Data de Pagamento</TableHead>
+              <TableHead>Data de Entrada</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead>Nome</TableHead>
+              <TableHead>Centro de Custo</TableHead>
+              <TableHead>Forma de Pagamento</TableHead>
+              <TableHead>Variante</TableHead>
+              <TableHead className="text-right">Valor</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-center">Ações</TableHead>
             </TableRow>
-          ) : (
-            transactions.map((transaction) => (
-              <TableRow key={transaction.id}>
-                <TableCell>{formatDate(transaction.transaction_date)}</TableCell>
-                <TableCell className="font-medium">{transaction.description}</TableCell>
-                <TableCell>{transaction.category || '-'}</TableCell>
-                <TableCell>{getTypeBadge(transaction.transaction_type)}</TableCell>
-                <TableCell className={
-                  transaction.transaction_type === 'receita' ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'
-                }>
-                  {formatCurrency(transaction.amount)}
-                </TableCell>
-                <TableCell>{getStatusBadge(transaction.status)}</TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    {onEdit && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onEdit(transaction)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
+          </TableHeader>
+          <TableBody>
+            {transactions.map((transaction) => {
+              const daysOverdue = Math.floor((new Date().getTime() - new Date(transaction.transaction_date).getTime()) / (1000 * 60 * 60 * 24));
+              const alertBadge = getAlertBadge(transaction.status, daysOverdue);
+              
+              return (
+                <TableRow key={transaction.id} className="hover:bg-muted/50">
+                  <TableCell>
+                    {alertBadge || (
+                      <div className="flex items-center justify-center">
+                        {transaction.transaction_type === 'receita' ? (
+                          <span className="text-green-600">🔹</span>
+                        ) : (
+                          <span className="text-red-600">🔻</span>
+                        )}
+                      </div>
                     )}
-                    {onDelete && (
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {format(new Date(transaction.transaction_date), 'dd/MM/yyyy')}
+                  </TableCell>
+                  <TableCell>
+                    {format(new Date(transaction.transaction_date), 'dd/MM/yyyy')}
+                  </TableCell>
+                  <TableCell>
+                    {transaction.transaction_type === 'receita' ? (
+                      <span className="text-green-600 font-medium">🔹 Receita</span>
+                    ) : (
+                      <span className="text-red-600 font-medium">🔻 Despesa</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="font-medium">{transaction.description}</TableCell>
+                  <TableCell>{transaction.category || '-'}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline">{transaction.payment_method || 'Pix'}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline">Fixa</Badge>
+                  </TableCell>
+                  <TableCell className={`text-right font-bold ${
+                    transaction.transaction_type === 'receita' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {formatCurrency(transaction.amount)}
+                  </TableCell>
+                  <TableCell>
+                    <Badge 
+                      variant={transaction.status === 'pago' ? 'info' : 'warning'}
+                      className="rounded-full"
+                    >
+                      {transaction.status === 'pago' ? 'Pago' : 'Pendente'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center justify-center gap-1">
                       <Button
                         variant="ghost"
                         size="icon"
+                        className="h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-full bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800"
+                      >
+                        <CheckCircle2 className="h-4 w-4 text-green-700 dark:text-green-300" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-full bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800"
                         onClick={() => onDelete(transaction.id)}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4 text-red-700 dark:text-red-300" />
                       </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
