@@ -5,12 +5,20 @@ interface FinancialSummaryCardsProps {
   totalReceitas: number;
   totalDespesas: number;
   saldo: number;
+  receitasFuturas: number;
+  despesasFuturas: number;
+  receitasDoMes: number;
+  despesasDoMes: number;
 }
 
 export function FinancialSummaryCards({
   totalReceitas,
   totalDespesas,
   saldo,
+  receitasFuturas,
+  despesasFuturas,
+  receitasDoMes,
+  despesasDoMes,
 }: FinancialSummaryCardsProps) {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -54,7 +62,7 @@ export function FinancialSummaryCards({
               <Calendar className="h-7 w-7 text-primary" />
             </div>
             <p className="text-xs font-medium text-secondary">Receitas Futuras</p>
-            <p className="text-xl font-semibold text-foreground">{formatCurrency(totalReceitas * 0.774)}</p>
+            <p className="text-xl font-semibold text-foreground">{formatCurrency(receitasFuturas)}</p>
           </div>
         </Card>
 
@@ -64,7 +72,7 @@ export function FinancialSummaryCards({
               <TrendingDown className="h-7 w-7 text-destructive" />
             </div>
             <p className="text-xs font-medium text-secondary">Despesas Futuras</p>
-            <p className="text-xl font-semibold text-foreground">{formatCurrency(totalDespesas * 0.94)}</p>
+            <p className="text-xl font-semibold text-foreground">{formatCurrency(despesasFuturas)}</p>
           </div>
         </Card>
 
@@ -74,7 +82,7 @@ export function FinancialSummaryCards({
               <DollarSign className="h-7 w-7 text-primary" />
             </div>
             <p className="text-xs font-medium text-secondary">Receita do Mês</p>
-            <p className="text-xl font-semibold text-foreground">{formatCurrency(totalReceitas)}</p>
+            <p className="text-xl font-semibold text-foreground">{formatCurrency(receitasDoMes)}</p>
           </div>
         </Card>
 
@@ -84,7 +92,7 @@ export function FinancialSummaryCards({
               <CreditCard className="h-7 w-7 text-warning" />
             </div>
             <p className="text-xs font-medium text-secondary">Total a Pagar no Mês</p>
-            <p className="text-xl font-semibold text-foreground">{formatCurrency(totalDespesas * 0.267)}</p>
+            <p className="text-xl font-semibold text-foreground">{formatCurrency(despesasDoMes)}</p>
           </div>
         </Card>
       </div>

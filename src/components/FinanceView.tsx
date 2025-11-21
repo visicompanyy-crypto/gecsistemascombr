@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,29 @@ export function FinanceView() {
       return data;
     },
   });
+
+  // Realtime subscription para atualização automática
+  useEffect(() => {
+    const channel = supabase
+      .channel('financial-transactions-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'financial_transactions'
+        },
+        (payload) => {
+          console.log('Transação atualizada em tempo real:', payload);
+          refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetch]);
 
   const summary = useFinancialSummary(transactions);
 
@@ -98,6 +121,10 @@ export function FinanceView() {
           totalReceitas={summary.totalReceitas}
           totalDespesas={summary.totalDespesas}
           saldo={summary.saldo}
+          receitasFuturas={summary.receitasFuturas}
+          despesasFuturas={summary.despesasFuturas}
+          receitasDoMes={summary.receitasDoMes}
+          despesasDoMes={summary.despesasDoMes}
         />
 
         <Button onClick={() => setModalOpen(true)} className="gap-2 shadow-sm">

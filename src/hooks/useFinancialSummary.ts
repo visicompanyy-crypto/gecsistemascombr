@@ -22,29 +22,62 @@ export function useFinancialSummary(transactions: Transaction[] | undefined) {
         receitasPagas: 0,
         despesasPagas: 0,
         receitasPendentes: 0,
+        receitasFuturas: 0,
         despesasPendentes: 0,
+        despesasFuturas: 0,
+        receitasDoMes: 0,
+        despesasDoMes: 0,
         transactionsByCategory: {},
         transactionsByMonth: [],
       };
     }
 
-    const totalReceitas = transactions
+    const hoje = new Date();
+    const mesAtual = hoje.getMonth();
+    const anoAtual = hoje.getFullYear();
+
+    // Receitas já recebidas (status = pago)
+    const receitasPagas = transactions
       .filter(t => t.transaction_type === 'receita' && t.status === 'pago')
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    const totalDespesas = transactions
+    // Despesas já pagas (status = pago)
+    const despesasPagas = transactions
       .filter(t => t.transaction_type === 'despesa' && t.status === 'pago')
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    const receitasPendentes = transactions
-      .filter(t => t.transaction_type === 'receita' && t.status === 'pendente')
+    // Receitas futuras (pendente ou previsto)
+    const receitasFuturas = transactions
+      .filter(t => t.transaction_type === 'receita' && (t.status === 'pendente' || t.status === 'previsto'))
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    const despesasPendentes = transactions
-      .filter(t => t.transaction_type === 'despesa' && t.status === 'pendente')
+    // Despesas futuras (pendente ou previsto)
+    const despesasFuturas = transactions
+      .filter(t => t.transaction_type === 'despesa' && (t.status === 'pendente' || t.status === 'previsto'))
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    const saldo = totalReceitas - totalDespesas;
+    // Receitas do mês atual (pagas ou pendentes)
+    const receitasDoMes = transactions
+      .filter(t => {
+        const dataTransacao = new Date(t.transaction_date);
+        return t.transaction_type === 'receita' && 
+               dataTransacao.getMonth() === mesAtual && 
+               dataTransacao.getFullYear() === anoAtual;
+      })
+      .reduce((sum, t) => sum + Number(t.amount), 0);
+
+    // Total a pagar no mês atual (despesas pendentes ou previstas do mês)
+    const despesasDoMes = transactions
+      .filter(t => {
+        const dataTransacao = new Date(t.transaction_date);
+        return t.transaction_type === 'despesa' && 
+               (t.status === 'pendente' || t.status === 'previsto') &&
+               dataTransacao.getMonth() === mesAtual && 
+               dataTransacao.getFullYear() === anoAtual;
+      })
+      .reduce((sum, t) => sum + Number(t.amount), 0);
+
+    const saldo = receitasPagas - despesasPagas;
 
     // Agrupar por categoria
     const transactionsByCategory = transactions.reduce((acc: any, t) => {
@@ -83,13 +116,17 @@ export function useFinancialSummary(transactions: Transaction[] | undefined) {
     transactionsByMonth.sort((a, b) => a.month.localeCompare(b.month));
 
     return {
-      totalReceitas,
-      totalDespesas,
+      totalReceitas: receitasPagas,
+      totalDespesas: despesasPagas,
       saldo,
-      receitasPagas: totalReceitas,
-      despesasPagas: totalDespesas,
-      receitasPendentes,
-      despesasPendentes,
+      receitasPagas,
+      despesasPagas,
+      receitasPendentes: receitasFuturas,
+      receitasFuturas,
+      despesasPendentes: despesasFuturas,
+      despesasFuturas,
+      receitasDoMes,
+      despesasDoMes,
       transactionsByCategory,
       transactionsByMonth,
     };
