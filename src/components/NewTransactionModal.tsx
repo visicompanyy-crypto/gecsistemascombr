@@ -66,6 +66,13 @@ export function NewTransactionModal({
     setLoading(true);
 
     try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("Usuário não autenticado");
+      }
+
       const data = {
         description: formData.description,
         amount: parseFloat(formData.amount),
@@ -92,7 +99,10 @@ export function NewTransactionModal({
       } else {
         const { error } = await supabase
           .from('financial_transactions')
-          .insert(data);
+          .insert({
+            ...data,
+            user_id: user.id,
+          });
 
         if (error) throw error;
 
