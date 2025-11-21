@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Plus, LogOut } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Plus, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { FinancialSummaryCards } from "./FinancialSummaryCards";
 import { FinanceChartSection } from "./FinanceChartSection";
 import { FinancePieCharts } from "./FinancePieCharts";
 import { FinancialTransactionsTable } from "./FinancialTransactionsTable";
+import { FinancialFilters } from "./FinancialFilters";
 import { NewTransactionModal } from "./NewTransactionModal";
 import { useFinancialSummary } from "@/hooks/useFinancialSummary";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +19,11 @@ export function FinanceView() {
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
+  const [costCenterFilter, setCostCenterFilter] = useState("all");
+  const [currentMonth] = useState(new Date());
 
   const { data: transactions, refetch } = useQuery({
     queryKey: ['financial-transactions'],
@@ -72,53 +79,130 @@ export function FinanceView() {
     setSelectedTransaction(null);
   };
 
+  const filteredTransactions = transactions?.filter(transaction => {
+    const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = typeFilter === "all" || transaction.transaction_type === typeFilter;
+    const matchesPaymentMethod = paymentMethodFilter === "all" || transaction.payment_method === paymentMethodFilter;
+    const matchesCostCenter = costCenterFilter === "all" || transaction.category === costCenterFilter;
+    return matchesSearch && matchesType && matchesPaymentMethod && matchesCostCenter;
+  });
+
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setTypeFilter("all");
+    setPaymentMethodFilter("all");
+    setCostCenterFilter("all");
+  };
+
   return (
-    <div className="space-y-6 p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Sistema Financeiro</h1>
-          <p className="text-muted-foreground">Gerencie suas receitas e despesas</p>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Financeiro</h1>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon">
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm font-medium">
+                {currentMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+              </span>
+              <Button variant="ghost" size="icon">
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+            <Button variant="outline" onClick={handleLogout} size="sm">
+              <LogOut className="mr-2 h-4 w-4" />
+              Sair
+            </Button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={() => setModalOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Nova Transação
-          </Button>
-          <Button variant="outline" onClick={handleLogout}>
-            <LogOut className="mr-2 h-4 w-4" />
-            Sair
-          </Button>
+
+        <FinancialSummaryCards
+          totalReceitas={summary.totalReceitas}
+          totalDespesas={summary.totalDespesas}
+          saldo={summary.saldo}
+        />
+
+        <Button onClick={() => setModalOpen(true)} className="gap-2">
+          <Plus className="h-4 w-4" />
+          Novo Lançamento
+        </Button>
+
+        <Card className="p-6 space-y-6">
+          <div>
+            <h2 className="text-xl font-bold mb-4">Lista de Lançamentos</h2>
+            <FinancialFilters
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              typeFilter={typeFilter}
+              onTypeFilterChange={setTypeFilter}
+              paymentMethodFilter={paymentMethodFilter}
+              onPaymentMethodFilterChange={setPaymentMethodFilter}
+              costCenterFilter={costCenterFilter}
+              onCostCenterFilterChange={setCostCenterFilter}
+              onClearFilters={handleClearFilters}
+            />
+          </div>
+
+          <FinancialTransactionsTable
+            transactions={filteredTransactions || []}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        </Card>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <Card className="p-6 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 border-amber-200">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold text-amber-700 dark:text-amber-300">Total de Receitas</h3>
+                  <p className="text-3xl font-bold text-amber-900 dark:text-amber-100 mt-2">
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.totalReceitas)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-6 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900 border-amber-200">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold text-amber-700 dark:text-amber-300">Total de Despesas</h3>
+                  <p className="text-3xl font-bold text-amber-900 dark:text-amber-100 mt-2">
+                    {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.totalDespesas)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Card>
         </div>
-      </div>
 
-      <FinancialSummaryCards
-        totalReceitas={summary.totalReceitas}
-        totalDespesas={summary.totalDespesas}
-        saldo={summary.saldo}
-      />
+        <Card className="p-6 bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900 dark:to-amber-800 border-amber-300">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-semibold text-amber-700 dark:text-amber-200">Saldo</h3>
+              <p className="text-4xl font-bold text-blue-600 dark:text-blue-400 mt-2">
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.saldo)}
+              </p>
+            </div>
+          </div>
+        </Card>
 
-      <FinanceChartSection data={summary.transactionsByMonth} />
+        <FinancePieCharts data={summary.transactionsByCategory} />
 
-      <FinancePieCharts data={summary.transactionsByCategory} />
-
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Transações</h2>
-        <FinancialTransactionsTable
-          transactions={transactions || []}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
+        <NewTransactionModal
+          open={modalOpen}
+          onOpenChange={handleModalClose}
+          onSuccess={() => {
+            refetch();
+            handleModalClose();
+          }}
+          transaction={selectedTransaction}
         />
       </div>
-
-      <NewTransactionModal
-        open={modalOpen}
-        onOpenChange={handleModalClose}
-        onSuccess={() => {
-          refetch();
-          handleModalClose();
-        }}
-        transaction={selectedTransaction}
-      />
     </div>
   );
 }
