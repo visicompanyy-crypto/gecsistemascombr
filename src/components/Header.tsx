@@ -15,10 +15,9 @@ import logo from "@/assets/logo.png";
 
 interface HeaderProps {
   currentMonth: Date;
-  onMonthChange?: (direction: 'prev' | 'next') => void;
 }
 
-export function Header({ currentMonth, onMonthChange }: HeaderProps) {
+export function Header({ currentMonth }: HeaderProps) {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -26,33 +25,13 @@ export function Header({ currentMonth, onMonthChange }: HeaderProps) {
     navigate("/auth");
   };
 
-  const tabs = ['Financeiro', 'Lançamentos', 'Relatórios'];
-  const activeTab = 'Financeiro';
-
   return (
     <header className="bg-background border-b border-border/20 h-[72px] sticky top-0 z-50 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto h-full px-8 flex items-center justify-between">
-        {/* Logo e Navegação */}
-        <div className="flex items-center gap-12">
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="Logo" className="w-11 h-11" />
-            <h1 className="text-xl font-semibold text-foreground">Finance</h1>
-          </div>
-
-          <nav className="flex items-center gap-2">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  tab === activeTab
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </nav>
+        {/* Logo */}
+        <div className="flex items-center gap-3">
+          <img src={logo} alt="Logo" className="w-11 h-11" />
+          <h1 className="text-xl font-semibold text-foreground">Finance</h1>
         </div>
 
         {/* Dropdowns e Actions */}
@@ -72,23 +51,6 @@ export function Header({ currentMonth, onMonthChange }: HeaderProps) {
               <DropdownMenuItem>Empresa 2</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Adicionar empresa</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {/* Dropdown Mês */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2 text-sm font-medium">
-                {currentMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>Período</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Janeiro 2025</DropdownMenuItem>
-              <DropdownMenuItem>Dezembro 2024</DropdownMenuItem>
-              <DropdownMenuItem>Novembro 2024</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
