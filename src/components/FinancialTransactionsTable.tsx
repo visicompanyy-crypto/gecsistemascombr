@@ -20,12 +20,16 @@ interface FinancialTransactionsTableProps {
   transactions: Transaction[];
   onEdit: (transaction: Transaction) => void;
   onDelete: (id: string) => void;
+  onViewDetails: (transaction: Transaction) => void;
+  onMarkAsPaid: (id: string) => void;
 }
 
 export function FinancialTransactionsTable({
   transactions,
   onEdit,
   onDelete,
+  onViewDetails,
+  onMarkAsPaid,
 }: FinancialTransactionsTableProps) {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -121,21 +125,37 @@ export function FinancialTransactionsTable({
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+                        onClick={() => onViewDetails(transaction)}
+                        title="Ver detalhes"
                       >
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-full bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800"
+                        className="h-8 w-8 rounded-full bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800"
+                        onClick={() => onEdit(transaction)}
+                        title="Editar transação"
                       >
-                        <CheckCircle2 className="h-4 w-4 text-green-700 dark:text-green-300" />
+                        <Pencil className="h-4 w-4 text-blue-700 dark:text-blue-300" />
                       </Button>
+                      {transaction.status === 'pendente' && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 rounded-full bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800"
+                          onClick={() => onMarkAsPaid(transaction.id)}
+                          title="Marcar como pago"
+                        >
+                          <CheckCircle2 className="h-4 w-4 text-green-700 dark:text-green-300" />
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 rounded-full bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800"
                         onClick={() => onDelete(transaction.id)}
+                        title="Deletar transação"
                       >
                         <Trash2 className="h-4 w-4 text-red-700 dark:text-red-300" />
                       </Button>

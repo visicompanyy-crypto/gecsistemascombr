@@ -10,6 +10,7 @@ import { FinancePieCharts } from "./FinancePieCharts";
 import { FinancialTransactionsTable } from "./FinancialTransactionsTable";
 import { FinancialFilters } from "./FinancialFilters";
 import { NewTransactionModal } from "./NewTransactionModal";
+import { TransactionDetailModal } from "./TransactionDetailModal";
 import { useFinancialSummary } from "@/hooks/useFinancialSummary";
 import { useToast } from "@/hooks/use-toast";
 import { Header } from "./Header";
@@ -17,6 +18,7 @@ import { Header } from "./Header";
 export function FinanceView() {
   const { toast } = useToast();
   const [modalOpen, setModalOpen] = useState(false);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -133,6 +135,37 @@ export function FinanceView() {
     }
   };
 
+  const handleViewDetails = (transaction: any) => {
+    setSelectedTransaction(transaction);
+    setDetailModalOpen(true);
+  };
+
+  const handleMarkAsPaid = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('financial_transactions')
+        .update({
+          status: 'pago',
+          payment_date: new Date().toISOString(),
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Transação marcada como paga!",
+        description: "Os valores foram atualizados automaticamente.",
+      });
+      refetchTransactions();
+    } catch (error: any) {
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleModalClose = () => {
     setModalOpen(false);
     setSelectedTransaction(null);
@@ -199,6 +232,8 @@ export function FinanceView() {
             transactions={filteredTransactions || []}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onViewDetails={handleViewDetails}
+            onMarkAsPaid={handleMarkAsPaid}
           />
         </Card>
 
@@ -232,6 +267,13 @@ export function FinanceView() {
             handleModalClose();
           }}
           transaction={selectedTransaction}
+        />
+
+        <TransactionDetailModal
+          open={detailModalOpen}
+          onOpenChange={setDetailModalOpen}
+          transaction={selectedTransaction}
+          onEdit={handleEdit}
         />
       </div>
     </div>
