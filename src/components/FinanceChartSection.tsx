@@ -43,14 +43,14 @@ export function FinanceChartSection({ data }: FinanceChartSectionProps) {
           <Line 
             type="monotone" 
             dataKey="receitas" 
-            stroke="#10b981" 
+            stroke="hsl(128, 42%, 40%)" 
             strokeWidth={2}
             name="Receitas"
           />
           <Line 
             type="monotone" 
             dataKey="despesas" 
-            stroke="#ef4444" 
+            stroke="hsl(0, 84.2%, 60.2%)" 
             strokeWidth={2}
             name="Despesas"
           />
