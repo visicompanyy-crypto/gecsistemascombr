@@ -102,18 +102,21 @@ export function FinanceView() {
     };
   }, [refetchTransactions, refetchTeamToolExpenses]);
 
-  const hoje = new Date();
-  const mesAtual = hoje.getMonth();
-  const anoAtual = hoje.getFullYear();
-  const primeiroDiaDoMes = new Date(anoAtual, mesAtual, 1);
-  const ultimoDiaDoMes = new Date(anoAtual, mesAtual + 1, 0);
+  const primeiroDiaDoMes = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+  const ultimoDiaDoMes = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
 
   const teamToolExpensesDoMes = teamToolExpenses?.filter(e => {
     const dataExpense = new Date(e.expense_date);
     return dataExpense >= primeiroDiaDoMes && dataExpense <= ultimoDiaDoMes;
   });
 
-  const summary = useFinancialSummary(transactions, teamToolExpenses);
+  const summary = useFinancialSummary(transactions, teamToolExpenses, currentMonth);
+  
+  // Filtrar transações para exibir apenas as do mês selecionado na tabela
+  const transactionsDoMes = transactions?.filter(t => {
+    const dataTransacao = new Date(t.transaction_date);
+    return dataTransacao >= primeiroDiaDoMes && dataTransacao <= ultimoDiaDoMes;
+  });
 
   const handleEdit = (transaction: any) => {
     setSelectedTransaction(transaction);
@@ -179,11 +182,11 @@ export function FinanceView() {
     setSelectedTransaction(null);
   };
 
-  const filteredTransactions = transactions?.filter(transaction => {
+  const filteredTransactions = transactionsDoMes?.filter(transaction => {
     const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = typeFilter === "all" || transaction.transaction_type === typeFilter;
     const matchesPaymentMethod = paymentMethodFilter === "all" || transaction.payment_method === paymentMethodFilter;
-    const matchesCostCenter = costCenterFilter === "all" || transaction.category === costCenterFilter;
+    const matchesCostCenter = costCenterFilter === "all" || transaction.cost_center_id === costCenterFilter;
     return matchesSearch && matchesType && matchesPaymentMethod && matchesCostCenter;
   });
 

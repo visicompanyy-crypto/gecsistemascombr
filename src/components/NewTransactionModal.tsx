@@ -116,23 +116,33 @@ export function NewTransactionModal({
   }, [formData.variation_type, numInstallments, formData.first_installment_date, totalAmount]);
 
   const getPreviewText = () => {
-    if (numInstallments <= 1) return null;
-    
-    const day = format(formData.first_installment_date, 'dd');
+    if (numInstallments <= 1 || formData.variation_type === 'recorrente') return null;
+
+    const firstDate = format(formData.first_installment_date, "dd/MM/yyyy");
+    const dayOfMonth = format(formData.first_installment_date, "dd");
     const formattedAmount = new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
     }).format(installmentAmount);
 
     if (formData.variation_type === 'variavel') {
-      return `Você definiu ${numInstallments} parcelas com valores personalizados. Você pode ajustar as datas manualmente se desejar.`;
+      return `As parcelas serão geradas mensalmente a partir de ${firstDate}, e você pode ajustar os valores e datas manualmente.`;
     }
 
-    if (formData.variation_type === 'recorrente') {
-      return `Serão criadas ${numInstallments} parcelas recorrentes de ${formattedAmount}, com vencimentos automáticos todo dia ${day} dos próximos meses. Você pode ajustar as datas manualmente se desejar.`;
-    }
+    // Tipo fixo
+    return `O valor será dividido em ${numInstallments} parcelas de ${formattedAmount}, com vencimentos automáticos todo dia ${dayOfMonth} dos próximos meses. Você pode ajustar as datas manualmente se desejar.`;
+  };
 
-    return `O valor será dividido em ${numInstallments} parcelas de ${formattedAmount}, com vencimentos automáticos todo dia ${day} dos próximos meses. Você pode ajustar as datas manualmente se desejar.`;
+  const getRecurrencePreviewText = () => {
+    if (formData.variation_type !== 'recorrente' || numInstallments <= 1) return null;
+    
+    const dayOfMonth = format(formData.first_installment_date, "dd");
+    const formattedTotalAmount = new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(totalAmount);
+
+    return `O valor de ${formattedTotalAmount} será repetido ${numInstallments} vezes, todo dia ${dayOfMonth} dos próximos meses. Você pode ajustar as datas manualmente se desejar.`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -178,7 +188,15 @@ export function NewTransactionModal({
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Usuário não autenticado");
+      if (!user) throw new Error('Usuário não autenticado');
+
+      const userId = user.id;
+      const numInstallments = parseInt(formData.installments);
+      const totalAmount = parseFloat(formData.amount.replace(/[^\d,]/g, '').replace(',', '.'));
+      
+      // Para recorrência, o valor NÃO é dividido, é repetido
+      const isRecurring = formData.variation_type === 'recorrente' && numInstallments > 1;
+      const installmentAmount = isRecurring ? totalAmount : totalAmount / numInstallments;
 
       if (transaction) {
         // Edit mode
@@ -202,89 +220,113 @@ export function NewTransactionModal({
           description: "A transação foi atualizada com sucesso.",
         });
       } else {
-        // Create mode with installments
-        if (numInstallments > 1) {
-          // Create parent transaction
-          const parentData = {
+        // Create mode
+        const firstDate = formData.first_installment_date;
+        const purchaseDate = format(formData.transaction_date, 'yyyy-MM-dd');
+
+        if (numInstallments === 1 && formData.variation_type !== 'recorrente') {
+          // Lançamento simples (sem parcelamento)
+          const { error } = await supabase.from('financial_transactions').insert({
+            user_id: userId,
             description: formData.description,
             amount: totalAmount,
             transaction_type: formData.transaction_type,
-            transaction_date: format(formData.transaction_date, 'yyyy-MM-dd'),
-            purchase_date: format(formData.transaction_date, 'yyyy-MM-dd'),
+            transaction_date: format(formData.first_installment_date, 'yyyy-MM-dd'),
+            purchase_date: purchaseDate,
             first_installment_date: format(formData.first_installment_date, 'yyyy-MM-dd'),
-            payment_method: formData.payment_method || null,
-            notes: formData.notes || null,
+            payment_method: formData.payment_method,
             cost_center_id: formData.cost_center_id || null,
-            is_installment: true,
-            is_recurring: formData.variation_type === 'recorrente',
-            recurrence_frequency: formData.variation_type === 'recorrente' ? 'monthly' : null,
-            total_installments: numInstallments,
+            notes: formData.notes || null,
             status: 'pendente',
-            user_id: user.id,
-          };
+            is_installment: false,
+            installment_number: 1,
+            total_installments: 1,
+            parent_transaction_id: null,
+            is_recurring: false,
+          });
 
-          const { data: parentTransaction, error: parentError } = await supabase
+          if (error) throw error;
+
+          toast({
+            title: "Lançamento criado",
+            description: "A transação foi criada com sucesso.",
+          });
+        } else {
+          // Lançamento parcelado (fixo, variável ou recorrente)
+          const isRecurring = formData.variation_type === 'recorrente';
+
+          // Criar a primeira parcela
+          const firstInstallmentAmount = formData.variation_type === 'variavel' 
+            ? parseFloat(variableInstallments[0].amount.replace(/[^\d,]/g, '').replace(',', '.')) 
+            : installmentAmount;
+
+          const { data: firstInstallmentData, error: firstError } = await supabase
             .from('financial_transactions')
-            .insert(parentData)
+            .insert({
+              user_id: userId,
+              description: formData.description,
+              amount: firstInstallmentAmount,
+              transaction_type: formData.transaction_type,
+              transaction_date: format(firstDate, 'yyyy-MM-dd'),
+              purchase_date: purchaseDate,
+              first_installment_date: format(firstDate, 'yyyy-MM-dd'),
+              payment_method: formData.payment_method,
+              cost_center_id: formData.cost_center_id || null,
+              notes: formData.notes || null,
+              status: 'pendente',
+              is_installment: true,
+              installment_number: 1,
+              total_installments: numInstallments,
+              parent_transaction_id: null, // A primeira parcela não tem pai
+              is_recurring: isRecurring,
+              recurrence_frequency: isRecurring ? 'monthly' : null,
+            })
             .select()
             .single();
 
-          if (parentError) throw parentError;
+          if (firstError) throw firstError;
 
-          // Create installment transactions based on variation type
-          const installmentsData = [];
-          
-          if (formData.variation_type === 'variavel') {
-            // Variable installments - use user-defined values and dates
-            for (let i = 0; i < numInstallments; i++) {
-              const instAmount = parseFloat(
-                variableInstallments[i].amount.replace(/[^\d,]/g, '').replace(',', '.') || '0'
-              );
-              installmentsData.push({
-                description: `${formData.description} - Parcela ${i + 1}/${numInstallments}`,
-                amount: instAmount,
-                transaction_type: formData.transaction_type,
-                transaction_date: format(variableInstallments[i].date, 'yyyy-MM-dd'),
-                due_date: format(variableInstallments[i].date, 'yyyy-MM-dd'),
-                payment_method: formData.payment_method || null,
-                cost_center_id: formData.cost_center_id || null,
-                is_installment: true,
-                installment_number: i + 1,
-                total_installments: numInstallments,
-                parent_transaction_id: parentTransaction.id,
-                status: 'pendente',
-                user_id: user.id,
-              });
-            }
-          } else {
-            // Fixed or Recurring installments - equal division
-            for (let i = 0; i < numInstallments; i++) {
-              const installmentDate = addMonths(formData.first_installment_date, i);
-              installmentsData.push({
-                description: `${formData.description} - Parcela ${i + 1}/${numInstallments}`,
-                amount: installmentAmount,
-                transaction_type: formData.transaction_type,
-                transaction_date: format(installmentDate, 'yyyy-MM-dd'),
-                due_date: format(installmentDate, 'yyyy-MM-dd'),
-                payment_method: formData.payment_method || null,
-                cost_center_id: formData.cost_center_id || null,
-                is_installment: true,
-                is_recurring: formData.variation_type === 'recorrente',
-                recurrence_frequency: formData.variation_type === 'recorrente' ? 'monthly' : null,
-                installment_number: i + 1,
-                total_installments: numInstallments,
-                parent_transaction_id: parentTransaction.id,
-                status: 'pendente',
-                user_id: user.id,
-              });
-            }
+          const parentId = firstInstallmentData.id;
+
+          // Atualizar a primeira parcela para apontar para si mesma como parent
+          await supabase
+            .from('financial_transactions')
+            .update({ parent_transaction_id: parentId })
+            .eq('id', parentId);
+
+          // Criar as demais parcelas
+          const installments = [];
+          for (let i = 1; i < numInstallments; i++) {
+            const installmentDate = addMonths(firstDate, i);
+            const installmentAmountValue = formData.variation_type === 'variavel' 
+              ? parseFloat(variableInstallments[i].amount.replace(/[^\d,]/g, '').replace(',', '.')) 
+              : installmentAmount;
+
+            installments.push({
+              user_id: userId,
+              description: formData.description,
+              amount: installmentAmountValue,
+              transaction_type: formData.transaction_type,
+              transaction_date: format(installmentDate, 'yyyy-MM-dd'),
+              purchase_date: purchaseDate,
+              first_installment_date: format(firstDate, 'yyyy-MM-dd'),
+              payment_method: formData.payment_method,
+              cost_center_id: formData.cost_center_id || null,
+              notes: formData.notes || null,
+              status: 'pendente',
+              is_installment: true,
+              installment_number: i + 1,
+              total_installments: numInstallments,
+              parent_transaction_id: parentId,
+              is_recurring: isRecurring,
+              recurrence_frequency: isRecurring ? 'monthly' : null,
+            });
           }
 
-          const { error: installmentsError } = await supabase
-            .from('financial_transactions')
-            .insert(installmentsData);
-
-          if (installmentsError) throw installmentsError;
+          if (installments.length > 0) {
+            const { error } = await supabase.from('financial_transactions').insert(installments);
+            if (error) throw error;
+          }
 
           const typeLabel = formData.variation_type === 'recorrente' ? 'recorrente' : 
                            formData.variation_type === 'variavel' ? 'com valores variáveis' : 'parcelada';
@@ -292,29 +334,6 @@ export function NewTransactionModal({
           toast({
             title: "Lançamento criado",
             description: `Transação ${typeLabel} em ${numInstallments}x criada com sucesso.`,
-          });
-        } else {
-          // Single transaction
-          const { error } = await supabase
-            .from('financial_transactions')
-            .insert({
-              description: formData.description,
-              amount: totalAmount,
-              transaction_type: formData.transaction_type,
-              transaction_date: format(formData.transaction_date, 'yyyy-MM-dd'),
-              due_date: format(formData.first_installment_date, 'yyyy-MM-dd'),
-              payment_method: formData.payment_method || null,
-              notes: formData.notes || null,
-              cost_center_id: formData.cost_center_id || null,
-              status: 'pendente',
-              user_id: user.id,
-            });
-
-          if (error) throw error;
-
-          toast({
-            title: "Lançamento criado",
-            description: "A transação foi criada com sucesso.",
           });
         }
       }
@@ -554,12 +573,24 @@ export function NewTransactionModal({
             )}
 
             {/* Preview Automático */}
-            {numInstallments > 1 && (
+            {getPreviewText() && (
               <div className="bg-white border border-border rounded-lg p-4">
                 <div className="flex items-start gap-3">
                   <CalendarIcon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                   <p className="text-sm text-foreground leading-relaxed">
                     {getPreviewText()}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Preview para Recorrência */}
+            {getRecurrencePreviewText() && (
+              <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <span className="text-lg mt-0.5 flex-shrink-0">⟳</span>
+                  <p className="text-sm text-primary font-medium leading-relaxed">
+                    {getRecurrencePreviewText()}
                   </p>
                 </div>
               </div>

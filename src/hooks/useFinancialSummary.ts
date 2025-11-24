@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { startOfMonth, endOfMonth } from 'date-fns';
 
 export interface Transaction {
   id: string;
@@ -10,6 +11,9 @@ export interface Transaction {
   category?: string | null;
   cost_center_id?: string | null;
   payment_method?: string | null;
+  is_installment?: boolean | null;
+  total_installments?: number | null;
+  installment_number?: number | null;
 }
 
 export interface TeamToolExpense {
@@ -24,7 +28,8 @@ export interface TeamToolExpense {
 
 export function useFinancialSummary(
   transactions: Transaction[] | undefined,
-  teamToolExpenses: TeamToolExpense[] | undefined
+  teamToolExpenses: TeamToolExpense[] | undefined,
+  currentMonth: Date
 ) {
   return useMemo(() => {
     if (!transactions || transactions.length === 0) {
@@ -46,14 +51,18 @@ export function useFinancialSummary(
       };
     }
 
-    const hoje = new Date();
-    const mesAtual = hoje.getMonth();
-    const anoAtual = hoje.getFullYear();
-    const primeiroDiaDoMes = new Date(anoAtual, mesAtual, 1);
-    const ultimoDiaDoMes = new Date(anoAtual, mesAtual + 1, 0);
+    // Usar currentMonth passado como parâmetro
+    const primeiroDiaDoMes = startOfMonth(currentMonth);
+    const ultimoDiaDoMes = endOfMonth(currentMonth);
+
+    // Filtrar apenas transações válidas (evitar duplicação de "pais fictícios")
+    const validTransactions = transactions.filter(t => 
+      t.is_installment === true || 
+      (t.is_installment === false && (t.total_installments === null || t.total_installments === 1))
+    );
 
     // 1️⃣ RECEITA TOTAL RECEBIDA - Todas as receitas com status "pago" (histórico completo)
-    const listaReceitaTotalRecebida = transactions.filter(
+    const listaReceitaTotalRecebida = validTransactions.filter(
       t => t.transaction_type === 'receita' && t.status === 'pago'
     );
     const receitaTotalRecebida = listaReceitaTotalRecebida.reduce(
@@ -61,8 +70,8 @@ export function useFinancialSummary(
       0
     );
 
-    // 2️⃣ RECEITAS FUTURAS - Data maior que último dia do mês atual
-    const listaReceitasFuturas = transactions.filter(t => {
+    // 2️⃣ RECEITAS FUTURAS - Data maior que último dia do mês selecionado
+    const listaReceitasFuturas = validTransactions.filter(t => {
       const dataTransacao = new Date(t.transaction_date);
       return t.transaction_type === 'receita' && dataTransacao > ultimoDiaDoMes;
     });
@@ -71,8 +80,8 @@ export function useFinancialSummary(
       0
     );
 
-    // 3️⃣ DESPESAS FUTURAS - Data maior que último dia do mês atual
-    const listaDespesasFuturas = transactions.filter(t => {
+    // 3️⃣ DESPESAS FUTURAS - Data maior que último dia do mês selecionado
+    const listaDespesasFuturas = validTransactions.filter(t => {
       const dataTransacao = new Date(t.transaction_date);
       return t.transaction_type === 'despesa' && dataTransacao > ultimoDiaDoMes;
     });
@@ -81,8 +90,8 @@ export function useFinancialSummary(
       0
     );
 
-    // 4️⃣ RECEITA DO MÊS - Receitas do mês atual
-    const listaReceitasDoMes = transactions.filter(t => {
+    // 4️⃣ RECEITA DO MÊS - Receitas do mês selecionado (independente de status)
+    const listaReceitasDoMes = validTransactions.filter(t => {
       const dataTransacao = new Date(t.transaction_date);
       return t.transaction_type === 'receita' && 
              dataTransacao >= primeiroDiaDoMes && 
@@ -93,8 +102,8 @@ export function useFinancialSummary(
       0
     );
 
-    // 5️⃣ TOTAL A PAGAR NO MÊS - Despesas + team_tool_expenses do mês atual
-    const listaDespesasDoMes = transactions.filter(t => {
+    // 5️⃣ TOTAL A PAGAR NO MÊS - Despesas + team_tool_expenses do mês selecionado
+    const listaDespesasDoMes = validTransactions.filter(t => {
       const dataTransacao = new Date(t.transaction_date);
       return t.transaction_type === 'despesa' && 
              dataTransacao >= primeiroDiaDoMes && 
@@ -115,15 +124,15 @@ export function useFinancialSummary(
 
     const totalAPagarNoMes = despesasTransacoesDoMes + despesasEquipeFerramentasDoMes;
 
-    // 💰 SALDO PROJETADO - Receitas do mês atual em diante - Despesas do mês atual em diante
-    const receitasDoMesEmDiante = transactions
+    // 💰 SALDO PROJETADO - Receitas do mês selecionado em diante - Despesas do mês selecionado em diante
+    const receitasDoMesEmDiante = validTransactions
       .filter(t => {
         const dataTransacao = new Date(t.transaction_date);
         return t.transaction_type === 'receita' && dataTransacao >= primeiroDiaDoMes;
       })
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    const despesasDoMesEmDiante = transactions
+    const despesasDoMesEmDiante = validTransactions
       .filter(t => {
         const dataTransacao = new Date(t.transaction_date);
         return t.transaction_type === 'despesa' && dataTransacao >= primeiroDiaDoMes;
@@ -140,7 +149,7 @@ export function useFinancialSummary(
     const saldoProjetado = receitasDoMesEmDiante - (despesasDoMesEmDiante + despesasEquipeFerramentasDoMesEmDiante);
 
     // Agrupar por categoria
-    const transactionsByCategory = transactions.reduce((acc: any, t) => {
+    const transactionsByCategory = validTransactions.reduce((acc: any, t) => {
       const category = t.category || 'Sem categoria';
       if (!acc[category]) {
         acc[category] = { receitas: 0, despesas: 0 };
@@ -154,7 +163,7 @@ export function useFinancialSummary(
     }, {});
 
     // Agrupar por mês
-    const transactionsByMonth = transactions.reduce((acc: any[], t) => {
+    const transactionsByMonth = validTransactions.reduce((acc: any[], t) => {
       const date = new Date(t.transaction_date);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       
@@ -191,5 +200,5 @@ export function useFinancialSummary(
       listaReceitasDoMes,
       listaDespesasDoMes,
     };
-  }, [transactions, teamToolExpenses]);
+  }, [transactions, teamToolExpenses, currentMonth]);
 }
