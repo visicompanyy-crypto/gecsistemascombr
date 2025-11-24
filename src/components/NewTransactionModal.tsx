@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Settings2 } from "lucide-react";
+import { CalendarIcon, Settings2, AlertCircle } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format, addMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,12 +47,18 @@ export function NewTransactionModal({
     amount: '',
     installments: '1',
     payment_method: '',
+    variation_type: 'fixa',
     first_installment_date: new Date(),
     cost_center_id: '',
     transaction_type: 'despesa',
     transaction_date: new Date(),
     notes: '',
   });
+
+  const [variableInstallments, setVariableInstallments] = useState<Array<{
+    amount: string;
+    date: Date;
+  }>>([]);
 
   useEffect(() => {
     if (open) {
@@ -62,6 +69,7 @@ export function NewTransactionModal({
           amount: transaction.amount.toString(),
           installments: '1',
           payment_method: transaction.payment_method || '',
+          variation_type: 'fixa',
           first_installment_date: new Date(),
           cost_center_id: transaction.cost_center_id || '',
           transaction_type: transaction.transaction_type,
@@ -95,6 +103,18 @@ export function NewTransactionModal({
   const totalAmount = parseFloat(formData.amount.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
   const installmentAmount = totalAmount / numInstallments;
 
+  // Initialize variable installments when needed
+  useEffect(() => {
+    if (formData.variation_type === 'variavel' && numInstallments > 1) {
+      const suggestedAmount = (totalAmount / numInstallments).toFixed(2);
+      const newInstallments = Array.from({ length: numInstallments }, (_, i) => ({
+        amount: suggestedAmount,
+        date: addMonths(formData.first_installment_date, i),
+      }));
+      setVariableInstallments(newInstallments);
+    }
+  }, [formData.variation_type, numInstallments, formData.first_installment_date, totalAmount]);
+
   const getPreviewText = () => {
     if (numInstallments <= 1) return null;
     
@@ -103,6 +123,14 @@ export function NewTransactionModal({
       style: 'currency',
       currency: 'BRL',
     }).format(installmentAmount);
+
+    if (formData.variation_type === 'variavel') {
+      return `Você definiu ${numInstallments} parcelas com valores personalizados. Você pode ajustar as datas manualmente se desejar.`;
+    }
+
+    if (formData.variation_type === 'recorrente') {
+      return `Serão criadas ${numInstallments} parcelas recorrentes de ${formattedAmount}, com vencimentos automáticos todo dia ${day} dos próximos meses. Você pode ajustar as datas manualmente se desejar.`;
+    }
 
     return `O valor será dividido em ${numInstallments} parcelas de ${formattedAmount}, com vencimentos automáticos todo dia ${day} dos próximos meses. Você pode ajustar as datas manualmente se desejar.`;
   };
@@ -117,6 +145,33 @@ export function NewTransactionModal({
         variant: "destructive",
       });
       return;
+    }
+
+    // Validate variable installments
+    if (formData.variation_type === 'variavel' && numInstallments > 1) {
+      const sumOfInstallments = variableInstallments.reduce(
+        (sum, inst) => sum + parseFloat(inst.amount.replace(/[^\d,]/g, '').replace(',', '.') || '0'),
+        0
+      );
+      
+      if (Math.abs(sumOfInstallments - totalAmount) > 0.01) {
+        toast({
+          title: "Erro de validação",
+          description: "A soma das parcelas deve ser igual ao valor total",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const hasEmptyDates = variableInstallments.some(inst => !inst.date);
+      if (hasEmptyDates) {
+        toast({
+          title: "Erro de validação",
+          description: "Todas as datas das parcelas devem ser preenchidas",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setLoading(true);
@@ -161,6 +216,8 @@ export function NewTransactionModal({
             notes: formData.notes || null,
             cost_center_id: formData.cost_center_id || null,
             is_installment: true,
+            is_recurring: formData.variation_type === 'recorrente',
+            recurrence_frequency: formData.variation_type === 'recorrente' ? 'monthly' : null,
             total_installments: numInstallments,
             status: 'pendente',
             user_id: user.id,
@@ -174,26 +231,53 @@ export function NewTransactionModal({
 
           if (parentError) throw parentError;
 
-          // Create installment transactions
+          // Create installment transactions based on variation type
           const installmentsData = [];
           
-          for (let i = 0; i < numInstallments; i++) {
-            const installmentDate = addMonths(formData.first_installment_date, i);
-            installmentsData.push({
-              description: `${formData.description} - Parcela ${i + 1}/${numInstallments}`,
-              amount: installmentAmount,
-              transaction_type: formData.transaction_type,
-              transaction_date: format(installmentDate, 'yyyy-MM-dd'),
-              due_date: format(installmentDate, 'yyyy-MM-dd'),
-              payment_method: formData.payment_method || null,
-              cost_center_id: formData.cost_center_id || null,
-              is_installment: true,
-              installment_number: i + 1,
-              total_installments: numInstallments,
-              parent_transaction_id: parentTransaction.id,
-              status: 'pendente',
-              user_id: user.id,
-            });
+          if (formData.variation_type === 'variavel') {
+            // Variable installments - use user-defined values and dates
+            for (let i = 0; i < numInstallments; i++) {
+              const instAmount = parseFloat(
+                variableInstallments[i].amount.replace(/[^\d,]/g, '').replace(',', '.') || '0'
+              );
+              installmentsData.push({
+                description: `${formData.description} - Parcela ${i + 1}/${numInstallments}`,
+                amount: instAmount,
+                transaction_type: formData.transaction_type,
+                transaction_date: format(variableInstallments[i].date, 'yyyy-MM-dd'),
+                due_date: format(variableInstallments[i].date, 'yyyy-MM-dd'),
+                payment_method: formData.payment_method || null,
+                cost_center_id: formData.cost_center_id || null,
+                is_installment: true,
+                installment_number: i + 1,
+                total_installments: numInstallments,
+                parent_transaction_id: parentTransaction.id,
+                status: 'pendente',
+                user_id: user.id,
+              });
+            }
+          } else {
+            // Fixed or Recurring installments - equal division
+            for (let i = 0; i < numInstallments; i++) {
+              const installmentDate = addMonths(formData.first_installment_date, i);
+              installmentsData.push({
+                description: `${formData.description} - Parcela ${i + 1}/${numInstallments}`,
+                amount: installmentAmount,
+                transaction_type: formData.transaction_type,
+                transaction_date: format(installmentDate, 'yyyy-MM-dd'),
+                due_date: format(installmentDate, 'yyyy-MM-dd'),
+                payment_method: formData.payment_method || null,
+                cost_center_id: formData.cost_center_id || null,
+                is_installment: true,
+                is_recurring: formData.variation_type === 'recorrente',
+                recurrence_frequency: formData.variation_type === 'recorrente' ? 'monthly' : null,
+                installment_number: i + 1,
+                total_installments: numInstallments,
+                parent_transaction_id: parentTransaction.id,
+                status: 'pendente',
+                user_id: user.id,
+              });
+            }
           }
 
           const { error: installmentsError } = await supabase
@@ -202,9 +286,12 @@ export function NewTransactionModal({
 
           if (installmentsError) throw installmentsError;
 
+          const typeLabel = formData.variation_type === 'recorrente' ? 'recorrente' : 
+                           formData.variation_type === 'variavel' ? 'com valores variáveis' : 'parcelada';
+
           toast({
             title: "Lançamento criado",
-            description: `Transação parcelada em ${numInstallments}x criada com sucesso.`,
+            description: `Transação ${typeLabel} em ${numInstallments}x criada com sucesso.`,
           });
         } else {
           // Single transaction
@@ -241,12 +328,14 @@ export function NewTransactionModal({
         amount: '',
         installments: '1',
         payment_method: '',
+        variation_type: 'fixa',
         first_installment_date: new Date(),
         cost_center_id: '',
         transaction_type: 'despesa',
         transaction_date: new Date(),
         notes: '',
       });
+      setVariableInstallments([]);
     } catch (error: any) {
       toast({
         title: "Erro",
@@ -328,6 +417,26 @@ export function NewTransactionModal({
               </div>
             </div>
 
+            {/* Tipo de Variação - only visible when installments > 1 */}
+            {numInstallments > 1 && (
+              <div className="space-y-2">
+                <Label className="text-sm text-muted-foreground">Tipo de variação *</Label>
+                <Select
+                  value={formData.variation_type}
+                  onValueChange={(value) => setFormData({ ...formData, variation_type: value })}
+                >
+                  <SelectTrigger className="border-input bg-white focus:ring-primary">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="fixa">Fixa (divisão igualitária)</SelectItem>
+                    <SelectItem value="variavel">Variável (valores personalizados)</SelectItem>
+                    <SelectItem value="recorrente">Recorrente (mensal)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
             {/* Data da Primeira Parcela */}
             <div className="space-y-2">
               <Label className="text-sm text-muted-foreground">Data da primeira parcela *</Label>
@@ -355,6 +464,94 @@ export function NewTransactionModal({
                 </PopoverContent>
               </Popover>
             </div>
+
+            {/* Variable Installments Table */}
+            {numInstallments > 1 && formData.variation_type === 'variavel' && (
+              <div className="space-y-3">
+                <Label className="text-sm text-muted-foreground">Valores das parcelas</Label>
+                <div className="bg-white border border-border rounded-lg overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[100px]">Parcela</TableHead>
+                        <TableHead>Valor</TableHead>
+                        <TableHead>Data</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {variableInstallments.map((inst, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">{index + 1}/{numInstallments}</TableCell>
+                          <TableCell>
+                            <CurrencyInput
+                              placeholder="R$ 0,00"
+                              value={inst.amount}
+                              onValueChange={(value) => {
+                                const newInstallments = [...variableInstallments];
+                                newInstallments[index].amount = value || '';
+                                setVariableInstallments(newInstallments);
+                              }}
+                              decimalsLimit={2}
+                              decimalSeparator=","
+                              groupSeparator="."
+                              prefix="R$ "
+                              className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm"
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="w-full justify-start text-left font-normal"
+                                >
+                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                  {format(inst.date, "dd/MM/yyyy", { locale: ptBR })}
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0" align="start">
+                                <Calendar
+                                  mode="single"
+                                  selected={inst.date}
+                                  onSelect={(date) => {
+                                    if (date) {
+                                      const newInstallments = [...variableInstallments];
+                                      newInstallments[index].date = date;
+                                      setVariableInstallments(newInstallments);
+                                    }
+                                  }}
+                                  initialFocus
+                                  className="pointer-events-auto"
+                                />
+                              </PopoverContent>
+                            </Popover>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                {(() => {
+                  const sumOfInstallments = variableInstallments.reduce(
+                    (sum, inst) => sum + parseFloat(inst.amount.replace(/[^\d,]/g, '').replace(',', '.') || '0'),
+                    0
+                  );
+                  const difference = Math.abs(sumOfInstallments - totalAmount);
+                  if (difference > 0.01) {
+                    return (
+                      <div className="flex items-start gap-2 text-sm text-destructive">
+                        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <span>
+                          Soma das parcelas: R$ {sumOfInstallments.toFixed(2)} (diferença: R$ {difference.toFixed(2)})
+                        </span>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+              </div>
+            )}
 
             {/* Preview Automático */}
             {numInstallments > 1 && (
