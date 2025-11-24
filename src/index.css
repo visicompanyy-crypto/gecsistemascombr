@@ -8,35 +8,36 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 200 14% 97%;
-    --foreground: 128 15% 20%;
+    /* Financial System Color Palette */
+    --background: 200 20% 95%;
+    --foreground: 0 0% 27%;
 
     --card: 0 0% 100%;
-    --card-foreground: 128 15% 20%;
+    --card-foreground: 0 0% 27%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 128 15% 20%;
+    --popover-foreground: 0 0% 27%;
 
-    --primary: 128 42% 40%;
+    --primary: 136 44% 40%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 49 11% 61%;
-    --secondary-foreground: 128 15% 20%;
+    --secondary: 38 10% 62%;
+    --secondary-foreground: 0 0% 27%;
 
-    --muted: 200 14% 96%;
-    --muted-foreground: 49 8% 45%;
+    --muted: 200 20% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 49 11% 61%;
-    --accent-foreground: 128 15% 20%;
+    --accent: 38 10% 62%;
+    --accent-foreground: 0 0% 27%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 49 11% 90%;
-    --input: 0 0% 98%;
-    --ring: 128 42% 40%;
+    --border: 0 0% 86%;
+    --input: 0 0% 86%;
+    --ring: 136 44% 40%;
 
-    --success: 128 42% 40%;
+    --success: 136 44% 40%;
     --success-foreground: 0 0% 100%;
     
     --warning: 38 92% 50%;
@@ -45,13 +46,13 @@ All colors MUST be HSL.
     --info: 199 89% 48%;
     --info-foreground: 0 0% 100%;
 
-    --chart-1: 128 42% 40%;
-    --chart-2: 128 42% 50%;
+    --chart-1: 136 44% 40%;
+    --chart-2: 136 44% 50%;
     --chart-3: 0 84.2% 60.2%;
     --chart-4: 38 92% 50%;
-    --chart-5: 49 11% 61%;
+    --chart-5: 38 10% 62%;
 
-    --radius: 0.875rem;
+    --radius: 1rem;
 
     --sidebar-background: 0 0% 100%;
 
