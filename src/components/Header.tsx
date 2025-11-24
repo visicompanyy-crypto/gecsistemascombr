@@ -1,4 +1,4 @@
-import { Bell, ChevronDown } from "lucide-react";
+import { Bell, ChevronDown, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,12 +22,22 @@ export function Header({ currentMonth }: HeaderProps) {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/auth");
+    navigate("/");
   };
 
   return (
     <header className="bg-background border-b border-border/20 h-[72px] sticky top-0 z-50 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto h-full px-8 flex items-center justify-between">
+        {/* Back to Home Button */}
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/")}
+          className="text-muted-foreground hover:text-primary gap-2"
+        >
+          <Home className="h-4 w-4" />
+          Voltar para home
+        </Button>
+
         {/* Logo */}
         <div className="flex items-center gap-3">
           <img src={logo} alt="Logo" className="w-11 h-11" />
