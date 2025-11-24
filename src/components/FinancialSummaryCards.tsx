@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, Calendar, DollarSign, CreditCard, Wallet } from "lucide-react";
+import { TrendingUp, TrendingDown, Calendar, DollarSign, CreditCard } from "lucide-react";
 import { TransactionDetailsModal } from "./TransactionDetailsModal";
 import { Transaction, TeamToolExpense } from "@/hooks/useFinancialSummary";
+import { MacBookMockup } from "./MacBookMockup";
+import dashboardPreview from "@/assets/dashboard-preview.png";
 
 interface FinancialSummaryCardsProps {
   saldoProjetado: number;
@@ -81,11 +83,10 @@ export function FinancialSummaryCards({
               Projeção a partir do mês atual até o futuro
             </p>
           </div>
-          <div className={`h-24 w-24 rounded-2xl ${
-            saldoPositivo ? 'bg-primary/15' : 'bg-destructive/15'
-          } flex items-center justify-center`}>
-            <Wallet className={`h-12 w-12 ${saldoPositivo ? 'text-primary' : 'text-destructive'}`} />
-          </div>
+          <MacBookMockup 
+            imageSrc={dashboardPreview}
+            className="w-40"
+          />
         </div>
       </Card>
 
