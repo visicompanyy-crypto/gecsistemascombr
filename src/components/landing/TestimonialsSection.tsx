@@ -26,12 +26,15 @@ export const TestimonialsSection = () => {
   ];
 
   return (
-    <section id="depoimentos" className="bg-[#FAF7E8] py-20 md:py-28">
+    <section id="depoimentos" className="bg-white py-20 md:py-32">
       <div className="max-w-[1320px] mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#252F1D]">
-            Empresas que já utilizam a Saldar
+          <h2 className="title-outlined text-4xl md:text-5xl lg:text-6xl mb-6">
+            Empresas que confiam na Saldar
           </h2>
+          <p className="text-xl text-gray-600">
+            Veja o que nossos clientes têm a dizer
+          </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
