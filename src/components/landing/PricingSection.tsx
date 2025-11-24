@@ -2,13 +2,13 @@ import { PricingCard } from "./PricingCard";
 
 export const PricingSection = () => {
   return (
-    <section id="precos" className="bg-gray-50 py-20 md:py-32">
+    <section id="precos" className="bg-white py-20 md:py-32">
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="title-outlined text-4xl md:text-5xl lg:text-6xl mb-6">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#252F1D] mb-4">
             Planos acessíveis para qualquer empresa
           </h2>
-          <p className="text-xl text-gray-600">
+          <p className="text-lg md:text-xl text-[#6b7280]">
             Escolha o melhor plano para o seu negócio
           </p>
         </div>
