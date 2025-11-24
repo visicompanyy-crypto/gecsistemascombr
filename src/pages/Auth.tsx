@@ -96,14 +96,11 @@ export default function Auth() {
         {/* Logo Premium */}
         <div className="flex flex-col items-center mb-8">
           <div className="relative mb-6">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#3c9247] to-[#2e6b38] flex items-center justify-center shadow-[0_8px_30px_rgba(60,146,71,0.3)] p-4">
-              <img 
-                src="/src/assets/logo.png" 
-                alt="Saldar Logo" 
-                className="w-full h-full object-contain"
-              />
-            </div>
-            <div className="absolute inset-0 rounded-full bg-[#3c9247]/20 blur-xl -z-10"></div>
+            <img 
+              src="/src/assets/logo.png" 
+              alt="Saldar Logo" 
+              className="w-20 h-20 object-contain"
+            />
           </div>
           
           <h1 className="text-2xl font-bold text-[#252F1D] text-center mb-2 tracking-tight">
