@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -47,6 +47,13 @@ const Pricing = () => {
   const { toast } = useToast();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Redirect to auth if not logged in
+  useEffect(() => {
+    if (!user) {
+      navigate("/auth");
+    }
+  }, [user, navigate]);
 
   const handleSubscribe = async (priceId: string, planName: string) => {
     if (!user) {
@@ -229,11 +236,6 @@ const Pricing = () => {
               </Card>
             );
           })}
-        </div>
-
-        <div className="text-center text-sm text-muted-foreground">
-          <p>Todos os planos incluem 7 dias de teste grátis</p>
-          <p>Cancele a qualquer momento, sem compromisso</p>
         </div>
       </div>
     </div>

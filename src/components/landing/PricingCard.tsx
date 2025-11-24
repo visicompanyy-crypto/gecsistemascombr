@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PricingCardProps {
   name: string;
@@ -13,6 +14,7 @@ interface PricingCardProps {
 
 export const PricingCard = ({ name, price, period, badge, highlighted, buttonText }: PricingCardProps) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   const benefits = [
     "Acesso completo ao sistema",
@@ -20,6 +22,14 @@ export const PricingCard = ({ name, price, period, badge, highlighted, buttonTex
     "Parcelamentos automáticos",
     "Suporte prioritário",
   ];
+
+  const handleClick = () => {
+    if (!user) {
+      navigate("/auth");
+    } else {
+      navigate("/pricing");
+    }
+  };
 
   return (
     <div className="relative">
@@ -64,7 +74,7 @@ export const PricingCard = ({ name, price, period, badge, highlighted, buttonTex
         </div>
 
         <Button
-          onClick={() => navigate("/pricing")}
+          onClick={handleClick}
           className={`w-full py-6 rounded-xl text-base font-bold transition-all hover:scale-105 ${
             highlighted
               ? "bg-gradient-to-r from-fintech-neon to-primary hover:opacity-90 text-white shadow-[0_8px_25px_rgba(138,253,86,0.3)]"
