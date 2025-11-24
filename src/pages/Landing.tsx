@@ -4,6 +4,7 @@ import { ProblemSection } from "@/components/landing/ProblemSection";
 import { SolutionSection } from "@/components/landing/SolutionSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
+import FAQSection from "@/components/landing/FAQSection";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
 import { Footer } from "@/components/landing/Footer";
@@ -17,6 +18,7 @@ const Landing = () => {
       <SolutionSection />
       <FeaturesSection />
       <TestimonialsSection />
+      <FAQSection />
       <PricingSection />
       <FinalCTASection />
       <Footer />
