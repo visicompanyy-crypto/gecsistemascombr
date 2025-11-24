@@ -3,8 +3,6 @@ import { Card } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, Calendar, DollarSign, CreditCard } from "lucide-react";
 import { TransactionDetailsModal } from "./TransactionDetailsModal";
 import { Transaction, TeamToolExpense } from "@/hooks/useFinancialSummary";
-import { MacBookMockup } from "./MacBookMockup";
-import dashboardPreview from "@/assets/dashboard-preview.png";
 
 interface FinancialSummaryCardsProps {
   saldoProjetado: number;
@@ -69,24 +67,18 @@ export function FinancialSummaryCards({
           saldoPositivo 
             ? 'from-primary/10 to-primary/5 border-primary/20' 
             : 'from-destructive/10 to-destructive/5 border-destructive/20'
-        } shadow-[0_5px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] transition-all duration-300`}
+        } shadow-[0_5px_20px_rgba(0,0,0,0.06)]`}
       >
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-3">
-              💰 Saldo Projetado
-            </p>
-            <p className={`text-5xl font-bold ${saldoPositivo ? 'text-primary-dark' : 'text-destructive'}`}>
-              {formatCurrency(saldoProjetado)}
-            </p>
-            <p className="text-sm text-secondary mt-3">
-              Projeção a partir do mês atual até o futuro
-            </p>
-          </div>
-          <MacBookMockup 
-            imageSrc={dashboardPreview}
-            className="w-40"
-          />
+        <div>
+          <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-3">
+            💰 Saldo Projetado
+          </p>
+          <p className={`text-5xl font-bold ${saldoPositivo ? 'text-primary-dark' : 'text-destructive'}`}>
+            {formatCurrency(saldoProjetado)}
+          </p>
+          <p className="text-sm text-secondary mt-3">
+            Projeção a partir do mês atual até o futuro
+          </p>
         </div>
       </Card>
 
