@@ -1,4 +1,4 @@
-import { Bell, ChevronDown, Home } from "lucide-react";
+import { Bell, ChevronDown, Home, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,8 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 interface HeaderProps {
@@ -19,9 +19,10 @@ interface HeaderProps {
 
 export function Header({ currentMonth }: HeaderProps) {
   const navigate = useNavigate();
+  const { user, subscription, signOut } = useAuth();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await signOut();
     navigate("/");
   };
 
@@ -84,13 +85,25 @@ export function Header({ currentMonth }: HeaderProps) {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium">Usuário</p>
-                  <p className="text-xs text-muted-foreground">usuario@email.com</p>
+                  <p className="text-sm font-medium">
+                    {user?.email?.split('@')[0] || 'Usuário'}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{user?.email}</p>
+                  {subscription?.subscribed && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <CreditCard className="h-3 w-3 text-green-500" />
+                      <span className="text-xs font-medium text-green-500">
+                        Assinante
+                      </span>
+                    </div>
+                  )}
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>Perfil</DropdownMenuItem>
-              <DropdownMenuItem>Assinatura</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/pricing")}>
+                {subscription?.subscribed ? "Gerenciar assinatura" : "Ver planos"}
+              </DropdownMenuItem>
               <DropdownMenuItem>Configurações</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout} className="text-destructive">
