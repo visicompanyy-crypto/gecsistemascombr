@@ -8,29 +8,30 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Lock, ArrowLeft } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, subscription, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+    if (authLoading) return;
+    
+    if (user) {
+      // Se usuário está logado, verificar assinatura
+      if (subscription?.subscribed) {
+        // Tem assinatura ativa, vai para dashboard
         navigate("/dashboard");
+      } else {
+        // Não tem assinatura, vai para pricing
+        navigate("/pricing");
       }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate("/dashboard");
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+    }
+  }, [user, subscription, authLoading, navigate]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
