@@ -41,7 +41,7 @@ export default function Auth() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/pricing`,
         },
       });
 
@@ -49,8 +49,11 @@ export default function Auth() {
 
       toast({
         title: "Cadastro realizado!",
-        description: "Verifique seu email para confirmar sua conta.",
+        description: "Redirecionando para seleção de planos...",
       });
+      
+      // Redirect to pricing after successful signup
+      navigate("/pricing");
     } catch (error: any) {
       toast({
         title: "Erro no cadastro",
