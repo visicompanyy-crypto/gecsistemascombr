@@ -26,18 +26,20 @@ export const TestimonialsSection = () => {
   ];
 
   return (
-    <section id="depoimentos" className="bg-[#FAF7E8] py-20 md:py-28">
+    <section id="depoimentos" className="bg-white py-20 md:py-28">
       <div className="max-w-[1320px] mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#252F1D]">
-            Empresas que já utilizam a Saldar
-          </h2>
-        </div>
+        <div className="bg-fintech-white-ice rounded-3xl p-12 md:p-16">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#252F1D]">
+              Empresas que já utilizam a Saldar
+            </h2>
+          </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {testimonials.map((testimonial, index) => (
-            <TestimonialCard key={index} {...testimonial} />
-          ))}
+          <div className="grid md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <TestimonialCard key={index} {...testimonial} />
+            ))}
+          </div>
         </div>
       </div>
     </section>

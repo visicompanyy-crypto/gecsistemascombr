@@ -6,8 +6,8 @@ interface ProblemCardProps {
 
 export const ProblemCard = ({ icon, title, description }: ProblemCardProps) => {
   return (
-    <div className="bg-white border border-[#e6e6e6] rounded-2xl p-10 shadow-[0_5px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300">
-      <div className="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10">
+    <div className="bg-white border-2 border-fintech-light/40 rounded-3xl p-10 shadow-[0_8px_25px_rgba(0,0,0,0.06)] hover:shadow-[0_15px_40px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300">
+      <div className="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-fintech-light/20">
         {icon}
       </div>
       

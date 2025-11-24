@@ -34,41 +34,47 @@ const FAQSection = () => {
   ];
 
   return (
-    <section className="py-20 px-6 bg-background">
+    <section className="py-20 px-6 bg-fintech-white-ice">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-[#252F1D] mb-4">
             Perguntas Frequentes
           </h2>
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-[#6b7280]">
             Tudo o que você precisa saber sobre a Saldar
           </p>
         </div>
 
         {/* FAQ Accordion */}
-        <div className="bg-card rounded-2xl shadow-sm border border-border/40 p-8 md:p-12 animate-fade-in">
-          <Accordion type="single" collapsible className="w-full space-y-4">
-            {faqs.map((faq, index) => (
-              <AccordionItem
-                key={index}
-                value={`item-${index}`}
-                className="border-b border-secondary/20 last:border-0 pb-4 last:pb-0"
-              >
-                <AccordionTrigger className="text-left text-lg font-medium text-foreground hover:text-primary transition-colors py-4 hover:no-underline">
-                  {faq.question}
-                </AccordionTrigger>
-                <AccordionContent className="text-base text-muted-foreground leading-relaxed pt-2 pb-4 animate-fade-in">
-                  {faq.answer}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+        <div className="space-y-4">
+          {faqs.map((faq, index) => (
+            <div 
+              key={index}
+              className="bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] overflow-hidden"
+            >
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem
+                  value={`item-${index}`}
+                  className="border-0"
+                >
+                  <AccordionTrigger className="text-left text-lg font-medium text-[#252F1D] hover:text-primary transition-colors px-6 py-6 hover:no-underline">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-base text-[#6b7280] leading-relaxed px-6 pb-6 animate-fade-in border-t border-[#A7A392]/20">
+                    <div className="pt-4">
+                      {faq.answer}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          ))}
         </div>
 
         {/* CTA Footer */}
         <div className="text-center mt-12 animate-fade-in">
-          <p className="text-muted-foreground mb-4">
+          <p className="text-[#6b7280] mb-4">
             Ainda tem dúvidas?
           </p>
           <a

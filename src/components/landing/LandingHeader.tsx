@@ -16,7 +16,7 @@ export const LandingHeader = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[hsl(var(--hero-dark))]/95 backdrop-blur-md border-b border-white/10">
+    <header className="sticky top-0 z-50 bg-fintech-dark/95 backdrop-blur-md border-b border-fintech-light/10">
       <div className="max-w-[1320px] mx-auto px-6 h-20 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img src="/src/assets/logo.png" alt="Saldar" className="h-10 w-10" />
@@ -27,19 +27,19 @@ export const LandingHeader = () => {
         <nav className="hidden md:flex items-center gap-8">
           <button
             onClick={() => scrollToSection("recursos")}
-            className="text-base font-medium text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors"
+            className="text-base font-medium text-white/70 hover:text-fintech-neon transition-colors"
           >
             Recursos
           </button>
           <button
             onClick={() => scrollToSection("precos")}
-            className="text-base font-medium text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors"
+            className="text-base font-medium text-white/70 hover:text-fintech-neon transition-colors"
           >
             Preços
           </button>
           <button
             onClick={() => scrollToSection("depoimentos")}
-            className="text-base font-medium text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors"
+            className="text-base font-medium text-white/70 hover:text-fintech-neon transition-colors"
           >
             Depoimentos
           </button>
@@ -48,7 +48,7 @@ export const LandingHeader = () => {
         <div className="flex items-center gap-4">
           <Button
             onClick={() => navigate("/login")}
-            className="bg-[hsl(var(--accent-green))] hover:bg-[hsl(var(--accent-green-light))] text-[hsl(var(--hero-dark))] px-7 py-3 rounded-xl font-bold transition-all hover:scale-105 shadow-[0_0_20px_rgba(138,253,86,0.3)]"
+            className="bg-fintech-neon hover:bg-fintech-neon/90 text-fintech-dark px-7 py-3 rounded-xl font-bold transition-all hover:scale-105 shadow-[0_0_20px_rgba(138,253,86,0.3)]"
           >
             Entrar
           </Button>
@@ -65,23 +65,23 @@ export const LandingHeader = () => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[hsl(var(--hero-dark))] border-t border-white/10 py-4 px-6">
+        <div className="md:hidden bg-fintech-dark border-t border-fintech-light/10 py-4 px-6">
           <nav className="flex flex-col gap-4">
             <button
               onClick={() => scrollToSection("recursos")}
-              className="text-base font-medium text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors text-left py-2"
+              className="text-base font-medium text-white/70 hover:text-fintech-neon transition-colors text-left py-2"
             >
               Recursos
             </button>
             <button
               onClick={() => scrollToSection("precos")}
-              className="text-base font-medium text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors text-left py-2"
+              className="text-base font-medium text-white/70 hover:text-fintech-neon transition-colors text-left py-2"
             >
               Preços
             </button>
             <button
               onClick={() => scrollToSection("depoimentos")}
-              className="text-base font-medium text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors text-left py-2"
+              className="text-base font-medium text-white/70 hover:text-fintech-neon transition-colors text-left py-2"
             >
               Depoimentos
             </button>
