@@ -64,7 +64,7 @@ export const PricingCard = ({ name, price, period, badge, highlighted, buttonTex
         </div>
 
         <Button
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/pricing")}
           className={`w-full py-6 rounded-xl text-base font-bold transition-all hover:scale-105 ${
             highlighted
               ? "bg-gradient-to-r from-fintech-neon to-primary hover:opacity-90 text-white shadow-[0_8px_25px_rgba(138,253,86,0.3)]"
