@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { PremiumBackground } from "./PremiumBackground";
+import heroDashboard from "@/assets/hero-dashboard.png";
 
 export const HeroSection = () => {
   const navigate = useNavigate();
@@ -53,11 +54,12 @@ export const HeroSection = () => {
                 }}
               />
               
-              <div className="aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl flex items-center justify-center overflow-hidden border border-gray-200">
-                <div className="text-center p-8">
-                  <div className="text-6xl mb-4">📊</div>
-                  <p className="text-gray-600 font-semibold">Dashboard Saldar</p>
-                </div>
+              <div className="aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden border border-gray-200">
+                <img 
+                  src={heroDashboard} 
+                  alt="Dashboard Saldar Preview" 
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
 
