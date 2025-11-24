@@ -54,21 +54,21 @@ All colors MUST be HSL.
     --chart-5: 38 10% 62%;
 
     --radius: 1rem;
+    
+    /* Landing page specific - Dark fintech theme */
+    --hero-dark: 160 65% 15%; /* #0D3B2E dark green */
+    --hero-gradient-start: 160 70% 12%; /* darker green */
+    --hero-gradient-end: 160 60% 18%; /* lighter green */
+    --accent-green: 88 97% 67%; /* #8AFD56 bright lime */
+    --accent-green-light: 88 97% 75%; /* lighter lime */
 
     --sidebar-background: 0 0% 100%;
-
     --sidebar-foreground: 128 15% 20%;
-
     --sidebar-primary: 128 42% 40%;
-
     --sidebar-primary-foreground: 0 0% 100%;
-
     --sidebar-accent: 200 14% 96%;
-
     --sidebar-accent-foreground: 128 15% 20%;
-
     --sidebar-border: 49 11% 90%;
-
     --sidebar-ring: 128 42% 40%;
   }
 
@@ -150,6 +150,11 @@ All colors MUST be HSL.
 @keyframes float-delayed {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-12px); }
+}
+
+@keyframes grid-flow {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
 }
 
 @keyframes fade-in {

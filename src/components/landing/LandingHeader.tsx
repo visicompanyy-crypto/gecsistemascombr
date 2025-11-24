@@ -16,30 +16,30 @@ export const LandingHeader = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#FAF7E8]/95 backdrop-blur-md border-b border-black/5">
+    <header className="sticky top-0 z-50 bg-[hsl(var(--hero-dark))]/95 backdrop-blur-md border-b border-white/10">
       <div className="max-w-[1320px] mx-auto px-6 h-20 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img src="/src/assets/logo.png" alt="Saldar" className="h-10 w-10" />
-          <span className="text-2xl font-bold text-[#252F1D]">Saldar</span>
+          <span className="text-2xl font-bold text-white">Saldar</span>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
           <button
             onClick={() => scrollToSection("recursos")}
-            className="text-base font-medium text-[#4a4a4a] hover:text-primary transition-colors"
+            className="text-base font-medium text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors"
           >
             Recursos
           </button>
           <button
             onClick={() => scrollToSection("precos")}
-            className="text-base font-medium text-[#4a4a4a] hover:text-primary transition-colors"
+            className="text-base font-medium text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors"
           >
             Preços
           </button>
           <button
             onClick={() => scrollToSection("depoimentos")}
-            className="text-base font-medium text-[#4a4a4a] hover:text-primary transition-colors"
+            className="text-base font-medium text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors"
           >
             Depoimentos
           </button>
@@ -48,14 +48,14 @@ export const LandingHeader = () => {
         <div className="flex items-center gap-4">
           <Button
             onClick={() => navigate("/login")}
-            className="bg-primary hover:bg-primary/90 text-white px-7 py-3 rounded-xl font-semibold transition-all hover:scale-105"
+            className="bg-[hsl(var(--accent-green))] hover:bg-[hsl(var(--accent-green-light))] text-[hsl(var(--hero-dark))] px-7 py-3 rounded-xl font-bold transition-all hover:scale-105 shadow-[0_0_20px_rgba(138,253,86,0.3)]"
           >
             Entrar
           </Button>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-[#252F1D]"
+            className="md:hidden text-white"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -65,23 +65,23 @@ export const LandingHeader = () => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#FAF7E8] border-t border-black/5 py-4 px-6">
+        <div className="md:hidden bg-[hsl(var(--hero-dark))] border-t border-white/10 py-4 px-6">
           <nav className="flex flex-col gap-4">
             <button
               onClick={() => scrollToSection("recursos")}
-              className="text-base font-medium text-[#4a4a4a] hover:text-primary transition-colors text-left py-2"
+              className="text-base font-medium text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors text-left py-2"
             >
               Recursos
             </button>
             <button
               onClick={() => scrollToSection("precos")}
-              className="text-base font-medium text-[#4a4a4a] hover:text-primary transition-colors text-left py-2"
+              className="text-base font-medium text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors text-left py-2"
             >
               Preços
             </button>
             <button
               onClick={() => scrollToSection("depoimentos")}
-              className="text-base font-medium text-[#4a4a4a] hover:text-primary transition-colors text-left py-2"
+              className="text-base font-medium text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors text-left py-2"
             >
               Depoimentos
             </button>
