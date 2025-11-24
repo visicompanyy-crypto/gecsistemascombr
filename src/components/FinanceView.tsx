@@ -39,7 +39,12 @@ export function FinanceView() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('financial_transactions')
-        .select('*')
+        .select(`
+          *,
+          cost_centers (
+            name
+          )
+        `)
         .is('deleted_at', null)
         .order('transaction_date', { ascending: false });
 

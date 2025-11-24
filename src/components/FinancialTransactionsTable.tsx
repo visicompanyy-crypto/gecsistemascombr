@@ -14,6 +14,10 @@ interface Transaction {
   status: string;
   payment_method?: string | null;
   cost_center_id?: string | null;
+  cost_centers?: {
+    name: string;
+  } | null;
+  notes?: string | null;
 }
 
 interface FinancialTransactionsTableProps {
@@ -98,8 +102,8 @@ export function FinancialTransactionsTable({
                     <span className="text-destructive font-semibold">🔻 Despesa</span>
                   )}
                 </TableCell>
-                <TableCell className="font-medium text-foreground">{transaction.description}</TableCell>
-                <TableCell className="text-foreground">{transaction.category || '-'}</TableCell>
+                <TableCell className="font-medium text-foreground">{transaction.description || transaction.notes || '-'}</TableCell>
+                <TableCell className="text-foreground">{transaction.cost_centers?.name || '-'}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className="bg-muted">{transaction.payment_method || 'Pix'}</Badge>
                 </TableCell>
