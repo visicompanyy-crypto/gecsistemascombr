@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { PremiumBackground } from "./PremiumBackground";
-import heroDashboard from "@/assets/hero-dashboard.png";
 
 export const HeroSection = () => {
   const navigate = useNavigate();
@@ -55,11 +54,7 @@ export const HeroSection = () => {
               />
               
               <div className="aspect-[4/3] bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden border border-gray-200">
-                <img 
-                  src={heroDashboard} 
-                  alt="Dashboard Saldar Preview" 
-                  className="w-full h-full object-cover"
-                />
+                {/* Card vazio - apenas gradiente */}
               </div>
             </div>
 
