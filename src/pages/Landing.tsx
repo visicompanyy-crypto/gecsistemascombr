@@ -18,9 +18,9 @@ const Landing = () => {
       <SolutionSection />
       <FeaturesSection />
       <TestimonialsSection />
-      <FAQSection />
       <PricingSection />
       <FinalCTASection />
+      <FAQSection />
       <Footer />
     </div>
   );
