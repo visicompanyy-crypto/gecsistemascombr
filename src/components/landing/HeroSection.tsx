@@ -30,36 +30,13 @@ export const HeroSection = () => {
               Organize receitas, despesas e projeções da sua empresa em um único lugar. Feito para a realidade do empreendedor brasileiro.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <div className="pt-4">
               <Button
                 onClick={() => navigate("/login")}
                 className="bg-primary hover:bg-primary/90 text-white px-8 py-6 rounded-xl text-lg font-bold transition-all hover:scale-105 shadow-[0_8px_30px_rgba(60,146,71,0.4)]"
               >
                 Começar agora
               </Button>
-              
-              <Button
-                variant="outline"
-                className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 px-8 py-6 rounded-xl text-lg font-semibold transition-all backdrop-blur-sm"
-              >
-                Ver demonstração
-              </Button>
-            </div>
-
-            {/* Trust Badges */}
-            <div className="pt-8">
-              <p className="text-white/50 text-sm mb-4">Confiado por centenas de empresas</p>
-              <div className="flex items-center gap-6 flex-wrap">
-                <div className="bg-white/5 backdrop-blur-md rounded-lg px-4 py-2 border border-white/10">
-                  <span className="text-white/70 text-xs font-medium">100+ Empresas</span>
-                </div>
-                <div className="bg-white/5 backdrop-blur-md rounded-lg px-4 py-2 border border-white/10">
-                  <span className="text-white/70 text-xs font-medium">Seguro e Confiável</span>
-                </div>
-                <div className="bg-white/5 backdrop-blur-md rounded-lg px-4 py-2 border border-white/10">
-                  <span className="text-white/70 text-xs font-medium">Suporte em PT-BR</span>
-                </div>
-              </div>
             </div>
           </div>
 
