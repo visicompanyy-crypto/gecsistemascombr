@@ -9,8 +9,7 @@ const corsHeaders = {
 
 // Whitelist de emails com acesso gratuito ao sistema
 const WHITELISTED_EMAILS: string[] = [
-  // Adicione aqui os emails que devem ter acesso gratuito
-  // Exemplo: "seu-email@gmail.com", "socio@gmail.com"
+  "gec@gmail.com",
 ];
 
 const logStep = (step: string, details?: any) => {
