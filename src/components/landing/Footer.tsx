@@ -1,6 +1,6 @@
 export const Footer = () => {
   return (
-    <footer className="bg-[#252F1D] text-white py-16">
+    <footer className="bg-[hsl(var(--hero-dark))] text-white py-16">
       <div className="max-w-[1320px] mx-auto px-6">
         <div className="grid md:grid-cols-3 gap-12 mb-12">
           {/* Logo Column */}
@@ -19,22 +19,22 @@ export const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Links rápidos</h3>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-white/80 hover:text-white transition-colors text-sm">
+                <a href="#" className="text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors text-sm">
                   Contato
                 </a>
               </li>
               <li>
-                <a href="#" className="text-white/80 hover:text-white transition-colors text-sm">
+                <a href="#" className="text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors text-sm">
                   Termos de Uso
                 </a>
               </li>
               <li>
-                <a href="#" className="text-white/80 hover:text-white transition-colors text-sm">
+                <a href="#" className="text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors text-sm">
                   Política de Privacidade
                 </a>
               </li>
               <li>
-                <a href="#" className="text-white/80 hover:text-white transition-colors text-sm">
+                <a href="#" className="text-white/70 hover:text-[hsl(var(--accent-green))] transition-colors text-sm">
                   FAQ
                 </a>
               </li>

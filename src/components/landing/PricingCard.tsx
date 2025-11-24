@@ -23,28 +23,32 @@ export const PricingCard = ({ name, price, period, badge, highlighted, buttonTex
 
   return (
     <div
-      className={`rounded-3xl p-12 transition-all duration-300 hover:scale-105 ${
+      className={`rounded-3xl p-10 transition-all duration-300 hover:-translate-y-2 ${
         highlighted
-          ? "bg-white border-2 border-primary shadow-[0_10px_40px_rgba(60,146,71,0.2)]"
-          : "bg-white border border-[#e6e6e6] shadow-[0_5px_20px_rgba(0,0,0,0.06)]"
+          ? "bg-gradient-to-br from-[hsl(var(--hero-gradient-start))] to-[hsl(var(--hero-gradient-end))] border-2 border-[hsl(var(--accent-green))]/30 shadow-[0_20px_60px_rgba(138,253,86,0.2)]"
+          : "bg-white border border-gray-200 shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
       }`}
     >
       {badge && (
-        <div className="inline-block bg-[#C4FEA1] text-[#252F1D] px-4 py-2 rounded-full text-sm font-semibold mb-6">
+        <div className={`inline-block px-4 py-2 rounded-full text-sm font-bold mb-6 ${
+          highlighted
+            ? "bg-[hsl(var(--accent-green))]/20 text-[hsl(var(--accent-green))] border border-[hsl(var(--accent-green))]/30"
+            : "bg-[hsl(var(--accent-green))]/10 text-[hsl(var(--primary))] border border-[hsl(var(--primary))]/20"
+        }`}>
           {badge}
         </div>
       )}
 
-      <h3 className="text-2xl font-bold text-[#252F1D] mb-2">
+      <h3 className={`text-2xl font-bold mb-2 ${highlighted ? "text-white" : "text-gray-900"}`}>
         {name}
       </h3>
 
       <div className="mb-8">
         <div className="flex items-baseline gap-2">
-          <span className="text-6xl font-extrabold text-[#252F1D]">
+          <span className={`text-6xl font-extrabold ${highlighted ? "text-white" : "text-gray-900"}`}>
             R$ {price}
           </span>
-          <span className="text-xl text-[#6b7280]">
+          <span className={`text-xl ${highlighted ? "text-white/70" : "text-gray-500"}`}>
             /{period}
           </span>
         </div>
@@ -53,18 +57,18 @@ export const PricingCard = ({ name, price, period, badge, highlighted, buttonTex
       <div className="space-y-4 mb-8">
         {benefits.map((benefit, index) => (
           <div key={index} className="flex items-start gap-3">
-            <CheckCircle2 className="text-primary flex-shrink-0 mt-0.5" size={20} />
-            <p className="text-base text-[#4a4a4a]">{benefit}</p>
+            <CheckCircle2 className={`flex-shrink-0 mt-0.5 ${highlighted ? "text-[hsl(var(--accent-green))]" : "text-[hsl(var(--primary))]"}`} size={20} />
+            <p className={`text-base ${highlighted ? "text-white/90" : "text-gray-600"}`}>{benefit}</p>
           </div>
         ))}
       </div>
 
       <Button
         onClick={() => navigate("/login")}
-        className={`w-full py-6 rounded-xl text-base font-semibold transition-all ${
+        className={`w-full py-6 rounded-xl text-base font-bold transition-all hover:scale-105 ${
           highlighted
-            ? "bg-primary hover:bg-primary/90 text-white"
-            : "bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white"
+            ? "bg-[hsl(var(--accent-green))] hover:bg-[hsl(var(--accent-green-light))] text-[hsl(var(--hero-dark))] shadow-[0_0_20px_rgba(138,253,86,0.3)]"
+            : "bg-transparent border-2 border-[hsl(var(--primary))] text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary))] hover:text-white"
         }`}
       >
         {buttonText}
