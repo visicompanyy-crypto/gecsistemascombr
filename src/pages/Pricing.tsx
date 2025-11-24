@@ -183,17 +183,21 @@ const Pricing = () => {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {plans.map((plan) => {
+          {plans.map((plan, index) => {
             const isCurrent = isCurrentPlan(plan.productId);
             
             return (
               <Card
                 key={plan.priceId}
-                className={`p-8 relative bg-white border-0 shadow-xl ${
+                className={`p-8 relative bg-white border-0 shadow-xl animate-fade-in ${
                   plan.highlighted
                     ? "ring-2 ring-green-400"
                     : ""
                 } ${isCurrent ? "ring-2 ring-green-500" : ""}`}
+                style={{
+                  animationDelay: `${index * 0.15}s`,
+                  animationFillMode: 'both'
+                }}
               >
                 {plan.badge && (
                   <div 
