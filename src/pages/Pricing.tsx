@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useAuth, PLAN_DETAILS } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Check, ArrowLeft, Loader2 } from "lucide-react";
+import { PremiumBackground } from "@/components/landing/PremiumBackground";
 
 const plans = [
   {
@@ -124,22 +125,27 @@ const Pricing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+    <PremiumBackground variant="mesh" className="min-h-screen py-12">
+      <div className="max-w-[1200px] mx-auto px-6">
         <Button
           variant="ghost"
           onClick={() => navigate("/")}
-          className="mb-8"
+          className="mb-8 text-white hover:text-white/80 hover:bg-white/10"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Voltar
         </Button>
 
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <h1 
+            className="text-3xl md:text-4xl lg:text-5xl font-shrikhand text-white mb-4"
+            style={{
+              textShadow: '0 0 30px rgba(255,255,255,0.2), 0 0 2px rgba(255,255,255,0.8)'
+            }}
+          >
             Escolha seu plano
           </h1>
-          <p className="text-xl text-muted-foreground mb-6">
+          <p className="text-lg md:text-xl text-white/80 font-jakarta mb-6">
             Organize o financeiro da sua empresa com total controle
           </p>
           
@@ -150,6 +156,7 @@ const Pricing = () => {
                 size="sm"
                 onClick={handleRefreshSubscription}
                 disabled={isRefreshing}
+                className="border-white/20 text-white hover:bg-white/10 hover:text-white"
               >
                 {isRefreshing ? (
                   <>
@@ -166,6 +173,7 @@ const Pricing = () => {
                   variant="outline"
                   size="sm"
                   onClick={handleManageSubscription}
+                  className="border-white/20 text-white hover:bg-white/10 hover:text-white"
                 >
                   Gerenciar assinatura
                 </Button>
@@ -181,29 +189,35 @@ const Pricing = () => {
             return (
               <Card
                 key={plan.priceId}
-                className={`p-8 relative ${
+                className={`p-8 relative bg-white border-0 shadow-xl ${
                   plan.highlighted
-                    ? "border-2 border-primary shadow-lg"
+                    ? "ring-2 ring-green-400"
                     : ""
                 } ${isCurrent ? "ring-2 ring-green-500" : ""}`}
               >
                 {plan.badge && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold">
+                  <div 
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-sm font-semibold text-white"
+                    style={{
+                      background: 'linear-gradient(135deg, #84cc16 0%, #65a30d 100%)',
+                      boxShadow: '0 4px 12px rgba(132, 204, 22, 0.4)'
+                    }}
+                  >
                     {plan.badge}
                   </div>
                 )}
                 
                 {isCurrent && (
-                  <div className="absolute -top-4 right-4 bg-green-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                  <div className="absolute -top-3 right-4 bg-green-500 text-white px-4 py-1 rounded-full text-sm font-semibold shadow-lg">
                     Seu Plano
                   </div>
                 )}
 
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                <div className="text-center mb-6 mt-2">
+                  <h3 className="text-2xl font-bold mb-2 text-gray-900">{plan.name}</h3>
                   <div className="flex items-baseline justify-center gap-2">
-                    <span className="text-4xl font-bold">R$ {plan.price}</span>
-                    <span className="text-muted-foreground">/ {plan.period}</span>
+                    <span className="text-4xl font-bold text-gray-900">R$ {plan.price}</span>
+                    <span className="text-gray-600">/ {plan.period}</span>
                   </div>
                 </div>
 
@@ -211,14 +225,17 @@ const Pricing = () => {
                   {benefits.map((benefit, index) => (
                     <li key={index} className="flex items-start gap-2">
                       <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">{benefit}</span>
+                      <span className="text-sm text-gray-700">{benefit}</span>
                     </li>
                   ))}
                 </ul>
 
                 <Button
-                  className="w-full"
-                  variant={plan.highlighted ? "default" : "outline"}
+                  className={`w-full font-semibold ${
+                    plan.highlighted
+                      ? "bg-green-600 hover:bg-green-700 text-white"
+                      : "bg-green-700 hover:bg-green-800 text-white"
+                  }`}
                   onClick={() => handleSubscribe(plan.priceId, plan.name)}
                   disabled={loadingPlan !== null || isCurrent}
                 >
@@ -238,7 +255,7 @@ const Pricing = () => {
           })}
         </div>
       </div>
-    </div>
+    </PremiumBackground>
   );
 };
 
