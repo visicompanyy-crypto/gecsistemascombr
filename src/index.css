@@ -8,36 +8,37 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Financial System Color Palette */
-    --background: 200 20% 95%;
-    --foreground: 0 0% 27%;
+    /* SAAS SALDAR - Professional Color Palette */
+    --background: 200 14% 95%; /* #f1f3f4 gelo claro */
+    --foreground: 0 0% 29%; /* #4a4a4a cinza escuro */
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 27%;
+    --card: 0 0% 100%; /* branco */
+    --card-foreground: 0 0% 29%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 27%;
+    --popover-foreground: 0 0% 29%;
 
-    --primary: 136 44% 40%;
+    --primary: 136 42% 40%; /* #3c9247 verde principal */
     --primary-foreground: 0 0% 100%;
+    --primary-dark: 136 42% 34%; /* #2e6b38 verde escuro */
 
-    --secondary: 38 10% 62%;
-    --secondary-foreground: 0 0% 27%;
+    --secondary: 38 10% 62%; /* #a7a392 bege secundário */
+    --secondary-foreground: 0 0% 29%;
 
-    --muted: 200 20% 96%;
+    --muted: 200 14% 97%; /* #f7f7f7 cinza muito claro */
     --muted-foreground: 0 0% 45%;
 
     --accent: 38 10% 62%;
-    --accent-foreground: 0 0% 27%;
+    --accent-foreground: 0 0% 29%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 86%;
-    --input: 0 0% 86%;
-    --ring: 136 44% 40%;
+    --border: 0 0% 90%; /* #e6e6e6 borda suave */
+    --input: 0 0% 90%;
+    --ring: 136 42% 40%;
 
-    --success: 136 44% 40%;
+    --success: 136 42% 40%;
     --success-foreground: 0 0% 100%;
     
     --warning: 38 92% 50%;
@@ -46,9 +47,9 @@ All colors MUST be HSL.
     --info: 199 89% 48%;
     --info-foreground: 0 0% 100%;
 
-    --chart-1: 136 44% 40%;
-    --chart-2: 136 44% 50%;
-    --chart-3: 0 84.2% 60.2%;
+    --chart-1: 136 42% 40%;
+    --chart-2: 136 42% 50%;
+    --chart-3: 0 84% 60%;
     --chart-4: 38 92% 50%;
     --chart-5: 38 10% 62%;
 

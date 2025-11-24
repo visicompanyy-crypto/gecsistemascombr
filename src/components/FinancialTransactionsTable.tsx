@@ -49,124 +49,123 @@ export function FinancialTransactionsTable({
   };
 
   return (
-    <div className="rounded-xl border bg-card overflow-hidden shadow-sm">
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/30 border-b">
-              <TableHead className="w-[80px] font-semibold text-secondary">Alerta</TableHead>
-              <TableHead className="font-semibold text-secondary">Data de Pagamento</TableHead>
-              <TableHead className="font-semibold text-secondary">Data de Entrada</TableHead>
-              <TableHead className="font-semibold text-secondary">Tipo</TableHead>
-              <TableHead className="font-semibold text-secondary">Nome</TableHead>
-              <TableHead className="font-semibold text-secondary">Centro de Custo</TableHead>
-              <TableHead className="font-semibold text-secondary">Forma de Pagamento</TableHead>
-              <TableHead className="font-semibold text-secondary">Variante</TableHead>
-              <TableHead className="text-right font-semibold text-secondary">Valor</TableHead>
-              <TableHead className="font-semibold text-secondary">Status</TableHead>
-              <TableHead className="text-center font-semibold text-secondary">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {transactions.map((transaction) => {
-              const daysOverdue = Math.floor((new Date().getTime() - new Date(transaction.transaction_date).getTime()) / (1000 * 60 * 60 * 24));
-              const alertBadge = getAlertBadge(transaction.status, daysOverdue);
-              
-              return (
-                <TableRow key={transaction.id} className="hover:bg-muted/30 transition-colors border-b border-border/50">
-                  <TableCell>
-                    {alertBadge || (
-                      <div className="flex items-center justify-center">
-                        {transaction.transaction_type === 'receita' ? (
-                          <span className="text-green-600">🔹</span>
-                        ) : (
-                          <span className="text-red-600">🔻</span>
-                        )}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    {format(new Date(transaction.transaction_date), 'dd/MM/yyyy')}
-                  </TableCell>
-                  <TableCell>
-                    {format(new Date(transaction.transaction_date), 'dd/MM/yyyy')}
-                  </TableCell>
-                  <TableCell>
-                    {transaction.transaction_type === 'receita' ? (
-                      <span className="text-green-600 font-medium">🔹 Receita</span>
-                    ) : (
-                      <span className="text-red-600 font-medium">🔻 Despesa</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="font-medium">{transaction.description}</TableCell>
-                  <TableCell>{transaction.category || '-'}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{transaction.payment_method || 'Pix'}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">Fixa</Badge>
-                  </TableCell>
-                  <TableCell className={`text-right font-bold ${
-                    transaction.transaction_type === 'receita' ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {formatCurrency(transaction.amount)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={transaction.status === 'pago' ? 'info' : 'warning'}
-                      className="rounded-full"
-                    >
-                      {transaction.status === 'pago' ? 'Pago' : 'Pendente'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center justify-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
-                        onClick={() => onViewDetails(transaction)}
-                        title="Ver detalhes"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 rounded-full bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:hover:bg-blue-800"
-                        onClick={() => onEdit(transaction)}
-                        title="Editar transação"
-                      >
-                        <Pencil className="h-4 w-4 text-blue-700 dark:text-blue-300" />
-                      </Button>
-                      {transaction.status === 'pendente' && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 rounded-full bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800"
-                          onClick={() => onMarkAsPaid(transaction.id)}
-                          title="Marcar como pago"
-                        >
-                          <CheckCircle2 className="h-4 w-4 text-green-700 dark:text-green-300" />
-                        </Button>
+    <div className="rounded-xl border border-border bg-card overflow-hidden shadow-[0_5px_20px_rgba(0,0,0,0.06)]">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-muted border-b border-border">
+            <TableHead className="w-[5%] font-semibold text-foreground">Alerta</TableHead>
+            <TableHead className="w-[12%] font-semibold text-foreground">Data de Pagamento</TableHead>
+            <TableHead className="w-[8%] font-semibold text-foreground">Tipo</TableHead>
+            <TableHead className="w-[22%] font-semibold text-foreground">Nome</TableHead>
+            <TableHead className="w-[12%] font-semibold text-foreground">Centro de Custo</TableHead>
+            <TableHead className="w-[14%] font-semibold text-foreground">Forma de Pagamento</TableHead>
+            <TableHead className="w-[10%] font-semibold text-foreground">Variável</TableHead>
+            <TableHead className="w-[10%] text-right font-semibold text-foreground">Valor</TableHead>
+            <TableHead className="w-[7%] font-semibold text-foreground">Status</TableHead>
+            <TableHead className="w-[10%] text-right font-semibold text-foreground">Ações</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {transactions.map((transaction, idx) => {
+            const daysOverdue = Math.floor((new Date().getTime() - new Date(transaction.transaction_date).getTime()) / (1000 * 60 * 60 * 24));
+            const alertBadge = getAlertBadge(transaction.status, daysOverdue);
+            
+            return (
+              <TableRow 
+                key={transaction.id} 
+                className={`hover:bg-muted/50 transition-colors border-b border-border/50 ${
+                  idx % 2 === 0 ? 'bg-card' : 'bg-muted/20'
+                }`}
+              >
+                <TableCell>
+                  {alertBadge || (
+                    <div className="flex items-center justify-center">
+                      {transaction.transaction_type === 'receita' ? (
+                        <span className="text-primary">🔹</span>
+                      ) : (
+                        <span className="text-destructive">🔻</span>
                       )}
+                    </div>
+                  )}
+                </TableCell>
+                <TableCell className="font-medium text-foreground">
+                  {format(new Date(transaction.transaction_date), 'dd/MM/yyyy')}
+                </TableCell>
+                <TableCell>
+                  {transaction.transaction_type === 'receita' ? (
+                    <span className="text-primary font-semibold">🔹 Receita</span>
+                  ) : (
+                    <span className="text-destructive font-semibold">🔻 Despesa</span>
+                  )}
+                </TableCell>
+                <TableCell className="font-medium text-foreground">{transaction.description}</TableCell>
+                <TableCell className="text-foreground">{transaction.category || '-'}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="bg-muted">{transaction.payment_method || 'Pix'}</Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="bg-muted">Fixa</Badge>
+                </TableCell>
+                <TableCell className={`text-right font-bold ${
+                  transaction.transaction_type === 'receita' ? 'text-primary' : 'text-destructive'
+                }`}>
+                  {formatCurrency(transaction.amount)}
+                </TableCell>
+                <TableCell>
+                  <Badge 
+                    variant={transaction.status === 'pago' ? 'info' : 'warning'}
+                    className="rounded-full"
+                  >
+                    {transaction.status === 'pago' ? 'Pago' : 'Pendente'}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center justify-end gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full hover:bg-muted"
+                      onClick={() => onViewDetails(transaction)}
+                      title="Ver detalhes"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full hover:bg-primary/10"
+                      onClick={() => onEdit(transaction)}
+                      title="Editar transação"
+                    >
+                      <Pencil className="h-4 w-4 text-primary" />
+                    </Button>
+                    {transaction.status === 'pendente' && (
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 rounded-full bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800"
-                        onClick={() => onDelete(transaction.id)}
-                        title="Deletar transação"
+                        className="h-8 w-8 rounded-full hover:bg-success/10"
+                        onClick={() => onMarkAsPaid(transaction.id)}
+                        title="Marcar como pago"
                       >
-                        <Trash2 className="h-4 w-4 text-red-700 dark:text-red-300" />
+                        <CheckCircle2 className="h-4 w-4 text-success" />
                       </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </div>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-full hover:bg-destructive/10"
+                      onClick={() => onDelete(transaction.id)}
+                      title="Deletar transação"
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
     </div>
   );
 }
