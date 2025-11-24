@@ -7,6 +7,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Whitelist de emails com acesso gratuito ao sistema
+const WHITELISTED_EMAILS: string[] = [
+  // Adicione aqui os emails que devem ter acesso gratuito
+  // Exemplo: "seu-email@gmail.com", "socio@gmail.com"
+];
+
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CHECK-SUBSCRIPTION] ${step}${detailsStr}`);
@@ -41,6 +47,19 @@ serve(async (req) => {
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
+
+    // Check if email is whitelisted
+    if (WHITELISTED_EMAILS.includes(user.email.toLowerCase())) {
+      logStep("Whitelisted email detected - granting free access", { email: user.email });
+      return new Response(JSON.stringify({ 
+        subscribed: true, 
+        product_id: "whitelisted",
+        subscription_end: null 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
