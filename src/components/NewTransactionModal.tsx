@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Settings2, AlertCircle } from "lucide-react";
+import { CalendarIcon, Settings2 } from "lucide-react";
 import { format, addMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,19 +15,13 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import CurrencyInput from 'react-currency-input-field';
 import { CostCenterManagerModal } from "./CostCenterManagerModal";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+
 
 interface NewTransactionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   transaction?: any;
-}
-
-interface VariableInstallment {
-  installmentNumber: number;
-  amount: string;
-  date: Date;
 }
 
 interface CostCenter {
@@ -46,14 +40,12 @@ export function NewTransactionModal({
   const [loading, setLoading] = useState(false);
   const [costCenterModalOpen, setCostCenterModalOpen] = useState(false);
   const [costCenters, setCostCenters] = useState<CostCenter[]>([]);
-  const [variableInstallments, setVariableInstallments] = useState<VariableInstallment[]>([]);
   
   const [formData, setFormData] = useState({
     description: '',
     amount: '',
     installments: '1',
     payment_method: '',
-    variation_type: '',
     first_installment_date: new Date(),
     cost_center_id: '',
     transaction_type: 'despesa',
@@ -70,7 +62,6 @@ export function NewTransactionModal({
           amount: transaction.amount.toString(),
           installments: '1',
           payment_method: transaction.payment_method || '',
-          variation_type: '',
           first_installment_date: new Date(),
           cost_center_id: transaction.cost_center_id || '',
           transaction_type: transaction.transaction_type,
@@ -80,18 +71,6 @@ export function NewTransactionModal({
       }
     }
   }, [open, transaction]);
-
-  useEffect(() => {
-    const numInstallments = parseInt(formData.installments) || 1;
-    if (formData.variation_type === 'variavel' && numInstallments > 1) {
-      const newInstallments: VariableInstallment[] = Array.from({ length: numInstallments }, (_, i) => ({
-        installmentNumber: i + 1,
-        amount: '',
-        date: addMonths(formData.first_installment_date, i),
-      }));
-      setVariableInstallments(newInstallments);
-    }
-  }, [formData.variation_type, formData.installments, formData.first_installment_date]);
 
   const fetchCostCenters = async () => {
     try {
@@ -112,8 +91,6 @@ export function NewTransactionModal({
     }
   };
 
-  const showVariationType = formData.payment_method !== 'cartao_credito';
-  const isVariableType = formData.variation_type === 'variavel';
   const numInstallments = parseInt(formData.installments) || 1;
   const totalAmount = parseFloat(formData.amount.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
   const installmentAmount = totalAmount / numInstallments;
@@ -140,22 +117,6 @@ export function NewTransactionModal({
         variant: "destructive",
       });
       return;
-    }
-
-    if (isVariableType) {
-      const totalVariableAmount = variableInstallments.reduce(
-        (sum, inst) => sum + (parseFloat(inst.amount.replace(/[^\d,]/g, '').replace(',', '.')) || 0),
-        0
-      );
-      
-      if (Math.abs(totalVariableAmount - totalAmount) > 0.01) {
-        toast({
-          title: "Erro",
-          description: "A soma das parcelas variáveis deve ser igual ao valor total",
-          variant: "destructive",
-        });
-        return;
-      }
     }
 
     setLoading(true);
@@ -216,45 +177,23 @@ export function NewTransactionModal({
           // Create installment transactions
           const installmentsData = [];
           
-          if (isVariableType) {
-            for (const inst of variableInstallments) {
-              const instAmount = parseFloat(inst.amount.replace(/[^\d,]/g, '').replace(',', '.'));
-              installmentsData.push({
-                description: `${formData.description} - Parcela ${inst.installmentNumber}/${numInstallments}`,
-                amount: instAmount,
-                transaction_type: formData.transaction_type,
-                transaction_date: format(inst.date, 'yyyy-MM-dd'),
-                due_date: format(inst.date, 'yyyy-MM-dd'),
-                payment_method: formData.payment_method || null,
-                cost_center_id: formData.cost_center_id || null,
-                is_installment: true,
-                installment_number: inst.installmentNumber,
-                total_installments: numInstallments,
-                parent_transaction_id: parentTransaction.id,
-                status: 'pendente',
-                user_id: user.id,
-              });
-            }
-          } else {
-            for (let i = 0; i < numInstallments; i++) {
-              const installmentDate = addMonths(formData.first_installment_date, i);
-              installmentsData.push({
-                description: `${formData.description} - Parcela ${i + 1}/${numInstallments}`,
-                amount: installmentAmount,
-                transaction_type: formData.transaction_type,
-                transaction_date: format(installmentDate, 'yyyy-MM-dd'),
-                due_date: format(installmentDate, 'yyyy-MM-dd'),
-                payment_method: formData.payment_method || null,
-                cost_center_id: formData.cost_center_id || null,
-                is_installment: true,
-                installment_number: i + 1,
-                total_installments: numInstallments,
-                parent_transaction_id: parentTransaction.id,
-                is_recurring: formData.variation_type === 'recorrente',
-                status: 'pendente',
-                user_id: user.id,
-              });
-            }
+          for (let i = 0; i < numInstallments; i++) {
+            const installmentDate = addMonths(formData.first_installment_date, i);
+            installmentsData.push({
+              description: `${formData.description} - Parcela ${i + 1}/${numInstallments}`,
+              amount: installmentAmount,
+              transaction_type: formData.transaction_type,
+              transaction_date: format(installmentDate, 'yyyy-MM-dd'),
+              due_date: format(installmentDate, 'yyyy-MM-dd'),
+              payment_method: formData.payment_method || null,
+              cost_center_id: formData.cost_center_id || null,
+              is_installment: true,
+              installment_number: i + 1,
+              total_installments: numInstallments,
+              parent_transaction_id: parentTransaction.id,
+              status: 'pendente',
+              user_id: user.id,
+            });
           }
 
           const { error: installmentsError } = await supabase
@@ -302,14 +241,12 @@ export function NewTransactionModal({
         amount: '',
         installments: '1',
         payment_method: '',
-        variation_type: '',
         first_installment_date: new Date(),
         cost_center_id: '',
         transaction_type: 'despesa',
         transaction_date: new Date(),
         notes: '',
       });
-      setVariableInstallments([]);
     } catch (error: any) {
       toast({
         title: "Erro",
@@ -374,7 +311,7 @@ export function NewTransactionModal({
                 <Label className="text-sm text-muted-foreground">Forma de pagamento *</Label>
                 <Select
                   value={formData.payment_method}
-                  onValueChange={(value) => setFormData({ ...formData, payment_method: value, variation_type: value === 'cartao_credito' ? '' : formData.variation_type })}
+                  onValueChange={(value) => setFormData({ ...formData, payment_method: value })}
                 >
                   <SelectTrigger className="border-input bg-white focus:ring-primary">
                     <SelectValue placeholder="Selecione" />
@@ -390,25 +327,6 @@ export function NewTransactionModal({
                 </Select>
               </div>
             </div>
-
-            {/* Tipo de Variação (only if not credit card and has installments) */}
-            {showVariationType && numInstallments > 1 && (
-              <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Tipo de variação *</Label>
-                <Select
-                  value={formData.variation_type}
-                  onValueChange={(value) => setFormData({ ...formData, variation_type: value })}
-                >
-                  <SelectTrigger className="border-input bg-white focus:ring-primary">
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="recorrente">Recorrente</SelectItem>
-                    <SelectItem value="variavel">Variável</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
 
             {/* Data da Primeira Parcela */}
             <div className="space-y-2">
@@ -438,77 +356,8 @@ export function NewTransactionModal({
               </Popover>
             </div>
 
-            {/* Variable Installments Table */}
-            {isVariableType && numInstallments > 1 && (
-              <div className="space-y-3 bg-white rounded-lg p-4 border border-border">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <AlertCircle className="w-4 h-4" />
-                  <span>Defina o valor e data de cada parcela</span>
-                </div>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Parcela</TableHead>
-                      <TableHead>Valor</TableHead>
-                      <TableHead>Data</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {variableInstallments.map((inst, index) => (
-                      <TableRow key={index}>
-                        <TableCell className="font-medium">
-                          {inst.installmentNumber}/{numInstallments}
-                        </TableCell>
-                        <TableCell>
-                          <CurrencyInput
-                            placeholder="R$ 0,00"
-                            value={inst.amount}
-                            onValueChange={(value) => {
-                              const updated = [...variableInstallments];
-                              updated[index].amount = value || '';
-                              setVariableInstallments(updated);
-                            }}
-                            decimalsLimit={2}
-                            decimalSeparator=","
-                            groupSeparator="."
-                            prefix="R$ "
-                            className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button variant="outline" className="w-full justify-start text-left font-normal h-9 text-sm">
-                                <CalendarIcon className="mr-2 h-3 w-3" />
-                                {format(inst.date, "dd/MM/yy")}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={inst.date}
-                                onSelect={(date) => {
-                                  if (date) {
-                                    const updated = [...variableInstallments];
-                                    updated[index].date = date;
-                                    setVariableInstallments(updated);
-                                  }
-                                }}
-                                initialFocus
-                                className="pointer-events-auto"
-                              />
-                            </PopoverContent>
-                          </Popover>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-
             {/* Preview Automático */}
-            {numInstallments > 1 && !isVariableType && (
+            {numInstallments > 1 && (
               <div className="bg-white border border-border rounded-lg p-4">
                 <div className="flex items-start gap-3">
                   <CalendarIcon className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
