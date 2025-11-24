@@ -8,30 +8,12 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Lock, ArrowLeft } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-
 export default function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, subscription, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  useEffect(() => {
-    if (authLoading) return;
-    
-    if (user) {
-      // Se usuário está logado, verificar assinatura
-      if (subscription?.subscribed) {
-        // Tem assinatura ativa, vai para dashboard
-        navigate("/dashboard");
-      } else {
-        // Não tem assinatura, vai para pricing
-        navigate("/pricing");
-      }
-    }
-  }, [user, subscription, authLoading, navigate]);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +24,7 @@ export default function Auth() {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/pricing`,
+          emailRedirectTo: `${window.location.origin}/`,
         },
       });
 
@@ -50,11 +32,36 @@ export default function Auth() {
 
       toast({
         title: "Cadastro realizado!",
-        description: "Redirecionando para seleção de planos...",
+        description: "Fazendo login...",
       });
       
-      // Redirect to pricing after successful signup
-      navigate("/pricing");
+      // Fazer login automático após cadastro
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        // Se falhar o login automático, redireciona para pricing
+        navigate("/pricing");
+        return;
+      }
+
+      // Verificar assinatura e redirecionar
+      const { data: session } = await supabase.auth.getSession();
+      if (session?.session) {
+        const { data: subData } = await supabase.functions.invoke('check-subscription', {
+          headers: {
+            Authorization: `Bearer ${session.session.access_token}`,
+          },
+        });
+        
+        if (subData?.subscribed) {
+          navigate("/dashboard");
+        } else {
+          navigate("/pricing");
+        }
+      }
     } catch (error: any) {
       toast({
         title: "Erro no cadastro",
@@ -82,6 +89,22 @@ export default function Auth() {
         title: "Login realizado!",
         description: "Bem-vindo ao sistema financeiro.",
       });
+
+      // Verificar assinatura e redirecionar
+      const { data: session } = await supabase.auth.getSession();
+      if (session?.session) {
+        const { data: subData } = await supabase.functions.invoke('check-subscription', {
+          headers: {
+            Authorization: `Bearer ${session.session.access_token}`,
+          },
+        });
+        
+        if (subData?.subscribed) {
+          navigate("/dashboard");
+        } else {
+          navigate("/pricing");
+        }
+      }
     } catch (error: any) {
       toast({
         title: "Erro no login",
