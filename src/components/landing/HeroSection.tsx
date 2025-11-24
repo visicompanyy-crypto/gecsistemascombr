@@ -1,9 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { TrendingUp, DollarSign, BarChart3, ArrowUpRight } from "lucide-react";
+import { useCountUp } from "@/hooks/useCountUp";
 
 export const HeroSection = () => {
   const navigate = useNavigate();
+  
+  const balanceCount = useCountUp({ 
+    end: 124247.82, 
+    duration: 2000, 
+    decimals: 2,
+    prefix: 'R$ ',
+    suffix: '' 
+  });
+  
+  const totalCount = useCountUp({ 
+    end: 247.8, 
+    duration: 2000, 
+    decimals: 1,
+    prefix: 'R$ ',
+    suffix: 'K' 
+  });
 
   return (
     <section className="relative overflow-hidden bg-[hsl(var(--dark-bg))] py-24 md:py-32 lg:py-40">
@@ -26,9 +43,11 @@ export const HeroSection = () => {
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button
                 onClick={() => navigate("/login")}
-                className="bg-[hsl(var(--neon-green))] hover:bg-[hsl(var(--neon-green-dim))] text-black px-10 py-7 rounded-2xl text-lg font-bold transition-all hover:scale-105 shadow-[0_0_40px_rgba(138,253,86,0.3)] relative overflow-hidden animate-light-sweep"
+                className="bg-[hsl(var(--neon-green))] hover:bg-[hsl(var(--neon-green-dim))] text-black px-12 py-8 rounded-2xl text-xl font-bold transition-premium hover:scale-105 hover:brightness-110 shadow-[0_0_60px_rgba(138,253,86,0.4)] hover:shadow-[0_0_80px_rgba(138,253,86,0.6)] relative overflow-hidden"
+                style={{ willChange: 'transform' }}
               >
-                Organizar meu financeiro
+                <span className="relative z-10">Organizar meu financeiro</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent animate-light-sweep"></div>
               </Button>
               
               <Button
@@ -43,57 +62,69 @@ export const HeroSection = () => {
           {/* Right Column - Floating Cards */}
           <div className="relative h-[600px] hidden lg:block">
             {/* Main Balance Card */}
-            <div className="absolute top-0 right-0 w-80 bg-white rounded-3xl p-8 shadow-[0_20px_60px_rgba(0,0,0,0.4)] animate-float-soft">
+            <div 
+              ref={balanceCount.ref}
+              className="glass-card absolute top-0 right-0 w-80 rounded-3xl p-8 shadow-premium shadow-premium-hover animate-float-soft transition-premium hover:scale-[1.02] hover:-translate-y-1"
+              style={{ willChange: 'transform' }}
+            >
               <div className="flex items-center justify-between mb-6">
-                <span className="text-sm font-medium text-gray-500">Saldo disponível</span>
+                <span className="text-base font-semibold text-gray-700">Saldo disponível</span>
                 <DollarSign className="w-5 h-5 text-[hsl(var(--primary))]" />
               </div>
-              <div className="text-4xl font-bold text-gray-900 mb-2">R$ 124.247,82</div>
-              <div className="flex items-center gap-2 text-[hsl(var(--neon-green-dim))] text-sm font-semibold">
-                <ArrowUpRight className="w-4 h-4" />
+              <div className="text-4xl font-bold text-gray-900 mb-2" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                {balanceCount.value}
+              </div>
+              <div className="flex items-center gap-2 text-[hsl(var(--neon-green))] text-base font-bold bg-[hsl(var(--neon-green))]/10 px-3 py-1.5 rounded-xl w-fit">
+                <ArrowUpRight className="w-5 h-5" />
                 <span>+18,2% este mês</span>
               </div>
             </div>
 
             {/* Transactions Card */}
-            <div className="absolute top-32 left-0 w-72 bg-white rounded-3xl p-6 shadow-[0_20px_60px_rgba(0,0,0,0.3)] animate-float-delayed">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-gray-900">Últimas transações</span>
+            <div className="glass-card absolute top-32 left-0 w-72 rounded-3xl p-6 shadow-[0_16px_48px_rgba(0,0,0,0.35)] shadow-premium-hover animate-float-delayed transition-premium hover:scale-[1.02] hover:-translate-y-1" style={{ willChange: 'transform' }}>
+              <div className="flex items-center justify-between mb-5">
+                <span className="text-base font-bold text-gray-800">Últimas transações</span>
                 <BarChart3 className="w-4 h-4 text-gray-400" />
               </div>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Fornecedor XYZ</span>
-                  <span className="text-sm font-semibold text-red-500">-R$ 2.340</span>
+                  <span className="text-base text-gray-800 font-semibold">Fornecedor XYZ</span>
+                  <span className="text-base font-bold text-red-500">-R$ 2.340</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Cliente ABC</span>
-                  <span className="text-sm font-semibold text-[hsl(var(--primary))]">+R$ 8.920</span>
+                  <span className="text-base text-gray-800 font-semibold">Cliente ABC</span>
+                  <span className="text-base font-bold text-[hsl(var(--neon-green))]">+R$ 8.920</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Pagamento PIX</span>
-                  <span className="text-sm font-semibold text-red-500">-R$ 1.150</span>
+                  <span className="text-base text-gray-800 font-semibold">Pagamento PIX</span>
+                  <span className="text-base font-bold text-red-500">-R$ 1.150</span>
                 </div>
               </div>
             </div>
 
             {/* Chart Card */}
-            <div className="absolute bottom-0 right-8 w-64 bg-white rounded-3xl p-6 shadow-[0_20px_60px_rgba(0,0,0,0.3)] animate-float-soft" style={{animationDelay: '1s'}}>
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-gray-900">Fluxo mensal</span>
+            <div className="glass-card absolute bottom-0 right-8 w-64 rounded-3xl p-6 shadow-[0_16px_48px_rgba(0,0,0,0.35)] shadow-premium-hover animate-float-soft transition-premium hover:scale-[1.02] hover:-translate-y-1" style={{animationDelay: '1s', willChange: 'transform'}}>
+              <div className="flex items-center justify-between mb-5">
+                <span className="text-base font-bold text-gray-800">Fluxo mensal</span>
                 <TrendingUp className="w-4 h-4 text-[hsl(var(--neon-green-dim))]" />
               </div>
               <div className="h-32 flex items-end justify-between gap-2">
                 {[40, 65, 45, 80, 55, 75, 90].map((height, i) => (
-                  <div key={i} className="flex-1 bg-gradient-to-t from-[hsl(var(--neon-green))] to-[hsl(var(--neon-green-dim))] rounded-t-lg animate-graph-grow" style={{height: `${height}%`, animationDelay: `${i * 100}ms`}}></div>
+                  <div key={i} className="flex-1 bg-gradient-to-t from-[hsl(var(--neon-green))] to-[hsl(var(--neon-green-dim))] rounded-t-lg animate-bar-grow" style={{height: `${height}%`, animationDelay: `${i * 100}ms`}}></div>
                 ))}
               </div>
             </div>
 
             {/* Total Received Badge */}
-            <div className="absolute bottom-32 left-4 bg-white rounded-2xl px-6 py-4 shadow-[0_10px_40px_rgba(0,0,0,0.2)] animate-float-delayed" style={{animationDelay: '2s'}}>
-              <div className="text-xs text-gray-500 mb-1">Total recebido</div>
-              <div className="text-2xl font-bold text-[hsl(var(--primary))]">R$ 247,8K</div>
+            <div 
+              ref={totalCount.ref}
+              className="glass-card absolute bottom-32 left-4 rounded-2xl px-6 py-4 shadow-[0_12px_40px_rgba(0,0,0,0.3)] shadow-premium-hover animate-float-delayed transition-premium hover:scale-[1.02] hover:-translate-y-1" 
+              style={{animationDelay: '2s', willChange: 'transform'}}
+            >
+              <div className="text-sm text-gray-700 font-semibold mb-1">Total recebido</div>
+              <div className="text-2xl font-bold text-[hsl(var(--primary))]" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                {totalCount.value}
+              </div>
             </div>
           </div>
         </div>

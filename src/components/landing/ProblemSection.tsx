@@ -22,12 +22,13 @@ export const ProblemSection = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="stagger-item bg-white border border-gray-100 rounded-3xl p-8 shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-2 flex flex-col items-center text-center group"
+              className="stagger-item glass-card rounded-3xl p-8 shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_48px_rgba(0,0,0,0.15)] transition-premium hover:-translate-y-2 hover:scale-[1.02] flex flex-col items-center text-center group"
+              style={{ willChange: 'transform' }}
             >
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[hsl(var(--neon-green))]/10 to-[hsl(var(--primary))]/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[hsl(var(--neon-green))]/20 to-[hsl(var(--primary))]/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-premium">
                 <feature.icon className="w-8 h-8 text-[hsl(var(--primary))]" />
               </div>
-              <h3 className="text-sm font-semibold text-gray-900">
+              <h3 className="text-base font-bold text-gray-900" style={{ lineHeight: '1.5' }}>
                 {feature.label}
               </h3>
             </div>
