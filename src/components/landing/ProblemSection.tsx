@@ -3,8 +3,22 @@ import { FileSpreadsheet, AlertCircle, EyeOff } from "lucide-react";
 
 export const ProblemSection = () => {
   return (
-    <section className="bg-white py-20 md:py-28">
-      <div className="max-w-[1320px] mx-auto px-6">
+    <section className="bg-white py-20 md:py-28 relative overflow-hidden">
+      {/* Decorative SVG Curve */}
+      <svg 
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        style={{ opacity: 0.3 }}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M-100,300 Q400,100 900,300 T1900,300"
+          stroke="hsl(var(--fintech-light))"
+          strokeWidth="2"
+          fill="none"
+        />
+      </svg>
+
+      <div className="max-w-[1320px] mx-auto px-6 relative z-10">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#252F1D] mb-4">
             A realidade financeira das empresas brasileiras

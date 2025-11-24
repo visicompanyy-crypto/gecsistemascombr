@@ -22,57 +22,58 @@ export const PricingCard = ({ name, price, period, badge, highlighted, buttonTex
   ];
 
   return (
-    <div
-      className={`rounded-3xl p-10 transition-all duration-300 hover:-translate-y-2 ${
-        highlighted
-          ? "bg-gradient-to-br from-[hsl(var(--hero-gradient-start))] to-[hsl(var(--hero-gradient-end))] border-2 border-[hsl(var(--accent-green))]/30 shadow-[0_20px_60px_rgba(138,253,86,0.2)]"
-          : "bg-white border border-gray-200 shadow-[0_8px_30px_rgba(0,0,0,0.08)]"
-      }`}
-    >
-      {badge && (
-        <div className={`inline-block px-4 py-2 rounded-full text-sm font-bold mb-6 ${
-          highlighted
-            ? "bg-[hsl(var(--accent-green))]/20 text-[hsl(var(--accent-green))] border border-[hsl(var(--accent-green))]/30"
-            : "bg-[hsl(var(--accent-green))]/10 text-[hsl(var(--primary))] border border-[hsl(var(--primary))]/20"
-        }`}>
-          {badge}
+    <div className="relative">
+      {/* Badge for highlighted card */}
+      {badge && highlighted && (
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+          <div className="bg-gradient-to-r from-fintech-neon to-primary text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg whitespace-nowrap">
+            {badge}
+          </div>
         </div>
       )}
 
-      <h3 className={`text-2xl font-bold mb-2 ${highlighted ? "text-white" : "text-gray-900"}`}>
-        {name}
-      </h3>
-
-      <div className="mb-8">
-        <div className="flex items-baseline gap-2">
-          <span className={`text-6xl font-extrabold ${highlighted ? "text-white" : "text-gray-900"}`}>
-            R$ {price}
-          </span>
-          <span className={`text-xl ${highlighted ? "text-white/70" : "text-gray-500"}`}>
-            /{period}
-          </span>
-        </div>
-      </div>
-
-      <div className="space-y-4 mb-8">
-        {benefits.map((benefit, index) => (
-          <div key={index} className="flex items-start gap-3">
-            <CheckCircle2 className={`flex-shrink-0 mt-0.5 ${highlighted ? "text-[hsl(var(--accent-green))]" : "text-[hsl(var(--primary))]"}`} size={20} />
-            <p className={`text-base ${highlighted ? "text-white/90" : "text-gray-600"}`}>{benefit}</p>
-          </div>
-        ))}
-      </div>
-
-      <Button
-        onClick={() => navigate("/login")}
-        className={`w-full py-6 rounded-xl text-base font-bold transition-all hover:scale-105 ${
+      <div
+        className={`rounded-3xl p-10 transition-all duration-300 hover:-translate-y-2 relative ${
           highlighted
-            ? "bg-[hsl(var(--accent-green))] hover:bg-[hsl(var(--accent-green-light))] text-[hsl(var(--hero-dark))] shadow-[0_0_20px_rgba(138,253,86,0.3)]"
-            : "bg-transparent border-2 border-[hsl(var(--primary))] text-[hsl(var(--primary))] hover:bg-[hsl(var(--primary))] hover:text-white"
+            ? "bg-white border-2 border-fintech-neon shadow-[0_15px_50px_rgba(138,253,86,0.3)]"
+            : "bg-white shadow-[0_10px_30px_rgba(0,0,0,0.2)]"
         }`}
       >
-        {buttonText}
-      </Button>
+        <h3 className="text-2xl font-bold mb-2 text-gray-900">
+          {name}
+        </h3>
+
+        <div className="mb-8">
+          <div className="flex items-baseline gap-2">
+            <span className="text-6xl font-extrabold text-gray-900">
+              R$ {price}
+            </span>
+            <span className="text-xl text-gray-500">
+              /{period}
+            </span>
+          </div>
+        </div>
+
+        <div className="space-y-4 mb-8">
+          {benefits.map((benefit, index) => (
+            <div key={index} className="flex items-start gap-3">
+              <CheckCircle2 className="flex-shrink-0 mt-0.5 text-primary" size={20} />
+              <p className="text-base text-gray-600">{benefit}</p>
+            </div>
+          ))}
+        </div>
+
+        <Button
+          onClick={() => navigate("/login")}
+          className={`w-full py-6 rounded-xl text-base font-bold transition-all hover:scale-105 ${
+            highlighted
+              ? "bg-gradient-to-r from-fintech-neon to-primary hover:opacity-90 text-white shadow-[0_8px_25px_rgba(138,253,86,0.3)]"
+              : "bg-primary hover:bg-primary/90 text-white"
+          }`}
+        >
+          {buttonText}
+        </Button>
+      </div>
     </div>
   );
 };
