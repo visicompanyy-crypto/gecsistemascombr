@@ -104,9 +104,16 @@ export function CostCenterManagerModal({
       fetchCostCenters();
       if (onUpdate) onUpdate();
     } catch (error: any) {
+      let errorMessage = error.message;
+      
+      // Verifica se é erro de código duplicado
+      if (error.message?.includes('cost_centers_user_code_unique')) {
+        errorMessage = 'Já existe um centro de custo com este código. Por favor, use um código diferente.';
+      }
+      
       toast({
         title: "Erro",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
