@@ -57,7 +57,6 @@ export function NewTransactionModal({
     first_installment_date: new Date(),
     cost_center_id: '',
     transaction_type: 'despesa',
-    category: '',
     transaction_date: new Date(),
     notes: '',
   });
@@ -75,7 +74,6 @@ export function NewTransactionModal({
           first_installment_date: new Date(),
           cost_center_id: transaction.cost_center_id || '',
           transaction_type: transaction.transaction_type,
-          category: transaction.category || '',
           transaction_date: new Date(transaction.transaction_date),
           notes: transaction.notes || '',
         });
@@ -129,7 +127,7 @@ export function NewTransactionModal({
       currency: 'BRL',
     }).format(installmentAmount);
 
-    return `Serão ${numInstallments} parcelas de ${formattedAmount} com data de pagamento no dia ${day} dos próximos meses.`;
+    return `O valor será dividido em ${numInstallments} parcelas de ${formattedAmount}, com vencimentos automáticos todo dia ${day} dos próximos meses. Você pode ajustar as datas manualmente se desejar.`;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -175,7 +173,6 @@ export function NewTransactionModal({
             amount: totalAmount,
             transaction_type: formData.transaction_type,
             transaction_date: format(formData.transaction_date, 'yyyy-MM-dd'),
-            category: formData.category || null,
             payment_method: formData.payment_method || null,
             notes: formData.notes || null,
             cost_center_id: formData.cost_center_id || null,
@@ -199,7 +196,6 @@ export function NewTransactionModal({
             transaction_date: format(formData.transaction_date, 'yyyy-MM-dd'),
             purchase_date: format(formData.transaction_date, 'yyyy-MM-dd'),
             first_installment_date: format(formData.first_installment_date, 'yyyy-MM-dd'),
-            category: formData.category || null,
             payment_method: formData.payment_method || null,
             notes: formData.notes || null,
             cost_center_id: formData.cost_center_id || null,
@@ -229,7 +225,6 @@ export function NewTransactionModal({
                 transaction_type: formData.transaction_type,
                 transaction_date: format(inst.date, 'yyyy-MM-dd'),
                 due_date: format(inst.date, 'yyyy-MM-dd'),
-                category: formData.category || null,
                 payment_method: formData.payment_method || null,
                 cost_center_id: formData.cost_center_id || null,
                 is_installment: true,
@@ -249,7 +244,6 @@ export function NewTransactionModal({
                 transaction_type: formData.transaction_type,
                 transaction_date: format(installmentDate, 'yyyy-MM-dd'),
                 due_date: format(installmentDate, 'yyyy-MM-dd'),
-                category: formData.category || null,
                 payment_method: formData.payment_method || null,
                 cost_center_id: formData.cost_center_id || null,
                 is_installment: true,
@@ -283,7 +277,6 @@ export function NewTransactionModal({
               transaction_type: formData.transaction_type,
               transaction_date: format(formData.transaction_date, 'yyyy-MM-dd'),
               due_date: format(formData.first_installment_date, 'yyyy-MM-dd'),
-              category: formData.category || null,
               payment_method: formData.payment_method || null,
               notes: formData.notes || null,
               cost_center_id: formData.cost_center_id || null,
@@ -313,7 +306,6 @@ export function NewTransactionModal({
         first_installment_date: new Date(),
         cost_center_id: '',
         transaction_type: 'despesa',
-        category: '',
         transaction_date: new Date(),
         notes: '',
       });
@@ -527,38 +519,6 @@ export function NewTransactionModal({
               </div>
             )}
 
-            {/* Centro de Custo */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm text-muted-foreground">Centro de custo *</Label>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setCostCenterModalOpen(true)}
-                  className="h-8 gap-1 text-primary hover:text-primary/90"
-                >
-                  <Settings2 className="w-4 h-4" />
-                  Gerenciar
-                </Button>
-              </div>
-              <Select
-                value={formData.cost_center_id}
-                onValueChange={(value) => setFormData({ ...formData, cost_center_id: value })}
-              >
-                <SelectTrigger className="border-input bg-white focus:ring-primary">
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  {costCenters.map((center) => (
-                    <SelectItem key={center.id} value={center.id}>
-                      {center.name} {center.code ? `(${center.code})` : ''}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
             <div className="grid gap-4 md:grid-cols-2">
               {/* Tipo */}
               <div className="space-y-2">
@@ -577,29 +537,34 @@ export function NewTransactionModal({
                 </Select>
               </div>
 
-              {/* Categoria */}
+              {/* Centro de Custo */}
               <div className="space-y-2">
-                <Label className="text-sm text-muted-foreground">Categoria</Label>
+                <div className="flex items-center justify-between">
+                  <Label className="text-sm text-muted-foreground">Centro de custo *</Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCostCenterModalOpen(true)}
+                    className="h-8 gap-1 text-primary hover:text-primary/90"
+                  >
+                    <Settings2 className="w-4 h-4" />
+                    Gerenciar
+                  </Button>
+                </div>
                 <Select
-                  value={formData.category}
-                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                  value={formData.cost_center_id}
+                  onValueChange={(value) => setFormData({ ...formData, cost_center_id: value })}
                 >
                   <SelectTrigger className="border-input bg-white focus:ring-primary">
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="vendas">Vendas</SelectItem>
-                    <SelectItem value="servicos">Serviços</SelectItem>
-                    <SelectItem value="produtos">Produtos</SelectItem>
-                    <SelectItem value="investimentos">Investimentos</SelectItem>
-                    <SelectItem value="outras_receitas">Outras Receitas</SelectItem>
-                    <SelectItem value="folha_pagamento">Folha de Pagamento</SelectItem>
-                    <SelectItem value="fornecedores">Fornecedores</SelectItem>
-                    <SelectItem value="impostos">Impostos</SelectItem>
-                    <SelectItem value="aluguel">Aluguel</SelectItem>
-                    <SelectItem value="marketing">Marketing</SelectItem>
-                    <SelectItem value="operacionais">Operacionais</SelectItem>
-                    <SelectItem value="outras_despesas">Outras Despesas</SelectItem>
+                    {costCenters.map((center) => (
+                      <SelectItem key={center.id} value={center.id}>
+                        {center.name} {center.code ? `(${center.code})` : ''}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
