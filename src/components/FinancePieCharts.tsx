@@ -44,9 +44,9 @@ export function FinancePieCharts({ data }: FinancePieChartsProps) {
   };
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
-      <Card className="p-8 shadow-sm border-border/50 bg-card">
-        <h3 className="text-lg font-semibold mb-6 text-secondary">Receitas por Categoria</h3>
+    <div className="grid gap-6 md:grid-cols-2 mt-6">
+      <Card className="p-8 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-border bg-card">
+        <h3 className="text-lg font-semibold mb-6 text-center text-foreground">Receitas por Categoria</h3>
         {receitasData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -83,8 +83,8 @@ export function FinancePieCharts({ data }: FinancePieChartsProps) {
         )}
       </Card>
 
-      <Card className="p-8 shadow-sm border-border/50 bg-card">
-        <h3 className="text-lg font-semibold mb-6 text-secondary">Despesas por Categoria</h3>
+      <Card className="p-8 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-border bg-card">
+        <h3 className="text-lg font-semibold mb-6 text-center text-foreground">Despesas por Categoria</h3>
         {despesasData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>

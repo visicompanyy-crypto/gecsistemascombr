@@ -60,104 +60,104 @@ export function FinancialSummaryCards({
   const saldoPositivo = saldoProjetado >= 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* 💰 CARD PRINCIPAL - SALDO PROJETADO */}
       <Card 
-        className={`p-8 bg-gradient-to-br ${
+        className={`w-full min-h-[120px] p-8 rounded-[18px] bg-gradient-to-br ${
           saldoPositivo 
             ? 'from-primary/10 to-primary/5 border-primary/20' 
             : 'from-destructive/10 to-destructive/5 border-destructive/20'
-        } shadow-lg hover:shadow-xl transition-all duration-300`}
+        } shadow-[0_5px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] transition-all duration-300`}
       >
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-secondary uppercase tracking-wide mb-2">
+            <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-3">
               💰 Saldo Projetado
             </p>
-            <p className={`text-5xl font-semibold ${saldoPositivo ? 'text-primary' : 'text-destructive'}`}>
+            <p className={`text-5xl font-bold ${saldoPositivo ? 'text-primary-dark' : 'text-destructive'}`}>
               {formatCurrency(saldoProjetado)}
             </p>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-sm text-secondary mt-3">
               Projeção a partir do mês atual até o futuro
             </p>
           </div>
-          <div className={`h-20 w-20 rounded-2xl ${
-            saldoPositivo ? 'bg-primary/10' : 'bg-destructive/10'
+          <div className={`h-24 w-24 rounded-2xl ${
+            saldoPositivo ? 'bg-primary/15' : 'bg-destructive/15'
           } flex items-center justify-center`}>
-            <Wallet className={`h-10 w-10 ${saldoPositivo ? 'text-primary' : 'text-destructive'}`} />
+            <Wallet className={`h-12 w-12 ${saldoPositivo ? 'text-primary' : 'text-destructive'}`} />
           </div>
         </div>
       </Card>
 
       {/* 📊 OS 5 CARDS HORIZONTAIS */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-5 md:grid-cols-5">
         {/* 1️⃣ RECEITA TOTAL RECEBIDA */}
         <Card 
-          className="p-6 hover:shadow-md transition-all duration-300 bg-card shadow-sm border-border/50 cursor-pointer"
+          className="w-full h-[110px] p-5 rounded-2xl hover:bg-muted/50 transition-all duration-300 bg-card shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-border cursor-pointer"
           onClick={() => openModal("💰 Receita Total Recebida", listaReceitaTotalRecebida)}
         >
-          <div className="flex flex-col items-center text-center space-y-3">
-            <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center">
-              <TrendingUp className="h-7 w-7 text-primary" />
+          <div className="flex flex-col items-center justify-center text-center space-y-2 h-full">
+            <div className="h-10 w-10 rounded-full border border-primary/20 flex items-center justify-center">
+              <TrendingUp className="h-5 w-5 text-primary" />
             </div>
-            <p className="text-xs font-medium text-secondary">Receita Total Recebida</p>
-            <p className="text-xl font-semibold text-foreground">{formatCurrency(receitaTotalRecebida)}</p>
+            <p className="text-[10px] font-medium text-foreground leading-tight">Receita Total Recebida</p>
+            <p className="text-lg font-bold text-foreground">{formatCurrency(receitaTotalRecebida)}</p>
           </div>
         </Card>
 
         {/* 2️⃣ RECEITAS FUTURAS */}
         <Card 
-          className="p-6 hover:shadow-md transition-all duration-300 bg-card shadow-sm border-border/50 cursor-pointer"
+          className="w-full h-[110px] p-5 rounded-2xl hover:bg-muted/50 transition-all duration-300 bg-card shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-border cursor-pointer"
           onClick={() => openModal("📅 Receitas Futuras", listaReceitasFuturas)}
         >
-          <div className="flex flex-col items-center text-center space-y-3">
-            <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center">
-              <Calendar className="h-7 w-7 text-primary" />
+          <div className="flex flex-col items-center justify-center text-center space-y-2 h-full">
+            <div className="h-10 w-10 rounded-full border border-primary/20 flex items-center justify-center">
+              <Calendar className="h-5 w-5 text-primary" />
             </div>
-            <p className="text-xs font-medium text-secondary">Receitas Futuras</p>
-            <p className="text-xl font-semibold text-foreground">{formatCurrency(receitasFuturas)}</p>
+            <p className="text-[10px] font-medium text-foreground leading-tight">Receitas Futuras</p>
+            <p className="text-lg font-bold text-foreground">{formatCurrency(receitasFuturas)}</p>
           </div>
         </Card>
 
         {/* 3️⃣ DESPESAS FUTURAS */}
         <Card 
-          className="p-6 hover:shadow-md transition-all duration-300 bg-card shadow-sm border-border/50 cursor-pointer"
+          className="w-full h-[110px] p-5 rounded-2xl hover:bg-muted/50 transition-all duration-300 bg-card shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-border cursor-pointer"
           onClick={() => openModal("📉 Despesas Futuras", listaDespesasFuturas)}
         >
-          <div className="flex flex-col items-center text-center space-y-3">
-            <div className="h-14 w-14 rounded-xl bg-destructive/10 flex items-center justify-center">
-              <TrendingDown className="h-7 w-7 text-destructive" />
+          <div className="flex flex-col items-center justify-center text-center space-y-2 h-full">
+            <div className="h-10 w-10 rounded-full border border-destructive/20 flex items-center justify-center">
+              <TrendingDown className="h-5 w-5 text-destructive" />
             </div>
-            <p className="text-xs font-medium text-secondary">Despesas Futuras</p>
-            <p className="text-xl font-semibold text-foreground">{formatCurrency(despesasFuturas)}</p>
+            <p className="text-[10px] font-medium text-foreground leading-tight">Despesas Futuras</p>
+            <p className="text-lg font-bold text-foreground">{formatCurrency(despesasFuturas)}</p>
           </div>
         </Card>
 
         {/* 4️⃣ RECEITA DO MÊS */}
         <Card 
-          className="p-6 hover:shadow-md transition-all duration-300 bg-card shadow-sm border-border/50 cursor-pointer"
+          className="w-full h-[110px] p-5 rounded-2xl hover:bg-muted/50 transition-all duration-300 bg-card shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-border cursor-pointer"
           onClick={() => openModal("💵 Receita do Mês", listaReceitasDoMes)}
         >
-          <div className="flex flex-col items-center text-center space-y-3">
-            <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center">
-              <DollarSign className="h-7 w-7 text-primary" />
+          <div className="flex flex-col items-center justify-center text-center space-y-2 h-full">
+            <div className="h-10 w-10 rounded-full border border-primary/20 flex items-center justify-center">
+              <DollarSign className="h-5 w-5 text-primary" />
             </div>
-            <p className="text-xs font-medium text-secondary">Receita do Mês</p>
-            <p className="text-xl font-semibold text-foreground">{formatCurrency(receitasDoMes)}</p>
+            <p className="text-[10px] font-medium text-foreground leading-tight">Receita do Mês</p>
+            <p className="text-lg font-bold text-foreground">{formatCurrency(receitasDoMes)}</p>
           </div>
         </Card>
 
         {/* 5️⃣ TOTAL A PAGAR NO MÊS */}
         <Card 
-          className="p-6 hover:shadow-md transition-all duration-300 bg-card shadow-sm border-border/50 cursor-pointer"
+          className="w-full h-[110px] p-5 rounded-2xl hover:bg-muted/50 transition-all duration-300 bg-card shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-border cursor-pointer"
           onClick={() => openModal("💳 Total a Pagar no Mês", listaDespesasDoMes, teamToolExpensesDoMes)}
         >
-          <div className="flex flex-col items-center text-center space-y-3">
-            <div className="h-14 w-14 rounded-xl bg-warning/10 flex items-center justify-center">
-              <CreditCard className="h-7 w-7 text-warning" />
+          <div className="flex flex-col items-center justify-center text-center space-y-2 h-full">
+            <div className="h-10 w-10 rounded-full border border-warning/20 flex items-center justify-center">
+              <CreditCard className="h-5 w-5 text-warning" />
             </div>
-            <p className="text-xs font-medium text-secondary">Total a Pagar no Mês</p>
-            <p className="text-xl font-semibold text-foreground">{formatCurrency(totalAPagarNoMes)}</p>
+            <p className="text-[10px] font-medium text-foreground leading-tight">Total a Pagar no Mês</p>
+            <p className="text-lg font-bold text-foreground">{formatCurrency(totalAPagarNoMes)}</p>
           </div>
         </Card>
       </div>

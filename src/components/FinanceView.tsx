@@ -201,7 +201,7 @@ export function FinanceView() {
     <div className="min-h-screen bg-background">
       <Header currentMonth={currentMonth} />
       
-      <div className="max-w-7xl mx-auto p-8 space-y-8 mt-8">
+      <div className="max-w-[1320px] mx-auto px-6 py-8 space-y-8 mt-8">
 
         <FinancialSummaryCards
           saldoProjetado={summary.saldoProjetado}
@@ -218,38 +218,41 @@ export function FinanceView() {
           teamToolExpensesDoMes={teamToolExpensesDoMes}
         />
 
-        <div className="flex items-center gap-4">
-          <Button onClick={() => setModalOpen(true)} className="gap-2 shadow-sm">
+        <div className="flex items-center gap-6">
+          <Button 
+            onClick={() => setModalOpen(true)} 
+            className="gap-2 bg-primary hover:bg-primary-dark text-primary-foreground rounded-[10px] px-6 py-2.5 font-medium shadow-md hover:shadow-lg transition-all"
+          >
             <Plus className="h-4 w-4" />
             Novo Lançamento
           </Button>
 
-          <div className="flex items-center gap-2 bg-card border border-border rounded-lg px-4 py-2 shadow-sm">
+          <div className="flex items-center gap-3 bg-card border border-border rounded-lg px-5 py-2.5 shadow-sm">
             <Button 
               variant="ghost" 
               size="icon"
               onClick={handlePreviousMonth}
-              className="h-8 w-8"
+              className="h-9 w-9 hover:bg-muted"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-5 w-5" />
             </Button>
-            <span className="text-sm font-medium min-w-[140px] text-center">
-              {currentMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+            <span className="text-sm font-semibold min-w-[160px] text-center text-foreground">
+              {currentMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase()}
             </span>
             <Button 
               variant="ghost" 
               size="icon"
               onClick={handleNextMonth}
-              className="h-8 w-8"
+              className="h-9 w-9 hover:bg-muted"
             >
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-5 w-5" />
             </Button>
           </div>
         </div>
 
-        <Card className="p-8 space-y-6 shadow-sm">
+        <Card className="p-8 space-y-6 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border-border">
           <div>
-            <h2 className="text-xl font-semibold mb-6 text-secondary">Lista de Lançamentos</h2>
+            <h2 className="text-xl font-semibold mb-6 text-foreground">Lista de Lançamentos</h2>
             <FinancialFilters
               searchTerm={searchTerm}
               onSearchChange={setSearchTerm}
@@ -272,20 +275,20 @@ export function FinanceView() {
           />
         </Card>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card className="p-8 bg-gradient-to-br from-card to-muted/30 shadow-sm border-border/50">
+        <div className="grid gap-5 md:grid-cols-2">
+          <Card className="p-8 bg-card rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-border">
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-secondary uppercase tracking-wide">Total de Receitas Pagas</h3>
-              <p className="text-4xl font-semibold text-primary">
+              <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Total de Receitas Pagas</h3>
+              <p className="text-5xl font-bold text-primary">
                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.receitaTotalRecebida)}
               </p>
             </div>
           </Card>
 
-          <Card className="p-8 bg-gradient-to-br from-card to-muted/30 shadow-sm border-border/50">
+          <Card className="p-8 bg-card rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-border">
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-secondary uppercase tracking-wide">Total a Pagar no Mês</h3>
-              <p className="text-4xl font-semibold text-destructive">
+              <h3 className="text-sm font-semibold text-foreground uppercase tracking-wide">Total a Pagar no Mês</h3>
+              <p className="text-5xl font-bold text-destructive">
                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.totalAPagarNoMes)}
               </p>
             </div>

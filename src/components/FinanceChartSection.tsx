@@ -31,8 +31,8 @@ export function FinanceChartSection({ data }: FinanceChartSectionProps) {
   }));
 
   return (
-    <Card className="p-8 shadow-sm border-border/50 bg-card">
-      <h3 className="text-lg font-semibold mb-6 text-secondary">Evolução Financeira</h3>
+    <Card className="p-8 mt-6 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-border bg-card">
+      <h3 className="text-lg font-semibold mb-6 text-foreground">Evolução Financeira</h3>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(49, 11%, 90%)" />
