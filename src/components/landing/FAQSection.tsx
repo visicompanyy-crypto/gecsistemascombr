@@ -34,14 +34,14 @@ const FAQSection = () => {
   ];
 
   return (
-    <section className="py-20 px-6 bg-landing-bg">
+    <section className="py-20 px-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16 animate-fade-in">
-          <h2 className="font-public-sans text-4xl md:text-5xl font-bold text-landing-text mb-4">
+          <h2 className="font-public-sans text-4xl md:text-5xl font-bold text-white mb-4">
             Perguntas Frequentes
           </h2>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-300">
             Tudo o que você precisa saber sobre a Saldar
           </p>
         </div>
@@ -51,17 +51,17 @@ const FAQSection = () => {
           {faqs.map((faq, index) => (
             <div 
               key={index}
-              className="bg-white rounded-2xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] overflow-hidden"
+              className="bg-[#0f1410]/60 backdrop-blur-sm rounded-2xl shadow-[0_2px_10px_rgba(0,255,136,0.1)] border border-[#00ff88]/20 overflow-hidden"
             >
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem
                   value={`item-${index}`}
                   className="border-0"
                 >
-                  <AccordionTrigger className="text-left text-lg font-medium text-landing-text hover:text-landing-green transition-colors px-6 py-6 hover:no-underline">
+                  <AccordionTrigger className="text-left text-lg font-medium text-white hover:text-[#00ff88] transition-colors px-6 py-6 hover:no-underline">
                     {faq.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-base text-gray-600 leading-relaxed px-6 pb-6 animate-fade-in border-t border-gray-200">
+                  <AccordionContent className="text-base text-gray-300 leading-relaxed px-6 pb-6 animate-fade-in border-t border-[#00ff88]/20">
                     <div className="pt-4">
                       {faq.answer}
                     </div>
@@ -74,12 +74,12 @@ const FAQSection = () => {
 
         {/* CTA Footer */}
         <div className="text-center mt-12 animate-fade-in">
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-300 mb-4">
             Ainda tem dúvidas?
           </p>
           <a
             href="/login"
-            className="inline-flex items-center justify-center text-landing-green font-medium hover:text-landing-green-accent transition-colors"
+            className="inline-flex items-center justify-center text-[#00ff88] font-medium hover:text-[#00cc6f] transition-colors"
           >
             Entre em contato conosco →
           </a>

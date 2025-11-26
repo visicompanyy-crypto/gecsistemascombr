@@ -26,10 +26,10 @@ export const TestimonialsSection = () => {
   ];
 
   return (
-    <section id="depoimentos" className="bg-landing-bg-alt py-20 md:py-28">
+    <section id="depoimentos" className="py-20 md:py-28">
       <div className="max-w-[1320px] mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-landing-text">
+          <h2 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-white">
             Empresas que já utilizam a Saldar
           </h2>
         </div>

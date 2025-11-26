@@ -77,57 +77,62 @@ export const PricingCard = ({
     <div className="relative">
       {badge && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
-          <div className={`${styles.badge} text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg whitespace-nowrap`}>
+          <div className={`${styles.badge} text-[#0a0f0b] px-6 py-2 rounded-full text-sm font-bold shadow-lg whitespace-nowrap`}>
             {badge}
           </div>
         </div>
       )}
 
       <div
-        className={`rounded-3xl p-10 transition-all duration-500 hover:-translate-y-2 relative bg-white border-2 ${styles.border} ${styles.shadow} ${styles.glow} ${
+        className={`rounded-3xl p-10 transition-all duration-500 hover:-translate-y-2 relative bg-[#0f1410]/80 backdrop-blur-sm border-2 ${styles.border} ${styles.shadow} ${styles.glow} ${
           highlighted ? "scale-105" : ""
         }`}
       >
-        <h3 className={`text-2xl font-bold mb-2 ${styles.title}`}>
-          {name}
-        </h3>
+        {/* Glow effect background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#00ff88]/5 to-transparent opacity-50 rounded-3xl" />
+        
+        <div className="relative z-10">
+          <h3 className={`text-2xl font-bold mb-2 ${styles.title}`}>
+            {name}
+          </h3>
 
-        <div className="mb-6">
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-bold text-landing-text">
-              R$
-            </span>
-            <span className="text-5xl font-extrabold text-landing-text">
-              {price}
-            </span>
-          </div>
-          <span className="text-lg text-gray-500 block mt-1">
-            por {period}
-          </span>
-          {billingInfo && (
-            <p className="text-sm text-gray-500 mt-1">{billingInfo}</p>
-          )}
-        </div>
-
-        {description && (
-          <p className="text-base text-gray-600 mb-6">{description}</p>
-        )}
-
-        <div className="space-y-4 mb-8">
-          {benefits.map((benefit, index) => (
-            <div key={index} className="flex items-start gap-3">
-              <CheckCircle2 className="flex-shrink-0 mt-0.5 text-landing-green" size={20} />
-              <p className="text-base text-gray-600">{benefit}</p>
+          <div className="mb-6">
+            <div className="flex items-baseline gap-1">
+              <span className="text-2xl font-bold text-white">
+                R$
+              </span>
+              <span className="text-5xl font-extrabold text-white">
+                {price}
+              </span>
             </div>
-          ))}
-        </div>
+            <span className="text-lg text-gray-300 block mt-1">
+              por {period}
+            </span>
+            {billingInfo && (
+              <p className="text-sm text-gray-400 mt-1">{billingInfo}</p>
+            )}
+          </div>
 
-        <Button
-          onClick={handleClick}
-          className={`w-full py-6 rounded-xl text-base font-bold transition-all duration-300 hover:scale-105 text-white shadow-lg ${styles.button}`}
-        >
-          {buttonText}
-        </Button>
+          {description && (
+            <p className="text-base text-gray-300 mb-6">{description}</p>
+          )}
+
+          <div className="space-y-4 mb-8">
+            {benefits.map((benefit, index) => (
+              <div key={index} className="flex items-start gap-3">
+                <CheckCircle2 className="flex-shrink-0 mt-0.5 text-[#00ff88]" size={20} />
+                <p className="text-base text-gray-300">{benefit}</p>
+              </div>
+            ))}
+          </div>
+
+          <Button
+            onClick={handleClick}
+            className={`w-full py-6 rounded-xl text-base font-bold transition-all duration-300 hover:scale-105 text-[#0a0f0b] shadow-lg ${styles.button}`}
+          >
+            {buttonText}
+          </Button>
+        </div>
       </div>
     </div>
   );

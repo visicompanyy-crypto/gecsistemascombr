@@ -8,20 +8,24 @@ import FAQSection from "@/components/landing/FAQSection";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
 import { Footer } from "@/components/landing/Footer";
+import { NeonBackground } from "@/components/landing/NeonBackground";
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-landing-bg">
-      <LandingHeader />
-      <HeroSection />
-      <ProblemSection />
-      <SolutionSection />
-      <FeaturesSection />
-      <TestimonialsSection />
-      <PricingSection />
-      <FAQSection />
-      <FinalCTASection />
-      <Footer />
+    <div className="min-h-screen relative">
+      <NeonBackground />
+      <div className="relative z-10">
+        <LandingHeader />
+        <HeroSection />
+        <ProblemSection />
+        <SolutionSection />
+        <FeaturesSection />
+        <TestimonialsSection />
+        <PricingSection />
+        <FAQSection />
+        <FinalCTASection />
+        <Footer />
+      </div>
     </div>
   );
 };

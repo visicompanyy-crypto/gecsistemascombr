@@ -16,30 +16,30 @@ export const LandingHeader = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
+    <header className="sticky top-0 z-50 bg-[#0a0f0b]/95 backdrop-blur-md border-b border-[#00ff88]/20 shadow-lg shadow-[#00ff88]/5">
       <div className="max-w-[1320px] mx-auto px-6 h-20 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img src="/src/assets/logo.png" alt="Saldar" className="h-10 w-10" />
-          <span className="text-2xl font-bold text-landing-text">Saldar</span>
+          <span className="text-2xl font-bold text-white">Saldar</span>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
           <button
             onClick={() => scrollToSection("recursos")}
-            className="text-base font-medium text-gray-600 hover:text-landing-green transition-colors"
+            className="text-base font-medium text-gray-300 hover:text-[#00ff88] transition-colors"
           >
             Recursos
           </button>
           <button
             onClick={() => scrollToSection("precos")}
-            className="text-base font-medium text-gray-600 hover:text-landing-green transition-colors"
+            className="text-base font-medium text-gray-300 hover:text-[#00ff88] transition-colors"
           >
             Preços
           </button>
           <button
             onClick={() => scrollToSection("depoimentos")}
-            className="text-base font-medium text-gray-600 hover:text-landing-green transition-colors"
+            className="text-base font-medium text-gray-300 hover:text-[#00ff88] transition-colors"
           >
             Depoimentos
           </button>
@@ -55,7 +55,7 @@ export const LandingHeader = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-landing-text"
+            className="md:hidden text-white"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -65,23 +65,23 @@ export const LandingHeader = () => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200 py-4 px-6">
+        <div className="md:hidden bg-[#0f1410]/95 backdrop-blur-md border-t border-[#00ff88]/20 py-4 px-6">
           <nav className="flex flex-col gap-4">
             <button
               onClick={() => scrollToSection("recursos")}
-              className="text-base font-medium text-gray-600 hover:text-landing-green transition-colors text-left py-2"
+              className="text-base font-medium text-gray-300 hover:text-[#00ff88] transition-colors text-left py-2"
             >
               Recursos
             </button>
             <button
               onClick={() => scrollToSection("precos")}
-              className="text-base font-medium text-gray-600 hover:text-landing-green transition-colors text-left py-2"
+              className="text-base font-medium text-gray-300 hover:text-[#00ff88] transition-colors text-left py-2"
             >
               Preços
             </button>
             <button
               onClick={() => scrollToSection("depoimentos")}
-              className="text-base font-medium text-gray-600 hover:text-landing-green transition-colors text-left py-2"
+              className="text-base font-medium text-gray-300 hover:text-[#00ff88] transition-colors text-left py-2"
             >
               Depoimentos
             </button>
