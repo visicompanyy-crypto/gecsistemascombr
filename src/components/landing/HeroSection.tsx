@@ -17,7 +17,7 @@ export const HeroSection = () => {
               </div>
             </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-landing-text leading-tight">
+            <h1 className="font-public-sans text-4xl md:text-5xl lg:text-6xl font-bold text-landing-text leading-tight">
               Controle financeiro simples e completo
             </h1>
             
