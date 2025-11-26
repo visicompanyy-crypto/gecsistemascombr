@@ -3,13 +3,13 @@ import { FileSpreadsheet, AlertCircle, EyeOff } from "lucide-react";
 
 export const ProblemSection = () => {
   return (
-    <section className="bg-landing-bg-alt py-20 md:py-28 relative">
+    <section className="py-20 md:py-28 relative">
       <div className="max-w-[1320px] mx-auto px-6 relative z-10">
         <div className="text-center mb-16">
-          <h2 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-landing-text mb-4">
+          <h2 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
             A realidade financeira das empresas brasileiras
           </h2>
-          <p className="text-lg md:text-xl text-gray-600">
+          <p className="text-lg md:text-xl text-gray-300">
             Desafios que atrapalham o crescimento todos os dias
           </p>
         </div>

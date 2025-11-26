@@ -64,10 +64,10 @@ export const FeaturesSection = () => {
   ];
 
   return (
-    <section id="recursos" className="bg-landing-bg-alt py-20 md:py-28">
+    <section id="recursos" className="py-20 md:py-28">
       <div ref={sectionRef} className="max-w-[1320px] mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-landing-text">
+          <h2 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-white">
             O que você encontra na Saldar
           </h2>
         </div>

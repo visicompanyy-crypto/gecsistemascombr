@@ -2,13 +2,13 @@ import { PricingCard } from "./PricingCard";
 
 export const PricingSection = () => {
   return (
-    <section id="precos" className="bg-landing-bg py-20 md:py-32">
+    <section id="precos" className="py-20 md:py-32">
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-landing-text mb-4">
+          <h2 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
             Mesma plataforma, três formas de pagar. Você escolhe.
           </h2>
-          <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
             Todos os planos incluem acesso completo ao sistema e suporte via WhatsApp.
             A única diferença está em como você prefere pagar e quanto quer economizar.
           </p>
