@@ -11,12 +11,6 @@ export const HeroSection = () => {
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Left Column - Text */}
           <div className="space-y-8 animate-fade-in">
-            <div className="inline-block">
-              <div className="flex items-center gap-2 bg-[#00ff88]/10 border border-[#00ff88]/30 rounded-full px-4 py-2">
-                <span className="text-[#00ff88] text-sm font-semibold">🇧🇷 Feito para empresas brasileiras</span>
-              </div>
-            </div>
-
             <h1 className="font-public-sans text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
               Controle financeiro simples e completo
             </h1>
@@ -32,6 +26,12 @@ export const HeroSection = () => {
               >
                 Começar agora
               </Button>
+            </div>
+
+            <div className="pt-6 flex justify-center md:justify-start">
+              <div className="flex items-center gap-3 bg-[#00ff88]/10 border border-[#00ff88]/30 rounded-full px-6 py-3">
+                <span className="text-[#00ff88] text-lg font-semibold">🇧🇷 Feito para empresas brasileiras</span>
+              </div>
             </div>
           </div>
 
