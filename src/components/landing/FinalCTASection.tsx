@@ -19,7 +19,7 @@ export const FinalCTASection = () => {
       />
       
       <div className="relative max-w-[1320px] mx-auto px-6 text-center">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 max-w-3xl mx-auto">
+        <h2 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 max-w-3xl mx-auto">
           Organize o financeiro da sua empresa hoje
         </h2>
         

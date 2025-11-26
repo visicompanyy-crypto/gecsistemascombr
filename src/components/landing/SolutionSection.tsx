@@ -19,7 +19,7 @@ export const SolutionSection = () => {
               A SOLUÇÃO
             </div>
 
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-landing-text leading-tight">
+            <h2 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-landing-text leading-tight">
               A solução criada para organizar o financeiro do seu negócio
             </h2>
 

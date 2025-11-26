@@ -15,6 +15,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        'public-sans': ['Public Sans', 'sans-serif'],
         shrikhand: ['Shrikhand', 'cursive'],
         jakarta: ['Plus Jakarta Sans', 'sans-serif'],
       },
