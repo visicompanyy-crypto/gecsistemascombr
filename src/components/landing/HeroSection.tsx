@@ -36,7 +36,7 @@ export const HeroSection = () => {
           </div>
 
           {/* Right Column - Illustration */}
-          <div className="relative h-[400px] md:h-[500px]">
+          <div className="relative h-[450px] md:h-[600px] lg:h-[650px]">
             <HeroIllustration />
           </div>
         </div>
