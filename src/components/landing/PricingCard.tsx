@@ -42,21 +42,24 @@ export const PricingCard = ({
       shadow: "shadow-[0_0_30px_rgba(0,255,136,0.5)]",
       glow: "hover:shadow-[0_0_50px_rgba(0,255,136,0.7)]",
       badge: "bg-gradient-to-r from-[#00ff88] to-[#00cc6f]",
-      button: "bg-gradient-to-r from-[#00ff88] to-[#00cc6f] hover:from-[#00cc6f] hover:to-[#00ff88]"
+      button: "bg-gradient-to-r from-[#00ff88] to-[#00cc6f] hover:from-[#00cc6f] hover:to-[#00ff88]",
+      title: "text-[#00ff88]"
     },
     yellow: {
       border: "border-[#ffd700]",
       shadow: "shadow-[0_0_30px_rgba(255,215,0,0.5)]",
       glow: "hover:shadow-[0_0_50px_rgba(255,215,0,0.7)]",
       badge: "bg-gradient-to-r from-[#ffd700] to-[#ffaa00]",
-      button: "bg-gradient-to-r from-[#ffd700] to-[#ffaa00] hover:from-[#ffaa00] hover:to-[#ffd700]"
+      button: "bg-gradient-to-r from-[#ffd700] to-[#ffaa00] hover:from-[#ffaa00] hover:to-[#ffd700]",
+      title: "text-[#ffd700]"
     },
     red: {
       border: "border-[#ff0055]",
       shadow: "shadow-[0_0_30px_rgba(255,0,85,0.5)]",
       glow: "hover:shadow-[0_0_50px_rgba(255,0,85,0.7)]",
       badge: "bg-gradient-to-r from-[#ff0055] to-[#cc0044]",
-      button: "bg-gradient-to-r from-[#ff0055] to-[#cc0044] hover:from-[#cc0044] hover:to-[#ff0055]"
+      button: "bg-gradient-to-r from-[#ff0055] to-[#cc0044] hover:from-[#cc0044] hover:to-[#ff0055]",
+      title: "text-[#ff0055]"
     }
   };
 
@@ -85,21 +88,24 @@ export const PricingCard = ({
           highlighted ? "scale-105" : ""
         }`}
       >
-        <h3 className="text-2xl font-bold mb-2 text-landing-text">
+        <h3 className={`text-2xl font-bold mb-2 ${styles.title}`}>
           {name}
         </h3>
 
         <div className="mb-6">
-          <div className="flex items-baseline gap-2">
-            <span className="text-5xl font-extrabold text-landing-text">
-              R$ {price}
+          <div className="flex items-baseline gap-1">
+            <span className="text-2xl font-bold text-landing-text">
+              R$
             </span>
-            <span className="text-xl text-gray-500">
-              por {period}
+            <span className="text-5xl font-extrabold text-landing-text">
+              {price}
             </span>
           </div>
+          <span className="text-lg text-gray-500 block mt-1">
+            por {period}
+          </span>
           {billingInfo && (
-            <p className="text-sm text-gray-500 mt-2">{billingInfo}</p>
+            <p className="text-sm text-gray-500 mt-1">{billingInfo}</p>
           )}
         </div>
 
