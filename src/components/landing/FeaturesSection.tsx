@@ -1,6 +1,5 @@
 import { FeatureCard } from "./FeatureCard";
-import { Zap, Calendar, TrendingUp, Target, Bell, Clock, BarChart3, Smile } from "lucide-react";
-import { PremiumBackground } from "./PremiumBackground";
+import { Zap, Calendar, TrendingUp, Target, Bell, BarChart3 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 export const FeaturesSection = () => {
@@ -12,7 +11,6 @@ export const FeaturesSection = () => {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // Stagger reveal animation
             features.forEach((_, index) => {
               setTimeout(() => {
                 setVisibleCards(prev => [...prev, index]);
@@ -34,62 +32,47 @@ export const FeaturesSection = () => {
 
   const features = [
     {
-      icon: <Zap className="text-white" size={32} />,
+      icon: <Zap className="text-white" size={28} />,
       title: "Lançamentos rápidos",
       description: "Adicione receitas e despesas em poucos cliques",
     },
     {
-      icon: <Calendar className="text-white" size={32} />,
+      icon: <Calendar className="text-white" size={28} />,
       title: "Parcelamentos automáticos",
-      description: "Divida valores em parcelas fixas, variáveis ou recorrentes",
+      description: "Divida valores em parcelas fixas ou variáveis",
     },
     {
-      icon: <TrendingUp className="text-white" size={32} />,
+      icon: <TrendingUp className="text-white" size={28} />,
       title: "Fluxo de caixa organizado",
       description: "Visualize entradas e saídas por período",
     },
     {
-      icon: <Target className="text-white" size={32} />,
+      icon: <Target className="text-white" size={28} />,
       title: "Projeção automática",
       description: "Veja quanto vai entrar e sair nos próximos meses",
     },
     {
-      icon: <Bell className="text-white" size={32} />,
+      icon: <Bell className="text-white" size={28} />,
       title: "Alertas de vencimento",
       description: "Nunca mais esqueça uma conta a pagar",
     },
     {
-      icon: <Clock className="text-white" size={32} />,
-      title: "Histórico claro",
-      description: "Consulte todas as transações já realizadas",
-    },
-    {
-      icon: <BarChart3 className="text-white" size={32} />,
-      title: "Relatórios básicos",
+      icon: <BarChart3 className="text-white" size={28} />,
+      title: "Relatórios claros",
       description: "Gráficos simples para entender seu financeiro",
-    },
-    {
-      icon: <Smile className="text-white" size={32} />,
-      title: "Interface simples",
-      description: "Design intuitivo, sem complicações",
     },
   ];
 
   return (
-    <PremiumBackground variant="grid-circular" className="py-20 md:py-28">
+    <section id="recursos" className="bg-landing-bg-alt py-20 md:py-28">
       <div ref={sectionRef} className="max-w-[1320px] mx-auto px-6">
         <div className="text-center mb-16">
-          <h2 
-            className="text-3xl md:text-4xl lg:text-5xl font-shrikhand text-white"
-            style={{
-              textShadow: '0 0 30px rgba(255,255,255,0.2), 0 0 2px rgba(255,255,255,0.8)'
-            }}
-          >
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-landing-text">
             O que você encontra na Saldar
           </h2>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
             <div
               key={index}
@@ -107,6 +90,6 @@ export const FeaturesSection = () => {
           ))}
         </div>
       </div>
-    </PremiumBackground>
+    </section>
   );
 };

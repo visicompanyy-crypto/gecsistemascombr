@@ -16,30 +16,30 @@ export const LandingHeader = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-fintech-dark/95 backdrop-blur-md border-b border-fintech-light/10">
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
       <div className="max-w-[1320px] mx-auto px-6 h-20 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img src="/src/assets/logo.png" alt="Saldar" className="h-10 w-10" />
-          <span className="text-2xl font-bold text-white">Saldar</span>
+          <span className="text-2xl font-bold text-landing-text">Saldar</span>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
           <button
             onClick={() => scrollToSection("recursos")}
-            className="text-base font-medium text-white/70 hover:text-fintech-neon transition-colors"
+            className="text-base font-medium text-gray-600 hover:text-landing-green transition-colors"
           >
             Recursos
           </button>
           <button
             onClick={() => scrollToSection("precos")}
-            className="text-base font-medium text-white/70 hover:text-fintech-neon transition-colors"
+            className="text-base font-medium text-gray-600 hover:text-landing-green transition-colors"
           >
             Preços
           </button>
           <button
             onClick={() => scrollToSection("depoimentos")}
-            className="text-base font-medium text-white/70 hover:text-fintech-neon transition-colors"
+            className="text-base font-medium text-gray-600 hover:text-landing-green transition-colors"
           >
             Depoimentos
           </button>
@@ -48,14 +48,14 @@ export const LandingHeader = () => {
         <div className="flex items-center gap-4">
           <Button
             onClick={() => navigate("/login")}
-            className="bg-fintech-neon hover:bg-fintech-neon/90 text-fintech-dark px-7 py-3 rounded-xl font-bold transition-all hover:scale-105 shadow-[0_0_20px_rgba(138,253,86,0.3)]"
+            className="bg-landing-green hover:bg-landing-green/90 text-white px-7 py-3 rounded-xl font-bold transition-all hover:scale-105 shadow-[0_4px_15px_rgba(0,110,93,0.2)]"
           >
             Entrar
           </Button>
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-white"
+            className="md:hidden text-landing-text"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -65,23 +65,23 @@ export const LandingHeader = () => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-fintech-dark border-t border-fintech-light/10 py-4 px-6">
+        <div className="md:hidden bg-white border-t border-gray-200 py-4 px-6">
           <nav className="flex flex-col gap-4">
             <button
               onClick={() => scrollToSection("recursos")}
-              className="text-base font-medium text-white/70 hover:text-fintech-neon transition-colors text-left py-2"
+              className="text-base font-medium text-gray-600 hover:text-landing-green transition-colors text-left py-2"
             >
               Recursos
             </button>
             <button
               onClick={() => scrollToSection("precos")}
-              className="text-base font-medium text-white/70 hover:text-fintech-neon transition-colors text-left py-2"
+              className="text-base font-medium text-gray-600 hover:text-landing-green transition-colors text-left py-2"
             >
               Preços
             </button>
             <button
               onClick={() => scrollToSection("depoimentos")}
-              className="text-base font-medium text-white/70 hover:text-fintech-neon transition-colors text-left py-2"
+              className="text-base font-medium text-gray-600 hover:text-landing-green transition-colors text-left py-2"
             >
               Depoimentos
             </button>

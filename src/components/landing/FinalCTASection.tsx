@@ -5,14 +5,14 @@ export const FinalCTASection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="relative bg-gradient-to-br from-[hsl(var(--hero-gradient-start))] to-[hsl(var(--hero-gradient-end))] py-24 md:py-32 overflow-hidden">
+    <section className="bg-gradient-to-br from-landing-green to-landing-green-accent py-24 md:py-32 overflow-hidden relative">
       {/* Grid Pattern Background */}
       <div 
         className="absolute inset-0 opacity-10"
         style={{
           backgroundImage: `
-            linear-gradient(rgba(138, 253, 86, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(138, 253, 86, 0.1) 1px, transparent 1px)
+            linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)
           `,
           backgroundSize: '50px 50px'
         }}
@@ -23,25 +23,16 @@ export const FinalCTASection = () => {
           Organize o financeiro da sua empresa hoje
         </h2>
         
-        <p className="text-xl md:text-2xl text-white/80 mb-12 max-w-2xl mx-auto">
+        <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl mx-auto">
           Comece agora e tenha controle total das suas finanças
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Button
-            onClick={() => navigate("/login")}
-            className="bg-[hsl(var(--accent-green))] hover:bg-[hsl(var(--accent-green-light))] text-[hsl(var(--hero-dark))] px-12 py-7 rounded-2xl text-xl font-bold transition-all hover:scale-105 shadow-[0_0_40px_rgba(138,253,86,0.4)]"
-          >
-            Começar gratuitamente
-          </Button>
-          
-          <Button
-            variant="outline"
-            className="border-2 border-white/30 text-white hover:bg-white/10 px-12 py-7 rounded-2xl text-xl font-semibold transition-all backdrop-blur-sm"
-          >
-            Falar com vendas
-          </Button>
-        </div>
+        <Button
+          onClick={() => navigate("/login")}
+          className="bg-white hover:bg-white/90 text-landing-green px-16 py-8 rounded-2xl text-xl font-bold transition-all hover:scale-105 shadow-[0_15px_50px_rgba(0,0,0,0.2)]"
+        >
+          Começar gratuitamente
+        </Button>
       </div>
     </section>
   );
