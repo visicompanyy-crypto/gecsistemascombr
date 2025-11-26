@@ -63,19 +63,16 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        hero: {
-          dark: "hsl(var(--hero-dark))",
-          "gradient-start": "hsl(var(--hero-gradient-start))",
-          "gradient-end": "hsl(var(--hero-gradient-end))",
-        },
-        "accent-green": {
-          DEFAULT: "hsl(var(--accent-green))",
-          light: "hsl(var(--accent-green-light))",
+        landing: {
+          bg: "hsl(var(--landing-bg))",
+          "bg-alt": "hsl(var(--landing-bg-alt))",
+          text: "hsl(var(--landing-text))",
+          green: "hsl(var(--landing-green))",
+          "green-accent": "hsl(var(--landing-green-accent))",
+          negative: "hsl(var(--landing-negative))",
         },
         fintech: {
-          dark: "hsl(var(--fintech-dark))",
           light: "hsl(var(--fintech-light))",
-          "white-ice": "hsl(var(--fintech-white-ice))",
           neon: "hsl(var(--fintech-neon))",
         },
       },

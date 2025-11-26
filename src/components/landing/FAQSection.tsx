@@ -34,14 +34,14 @@ const FAQSection = () => {
   ];
 
   return (
-    <section className="py-20 px-6 bg-fintech-white-ice">
+    <section className="py-20 px-6 bg-landing-bg">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16 animate-fade-in">
-          <h2 className="text-4xl md:text-5xl font-bold text-[#252F1D] mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-landing-text mb-4">
             Perguntas Frequentes
           </h2>
-          <p className="text-lg text-[#6b7280]">
+          <p className="text-lg text-gray-600">
             Tudo o que você precisa saber sobre a Saldar
           </p>
         </div>
@@ -58,10 +58,10 @@ const FAQSection = () => {
                   value={`item-${index}`}
                   className="border-0"
                 >
-                  <AccordionTrigger className="text-left text-lg font-medium text-[#252F1D] hover:text-primary transition-colors px-6 py-6 hover:no-underline">
+                  <AccordionTrigger className="text-left text-lg font-medium text-landing-text hover:text-landing-green transition-colors px-6 py-6 hover:no-underline">
                     {faq.question}
                   </AccordionTrigger>
-                  <AccordionContent className="text-base text-[#6b7280] leading-relaxed px-6 pb-6 animate-fade-in border-t border-[#A7A392]/20">
+                  <AccordionContent className="text-base text-gray-600 leading-relaxed px-6 pb-6 animate-fade-in border-t border-gray-200">
                     <div className="pt-4">
                       {faq.answer}
                     </div>
@@ -74,12 +74,12 @@ const FAQSection = () => {
 
         {/* CTA Footer */}
         <div className="text-center mt-12 animate-fade-in">
-          <p className="text-[#6b7280] mb-4">
+          <p className="text-gray-600 mb-4">
             Ainda tem dúvidas?
           </p>
           <a
             href="/login"
-            className="inline-flex items-center justify-center text-primary font-medium hover:text-primary-dark transition-colors"
+            className="inline-flex items-center justify-center text-landing-green font-medium hover:text-landing-green-accent transition-colors"
           >
             Entre em contato conosco →
           </a>

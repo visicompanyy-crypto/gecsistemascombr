@@ -55,17 +55,16 @@ All colors MUST be HSL.
 
     --radius: 1rem;
     
-    /* Landing page specific - Dark fintech theme */
-    --hero-dark: 160 65% 15%; /* #0D3B2E dark green */
-    --hero-gradient-start: 160 70% 12%; /* darker green */
-    --hero-gradient-end: 160 60% 18%; /* lighter green */
-    --accent-green: 88 97% 67%; /* #8AFD56 bright lime */
-    --accent-green-light: 88 97% 75%; /* lighter lime */
+    /* Landing page specific - Light clean theme */
+    --landing-bg: 0 0% 98%; /* #FAFAFA clean white */
+    --landing-bg-alt: 0 0% 97%; /* #F9F9F9 subtle gray */
+    --landing-text: 0 0% 18%; /* #2E2E2E graphite */
+    --landing-green: 166 100% 22%; /* #006E5D petrol green */
+    --landing-green-accent: 150 72% 47%; /* #1AB36E bright green */
+    --landing-negative: 15 75% 55%; /* Discrete orange for problems */
     
-    /* Fintech Premium Colors */
-    --fintech-dark: 160 33% 9%; /* #0E1C17 */
+    /* Keep some fintech colors for compatibility */
     --fintech-light: 88 98% 81%; /* #C4FEA1 */
-    --fintech-white-ice: 200 14% 95%; /* #F1F3F4 */
     --fintech-neon: 88 97% 67%; /* #8AFD56 */
 
     --sidebar-background: 0 0% 100%;
