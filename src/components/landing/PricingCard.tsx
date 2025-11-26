@@ -11,6 +11,7 @@ interface PricingCardProps {
   badge?: string;
   description?: string;
   highlighted?: boolean;
+  neonColor?: "green" | "yellow" | "red";
   buttonText: string;
   benefits?: string[];
 }
@@ -22,7 +23,8 @@ export const PricingCard = ({
   billingInfo,
   badge, 
   description,
-  highlighted, 
+  highlighted,
+  neonColor = "green",
   buttonText,
   benefits = [
     "Acesso completo ao sistema",
@@ -34,6 +36,32 @@ export const PricingCard = ({
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const neonStyles = {
+    green: {
+      border: "border-[#00ff88]",
+      shadow: "shadow-[0_0_30px_rgba(0,255,136,0.5)]",
+      glow: "hover:shadow-[0_0_50px_rgba(0,255,136,0.7)]",
+      badge: "bg-gradient-to-r from-[#00ff88] to-[#00cc6f]",
+      button: "bg-gradient-to-r from-[#00ff88] to-[#00cc6f] hover:from-[#00cc6f] hover:to-[#00ff88]"
+    },
+    yellow: {
+      border: "border-[#ffd700]",
+      shadow: "shadow-[0_0_30px_rgba(255,215,0,0.5)]",
+      glow: "hover:shadow-[0_0_50px_rgba(255,215,0,0.7)]",
+      badge: "bg-gradient-to-r from-[#ffd700] to-[#ffaa00]",
+      button: "bg-gradient-to-r from-[#ffd700] to-[#ffaa00] hover:from-[#ffaa00] hover:to-[#ffd700]"
+    },
+    red: {
+      border: "border-[#ff0055]",
+      shadow: "shadow-[0_0_30px_rgba(255,0,85,0.5)]",
+      glow: "hover:shadow-[0_0_50px_rgba(255,0,85,0.7)]",
+      badge: "bg-gradient-to-r from-[#ff0055] to-[#cc0044]",
+      button: "bg-gradient-to-r from-[#ff0055] to-[#cc0044] hover:from-[#cc0044] hover:to-[#ff0055]"
+    }
+  };
+
+  const styles = neonStyles[neonColor];
+
   const handleClick = () => {
     if (!user) {
       navigate("/auth");
@@ -44,19 +72,17 @@ export const PricingCard = ({
 
   return (
     <div className="relative">
-      {badge && highlighted && (
+      {badge && (
         <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
-          <div className="bg-gradient-to-r from-landing-green to-landing-green-accent text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg whitespace-nowrap">
+          <div className={`${styles.badge} text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg whitespace-nowrap`}>
             {badge}
           </div>
         </div>
       )}
 
       <div
-        className={`rounded-3xl p-10 transition-all duration-300 hover:-translate-y-2 relative ${
-          highlighted
-            ? "bg-white border-3 border-landing-green shadow-[0_20px_60px_rgba(0,110,93,0.25)] scale-105"
-            : "bg-white border border-gray-200 shadow-[0_10px_30px_rgba(0,0,0,0.1)]"
+        className={`rounded-3xl p-10 transition-all duration-500 hover:-translate-y-2 relative bg-white border-2 ${styles.border} ${styles.shadow} ${styles.glow} ${
+          highlighted ? "scale-105" : ""
         }`}
       >
         <h3 className="text-2xl font-bold mb-2 text-landing-text">
@@ -92,11 +118,7 @@ export const PricingCard = ({
 
         <Button
           onClick={handleClick}
-          className={`w-full py-6 rounded-xl text-base font-bold transition-all hover:scale-105 ${
-            highlighted
-              ? "bg-gradient-to-r from-landing-green to-landing-green-accent hover:opacity-90 text-white shadow-[0_8px_25px_rgba(0,110,93,0.3)]"
-              : "bg-landing-green hover:bg-landing-green/90 text-white"
-          }`}
+          className={`w-full py-6 rounded-xl text-base font-bold transition-all duration-300 hover:scale-105 text-white shadow-lg ${styles.button}`}
         >
           {buttonText}
         </Button>

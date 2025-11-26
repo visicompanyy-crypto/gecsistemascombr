@@ -16,14 +16,15 @@ export const PricingSection = () => {
 
         <div className="grid md:grid-cols-3 gap-8">
           <PricingCard
-            name="🟢 Plano Anual"
+            name="Plano Anual"
             price="99,90"
             period="mês"
             billingInfo="Pagamento único de R$ 1.188,00"
             badge="Mais econômico"
             description="Perfeito para quem quer tranquilidade o ano todo com o melhor custo-benefício."
             highlighted={true}
-            buttonText="Quero organizar o financeiro da minha empresa"
+            neonColor="green"
+            buttonText="Assinar plano anual"
             benefits={[
               "Acesso total a todos os recursos",
               "Lançamentos ilimitados",
@@ -35,12 +36,13 @@ export const PricingSection = () => {
           />
           
           <PricingCard
-            name="🟡 Plano Trimestral"
+            name="Plano Trimestral"
             price="119,90"
             period="mês"
             billingInfo="Cobrança a cada 3 meses: R$ 359,70"
             description="Mais flexibilidade, ideal para quem quer experimentar com mais tempo."
-            buttonText="Quero organizar o financeiro da minha empresa"
+            neonColor="yellow"
+            buttonText="Assinar plano trimestral"
             benefits={[
               "Acesso total ao sistema",
               "Suporte via WhatsApp",
@@ -51,12 +53,13 @@ export const PricingSection = () => {
           />
           
           <PricingCard
-            name="🔴 Plano Mensal"
+            name="Plano Mensal"
             price="139,90"
             period="mês"
             billingInfo="Cobrança recorrente mensal"
             description="Liberdade total para começar no seu ritmo, sem fidelidade."
-            buttonText="Quero organizar o financeiro da minha empresa"
+            neonColor="red"
+            buttonText="Assinar plano mensal"
             benefits={[
               "Acesso total à plataforma",
               "Todos os recursos disponíveis",
