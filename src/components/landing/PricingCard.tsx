@@ -7,21 +7,32 @@ interface PricingCardProps {
   name: string;
   price: string;
   period: string;
+  billingInfo?: string;
   badge?: string;
+  description?: string;
   highlighted?: boolean;
   buttonText: string;
+  benefits?: string[];
 }
 
-export const PricingCard = ({ name, price, period, badge, highlighted, buttonText }: PricingCardProps) => {
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  
-  const benefits = [
+export const PricingCard = ({ 
+  name, 
+  price, 
+  period, 
+  billingInfo,
+  badge, 
+  description,
+  highlighted, 
+  buttonText,
+  benefits = [
     "Acesso completo ao sistema",
     "Lançamentos ilimitados",
     "Parcelamentos automáticos",
     "Suporte prioritário",
-  ];
+  ]
+}: PricingCardProps) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleClick = () => {
     if (!user) {
@@ -52,16 +63,23 @@ export const PricingCard = ({ name, price, period, badge, highlighted, buttonTex
           {name}
         </h3>
 
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="flex items-baseline gap-2">
-            <span className="text-6xl font-extrabold text-landing-text">
+            <span className="text-5xl font-extrabold text-landing-text">
               R$ {price}
             </span>
             <span className="text-xl text-gray-500">
-              /{period}
+              por {period}
             </span>
           </div>
+          {billingInfo && (
+            <p className="text-sm text-gray-500 mt-2">{billingInfo}</p>
+          )}
         </div>
+
+        {description && (
+          <p className="text-base text-gray-600 mb-6">{description}</p>
+        )}
 
         <div className="space-y-4 mb-8">
           {benefits.map((benefit, index) => (
