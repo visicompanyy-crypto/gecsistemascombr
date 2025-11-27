@@ -46,7 +46,7 @@ export function FinancePieCharts({ data }: FinancePieChartsProps) {
   return (
     <div className="grid gap-6 md:grid-cols-2 mt-6">
       <Card className="p-8 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-border bg-card">
-        <h3 className="text-lg font-semibold mb-6 text-center text-foreground">Receitas por Categoria</h3>
+        <h3 className="text-lg font-semibold mb-6 text-center text-foreground">Receitas por Centro de Custo</h3>
         {receitasData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -78,13 +78,13 @@ export function FinancePieCharts({ data }: FinancePieChartsProps) {
           </ResponsiveContainer>
         ) : (
           <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-            Nenhuma receita cadastrada
+            Nenhuma receita paga cadastrada
           </div>
         )}
       </Card>
 
       <Card className="p-8 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-border bg-card">
-        <h3 className="text-lg font-semibold mb-6 text-center text-foreground">Despesas por Categoria</h3>
+        <h3 className="text-lg font-semibold mb-6 text-center text-foreground">Despesas por Centro de Custo</h3>
         {despesasData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -116,7 +116,7 @@ export function FinancePieCharts({ data }: FinancePieChartsProps) {
           </ResponsiveContainer>
         ) : (
           <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-            Nenhuma despesa cadastrada
+            Nenhuma despesa paga cadastrada
           </div>
         )}
       </Card>

@@ -10,6 +10,7 @@ export interface Transaction {
   status: string;
   category?: string | null;
   cost_center_id?: string | null;
+  cost_centers?: { name: string } | null;
   payment_method?: string | null;
   is_installment?: boolean | null;
   total_installments?: number | null;
@@ -127,16 +128,16 @@ export function useFinancialSummary(
     // 💰 RESULTADO DO MÊS - Apenas receitas e despesas do mês atual (sem projeções futuras)
     const resultadoDoMes = receitasDoMes - totalAPagarNoMes;
 
-    // Agrupar por categoria
+    // Agrupar por centro de custo
     const transactionsByCategory = validTransactions.reduce((acc: any, t) => {
-      const category = t.category || 'Sem categoria';
-      if (!acc[category]) {
-        acc[category] = { receitas: 0, despesas: 0 };
+      const costCenterName = t.cost_centers?.name || 'Sem centro de custo';
+      if (!acc[costCenterName]) {
+        acc[costCenterName] = { receitas: 0, despesas: 0 };
       }
       if (t.transaction_type === 'receita' && t.status === 'pago') {
-        acc[category].receitas += Number(t.amount);
+        acc[costCenterName].receitas += Number(t.amount);
       } else if (t.transaction_type === 'despesa' && t.status === 'pago') {
-        acc[category].despesas += Number(t.amount);
+        acc[costCenterName].despesas += Number(t.amount);
       }
       return acc;
     }, {});
