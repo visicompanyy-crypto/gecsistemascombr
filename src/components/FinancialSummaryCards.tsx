@@ -120,11 +120,11 @@ export function FinancialSummaryCards({
           onClick={() => openModal("💰 Receita Total Recebida", listaReceitaTotalRecebida)}
         >
           <div className="flex flex-col items-center justify-center text-center space-y-2 h-full">
-            <div className="h-10 w-10 rounded-full border border-primary/20 flex items-center justify-center">
-              <TrendingUp className="h-5 w-5 text-primary" />
+            <div className="h-10 w-10 rounded-full border border-income/20 flex items-center justify-center">
+              <TrendingUp className="h-5 w-5 text-income" />
             </div>
-            <p className="text-[10px] font-medium text-foreground leading-tight">Receita Total Recebida</p>
-            <p className="text-lg font-bold text-foreground">{formatCurrency(receitaTotalRecebida)}</p>
+            <p className="text-[10px] font-medium text-income leading-tight">Receita Total Recebida</p>
+            <p className="text-lg font-bold text-income">{formatCurrency(receitaTotalRecebida)}</p>
           </div>
         </Card>
 
@@ -134,11 +134,11 @@ export function FinancialSummaryCards({
           onClick={() => openModal("📅 Receitas Futuras", listaReceitasFuturas)}
         >
           <div className="flex flex-col items-center justify-center text-center space-y-2 h-full">
-            <div className="h-10 w-10 rounded-full border border-primary/20 flex items-center justify-center">
-              <Calendar className="h-5 w-5 text-primary" />
+            <div className="h-10 w-10 rounded-full border border-income/20 flex items-center justify-center">
+              <Calendar className="h-5 w-5 text-income" />
             </div>
-            <p className="text-[10px] font-medium text-foreground leading-tight">Receitas Futuras</p>
-            <p className="text-lg font-bold text-foreground">{formatCurrency(receitasFuturas)}</p>
+            <p className="text-[10px] font-medium text-income leading-tight">Receitas Futuras</p>
+            <p className="text-lg font-bold text-income">{formatCurrency(receitasFuturas)}</p>
           </div>
         </Card>
 
@@ -162,11 +162,11 @@ export function FinancialSummaryCards({
           onClick={() => openModal("💵 Receita do Mês", listaReceitasDoMes)}
         >
           <div className="flex flex-col items-center justify-center text-center space-y-2 h-full">
-            <div className="h-10 w-10 rounded-full border border-primary/20 flex items-center justify-center">
-              <DollarSign className="h-5 w-5 text-primary" />
+            <div className="h-10 w-10 rounded-full border border-income/20 flex items-center justify-center">
+              <DollarSign className="h-5 w-5 text-income" />
             </div>
-            <p className="text-[10px] font-medium text-foreground leading-tight">Receita do Mês</p>
-            <p className="text-lg font-bold text-foreground">{formatCurrency(receitasDoMes)}</p>
+            <p className="text-[10px] font-medium text-income leading-tight">Receita do Mês</p>
+            <p className="text-lg font-bold text-income">{formatCurrency(receitasDoMes)}</p>
           </div>
         </Card>
 
