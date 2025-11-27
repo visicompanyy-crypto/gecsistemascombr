@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      company_settings: {
+        Row: {
+          company_name: string
+          created_at: string
+          id: string
+          logo_url: string | null
+          onboarding_completed: boolean | null
+          primary_color: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name: string
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          onboarding_completed?: boolean | null
+          primary_color?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          onboarding_completed?: boolean | null
+          primary_color?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       cost_centers: {
         Row: {
           annual_budget: number | null

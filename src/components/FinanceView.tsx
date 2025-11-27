@@ -11,21 +11,36 @@ import { FinancialTransactionsTable } from "./FinancialTransactionsTable";
 import { FinancialFilters } from "./FinancialFilters";
 import { NewTransactionModal } from "./NewTransactionModal";
 import { TransactionDetailModal } from "./TransactionDetailModal";
+import { FirstAccessModal } from "./FirstAccessModal";
+import { WelcomeCard } from "./WelcomeCard";
 import { useFinancialSummary } from "@/hooks/useFinancialSummary";
 import { useToast } from "@/hooks/use-toast";
 import { Header } from "./Header";
 import { OnboardingTour } from "./OnboardingTour";
+import { useCompanySettings } from "@/contexts/CompanySettingsContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function FinanceView() {
   const { toast } = useToast();
+  const { settings, loading: settingsLoading, refreshSettings } = useCompanySettings();
+  const { subscription } = useAuth();
+  
   const [modalOpen, setModalOpen] = useState(false);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [firstAccessModalOpen, setFirstAccessModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
   const [costCenterFilter, setCostCenterFilter] = useState("all");
   const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  // Show first access modal if user is subscribed but hasn't completed onboarding
+  useEffect(() => {
+    if (!settingsLoading && subscription?.subscribed && !settings?.onboarding_completed) {
+      setFirstAccessModalOpen(true);
+    }
+  }, [settingsLoading, subscription, settings]);
 
   const handlePreviousMonth = () => {
     setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
@@ -164,12 +179,22 @@ export function FinanceView() {
     setCostCenterFilter("all");
   };
 
+  const handleFirstAccessComplete = async () => {
+    await refreshSettings();
+    // Refetch transactions to include newly created cost centers
+    refetchTransactions();
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <OnboardingTour />
-      <Header currentMonth={currentMonth} />
+      <Header 
+        currentMonth={currentMonth} 
+        onOpenCompanySettings={() => setFirstAccessModalOpen(true)}
+      />
       
       <div className="max-w-[1320px] mx-auto px-6 py-8 space-y-8 mt-8">
+        <WelcomeCard />
 
         <div data-tour="summary-cards">
           <FinancialSummaryCards
@@ -289,6 +314,12 @@ export function FinanceView() {
           onOpenChange={setDetailModalOpen}
           transaction={selectedTransaction}
           onEdit={handleEdit}
+        />
+
+        <FirstAccessModal
+          open={firstAccessModalOpen}
+          onOpenChange={setFirstAccessModalOpen}
+          onComplete={handleFirstAccessComplete}
         />
       </div>
     </div>
