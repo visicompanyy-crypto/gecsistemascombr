@@ -11,7 +11,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 interface CostCenter {
   id: string;
   name: string;
-  code?: string;
   description?: string;
 }
 
@@ -32,7 +31,6 @@ export function CostCenterManagerModal({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    code: '',
     description: '',
   });
 
@@ -78,7 +76,6 @@ export function CostCenterManagerModal({
           .from('cost_centers')
           .update({
             name: formData.name,
-            code: formData.code || null,
             description: formData.description || null,
           })
           .eq('id', editingId);
@@ -90,7 +87,6 @@ export function CostCenterManagerModal({
           .from('cost_centers')
           .insert({
             name: formData.name,
-            code: formData.code || null,
             description: formData.description || null,
             user_id: user.id,
           });
@@ -99,21 +95,14 @@ export function CostCenterManagerModal({
         toast({ title: "Centro de custo criado com sucesso" });
       }
 
-      setFormData({ name: '', code: '', description: '' });
+      setFormData({ name: '', description: '' });
       setEditingId(null);
       fetchCostCenters();
       if (onUpdate) onUpdate();
     } catch (error: any) {
-      let errorMessage = error.message;
-      
-      // Verifica se é erro de código duplicado
-      if (error.message?.includes('cost_centers_user_code_unique')) {
-        errorMessage = 'Já existe um centro de custo com este código. Por favor, use um código diferente.';
-      }
-      
       toast({
         title: "Erro",
-        description: errorMessage,
+        description: error.message,
         variant: "destructive",
       });
     } finally {
@@ -125,7 +114,6 @@ export function CostCenterManagerModal({
     setEditingId(center.id);
     setFormData({
       name: center.name,
-      code: center.code || '',
       description: center.description || '',
     });
   };
@@ -152,7 +140,7 @@ export function CostCenterManagerModal({
 
   const handleCancel = () => {
     setEditingId(null);
-    setFormData({ name: '', code: '', description: '' });
+    setFormData({ name: '', description: '' });
   };
 
   return (
@@ -165,33 +153,18 @@ export function CostCenterManagerModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 border-b border-border pb-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm text-muted-foreground">
-                Nome *
-              </Label>
-              <Input
-                id="name"
-                placeholder="Ex: Marketing Digital"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-                className="border-input"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="code" className="text-sm text-muted-foreground">
-                Código
-              </Label>
-              <Input
-                id="code"
-                placeholder="Ex: MKT-001"
-                value={formData.code}
-                onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                className="border-input"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="name" className="text-sm text-muted-foreground">
+              Nome *
+            </Label>
+            <Input
+              id="name"
+              placeholder="Ex: Marketing Digital"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+              className="border-input"
+            />
           </div>
 
           <div className="space-y-2">
@@ -241,7 +214,6 @@ export function CostCenterManagerModal({
               <TableHeader>
                 <TableRow>
                   <TableHead>Nome</TableHead>
-                  <TableHead>Código</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -249,9 +221,6 @@ export function CostCenterManagerModal({
                 {costCenters.map((center) => (
                   <TableRow key={center.id}>
                     <TableCell className="font-medium">{center.name}</TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {center.code || '-'}
-                    </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button
