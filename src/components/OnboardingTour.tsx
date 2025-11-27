@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 const steps: Step[] = [
   {
     target: '[data-tour="summary-cards"]',
-    content: 'Bem-vindo ao seu painel financeiro! Aqui você vê o resumo do mês: saldo projetado, receitas recebidas, receitas futuras e despesas pendentes.',
+    content: 'Bem-vindo ao seu painel financeiro! O card principal mostra o Resultado do Mês: se vai sobrar ou faltar dinheiro baseado nas receitas e despesas lançadas.',
     placement: 'bottom',
     disableBeacon: true,
   },

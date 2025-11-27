@@ -212,7 +212,7 @@ export function FinanceView() {
 
         <div data-tour="summary-cards">
           <FinancialSummaryCards
-            saldoProjetado={summary.saldoProjetado}
+            resultadoDoMes={summary.resultadoDoMes}
             receitaTotalRecebida={summary.receitaTotalRecebida}
             receitasFuturas={summary.receitasFuturas}
             despesasFuturas={summary.despesasFuturas}
