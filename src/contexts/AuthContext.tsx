@@ -14,6 +14,7 @@ interface AuthContextType {
   session: Session | null;
   subscription: SubscriptionData | null;
   loading: boolean;
+  subscriptionLoading: boolean;
   signOut: () => Promise<void>;
   refreshSubscription: () => Promise<void>;
 }
@@ -40,14 +41,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
   const { toast } = useToast();
 
   const checkSubscription = async (currentSession: Session | null) => {
     if (!currentSession) {
       setSubscription(null);
+      setSubscriptionLoading(false);
       return;
     }
 
+    setSubscriptionLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("check-subscription", {
         headers: {
@@ -60,6 +64,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Error checking subscription:", error);
       setSubscription({ subscribed: false, product_id: null, subscription_end: null });
+    } finally {
+      setSubscriptionLoading(false);
     }
   };
 
@@ -79,16 +85,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }, 0);
         } else {
           setSubscription(null);
+          setSubscriptionLoading(false);
         }
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+    supabase.auth.getSession().then(async ({ data: { session: currentSession } }) => {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       
       if (currentSession?.user) {
-        checkSubscription(currentSession);
+        await checkSubscription(currentSession);
       }
       
       setLoading(false);
@@ -134,6 +141,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         session,
         subscription,
         loading,
+        subscriptionLoading,
         signOut,
         refreshSubscription,
       }}
