@@ -68,45 +68,6 @@ export function FinanceView() {
     },
   });
 
-  // Realtime subscription para atualização automática
-  useEffect(() => {
-    const transactionsChannel = supabase
-      .channel('financial-transactions-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'financial_transactions'
-        },
-        (payload) => {
-          console.log('Transação atualizada em tempo real:', payload);
-          refetchTransactions();
-        }
-      )
-      .subscribe();
-
-    const expensesChannel = supabase
-      .channel('team-tool-expenses-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'team_tool_expenses'
-        },
-        (payload) => {
-          console.log('Despesa de equipe/ferramenta atualizada em tempo real:', payload);
-          refetchTeamToolExpenses();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(transactionsChannel);
-      supabase.removeChannel(expensesChannel);
-    };
-  }, [refetchTransactions, refetchTeamToolExpenses]);
 
   const primeiroDiaDoMes = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
   const ultimoDiaDoMes = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
