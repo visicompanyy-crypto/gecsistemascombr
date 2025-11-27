@@ -104,15 +104,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => authSubscription.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (!session) return;
-
-    const interval = setInterval(() => {
-      checkSubscription(session);
-    }, 60000);
-
-    return () => clearInterval(interval);
-  }, [session]);
+  // Removido: interval de 60 segundos que causava atualizações automáticas indesejadas
 
   const signOut = async () => {
     try {
