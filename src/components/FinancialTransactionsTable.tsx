@@ -85,7 +85,7 @@ export function FinancialTransactionsTable({
                   {alertBadge || (
                     <div className="flex items-center justify-center">
                       {transaction.transaction_type === 'receita' ? (
-                        <span className="text-primary">🔹</span>
+                        <span className="text-income">🔹</span>
                       ) : (
                         <span className="text-destructive">🔻</span>
                       )}
@@ -97,7 +97,7 @@ export function FinancialTransactionsTable({
                 </TableCell>
                 <TableCell>
                   {transaction.transaction_type === 'receita' ? (
-                    <span className="text-primary font-semibold">🔹 Receita</span>
+                    <span className="text-income font-semibold">🔹 Receita</span>
                   ) : (
                     <span className="text-destructive font-semibold">🔻 Despesa</span>
                   )}
@@ -111,7 +111,7 @@ export function FinancialTransactionsTable({
                   <Badge variant="outline" className="bg-muted">Fixa</Badge>
                 </TableCell>
                 <TableCell className={`text-right font-bold ${
-                  transaction.transaction_type === 'receita' ? 'text-primary' : 'text-destructive'
+                  transaction.transaction_type === 'receita' ? 'text-income' : 'text-destructive'
                 }`}>
                   {formatCurrency(transaction.amount)}
                 </TableCell>
