@@ -34,7 +34,7 @@ export function useFinancialSummary(
   return useMemo(() => {
     if (!transactions || transactions.length === 0) {
       return {
-        saldoProjetado: 0,
+        resultadoDoMes: 0,
         receitaTotalRecebida: 0,
         receitasFuturas: 0,
         despesasFuturas: 0,
@@ -124,29 +124,8 @@ export function useFinancialSummary(
 
     const totalAPagarNoMes = despesasTransacoesDoMes + despesasEquipeFerramentasDoMes;
 
-    // 💰 SALDO PROJETADO - Receitas do mês selecionado em diante - Despesas do mês selecionado em diante
-    const receitasDoMesEmDiante = validTransactions
-      .filter(t => {
-        const dataTransacao = new Date(t.transaction_date);
-        return t.transaction_type === 'receita' && dataTransacao >= primeiroDiaDoMes;
-      })
-      .reduce((sum, t) => sum + Number(t.amount), 0);
-
-    const despesasDoMesEmDiante = validTransactions
-      .filter(t => {
-        const dataTransacao = new Date(t.transaction_date);
-        return t.transaction_type === 'despesa' && dataTransacao >= primeiroDiaDoMes;
-      })
-      .reduce((sum, t) => sum + Number(t.amount), 0);
-
-    const despesasEquipeFerramentasDoMesEmDiante = (teamToolExpenses || [])
-      .filter(e => {
-        const dataExpense = new Date(e.expense_date);
-        return dataExpense >= primeiroDiaDoMes;
-      })
-      .reduce((sum, e) => sum + Number(e.amount), 0);
-
-    const saldoProjetado = receitasDoMesEmDiante - (despesasDoMesEmDiante + despesasEquipeFerramentasDoMesEmDiante);
+    // 💰 RESULTADO DO MÊS - Apenas receitas e despesas do mês atual (sem projeções futuras)
+    const resultadoDoMes = receitasDoMes - totalAPagarNoMes;
 
     // Agrupar por categoria
     const transactionsByCategory = validTransactions.reduce((acc: any, t) => {
@@ -185,7 +164,7 @@ export function useFinancialSummary(
     transactionsByMonth.sort((a, b) => a.month.localeCompare(b.month));
 
     return {
-      saldoProjetado,
+      resultadoDoMes,
       receitaTotalRecebida,
       receitasFuturas,
       despesasFuturas,

@@ -5,7 +5,7 @@ import { TransactionDetailsModal } from "./TransactionDetailsModal";
 import { Transaction, TeamToolExpense } from "@/hooks/useFinancialSummary";
 
 interface FinancialSummaryCardsProps {
-  saldoProjetado: number;
+  resultadoDoMes: number;
   receitaTotalRecebida: number;
   receitasFuturas: number;
   despesasFuturas: number;
@@ -21,7 +21,7 @@ interface FinancialSummaryCardsProps {
 }
 
 export function FinancialSummaryCards({
-  saldoProjetado,
+  resultadoDoMes,
   receitaTotalRecebida,
   receitasFuturas,
   despesasFuturas,
@@ -57,27 +57,57 @@ export function FinancialSummaryCards({
     setModalOpen(true);
   };
 
-  const saldoPositivo = saldoProjetado >= 0;
+  // Determinar estado do resultado
+  const isPositivo = resultadoDoMes > 0;
+  const isNegativo = resultadoDoMes < 0;
+  const isEquilibrado = resultadoDoMes === 0;
+
+  // Definir cores e textos baseados no resultado
+  const getResultadoStyles = () => {
+    if (isPositivo) {
+      return {
+        bgClass: 'from-emerald-50 to-emerald-100/50 border-emerald-200',
+        textColor: 'text-emerald-600',
+        valueColor: 'text-emerald-700',
+        emoji: '📈',
+        subtitle: `Sobrará ${formatCurrency(resultadoDoMes)} este mês`
+      };
+    }
+    if (isNegativo) {
+      return {
+        bgClass: 'from-red-50 to-red-100/50 border-red-200',
+        textColor: 'text-red-600',
+        valueColor: 'text-red-700',
+        emoji: '📉',
+        subtitle: `Faltará ${formatCurrency(Math.abs(resultadoDoMes))} este mês`
+      };
+    }
+    return {
+      bgClass: 'from-gray-50 to-gray-100/50 border-gray-200',
+      textColor: 'text-gray-600',
+      valueColor: 'text-gray-700',
+      emoji: '⚖️',
+      subtitle: 'O mês deve fechar equilibrado'
+    };
+  };
+
+  const styles = getResultadoStyles();
 
   return (
     <div className="space-y-8">
-      {/* 💰 CARD PRINCIPAL - SALDO PROJETADO */}
+      {/* 💰 CARD PRINCIPAL - RESULTADO DO MÊS */}
       <Card 
-        className={`w-full min-h-[120px] p-8 rounded-[18px] bg-gradient-to-br ${
-          saldoPositivo 
-            ? 'from-primary/10 to-primary/5 border-primary/20' 
-            : 'from-destructive/10 to-destructive/5 border-destructive/20'
-        } shadow-[0_5px_20px_rgba(0,0,0,0.06)]`}
+        className={`w-full min-h-[120px] p-8 rounded-[18px] bg-gradient-to-br ${styles.bgClass} shadow-[0_5px_20px_rgba(0,0,0,0.06)]`}
       >
         <div>
-          <p className="text-sm font-semibold text-primary uppercase tracking-wider mb-3">
-            💰 Saldo Projetado
+          <p className={`text-sm font-semibold ${styles.textColor} uppercase tracking-wider mb-3`}>
+            {styles.emoji} Resultado do Mês
           </p>
-          <p className={`text-5xl font-bold ${saldoPositivo ? 'text-primary-dark' : 'text-destructive'}`}>
-            {formatCurrency(saldoProjetado)}
+          <p className={`text-5xl font-bold ${styles.valueColor}`}>
+            {formatCurrency(resultadoDoMes)}
           </p>
-          <p className="text-sm text-secondary mt-3">
-            Projeção a partir do mês atual até o futuro
+          <p className={`text-sm ${styles.textColor} mt-3 font-medium`}>
+            {styles.subtitle}
           </p>
         </div>
       </Card>
