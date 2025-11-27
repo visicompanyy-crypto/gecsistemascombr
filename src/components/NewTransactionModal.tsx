@@ -160,7 +160,7 @@ export function NewTransactionModal({
     // Validate variable installments
     if (formData.variation_type === 'variavel' && numInstallments > 1) {
       const sumOfInstallments = variableInstallments.reduce(
-        (sum, inst) => sum + parseFloat(inst.amount.replace(/[^\d,]/g, '').replace(',', '.') || '0'),
+        (sum, inst) => sum + parseFloat(inst.amount || '0'),
         0
       );
       
@@ -257,7 +257,7 @@ export function NewTransactionModal({
 
           // Criar a primeira parcela
           const firstInstallmentAmount = formData.variation_type === 'variavel' 
-            ? parseFloat(variableInstallments[0].amount.replace(/[^\d,]/g, '').replace(',', '.')) 
+            ? parseFloat(variableInstallments[0].amount || '0') 
             : installmentAmount;
 
           const { data: firstInstallmentData, error: firstError } = await supabase
@@ -299,7 +299,7 @@ export function NewTransactionModal({
           for (let i = 1; i < numInstallments; i++) {
             const installmentDate = addMonths(firstDate, i);
             const installmentAmountValue = formData.variation_type === 'variavel' 
-              ? parseFloat(variableInstallments[i].amount.replace(/[^\d,]/g, '').replace(',', '.')) 
+              ? parseFloat(variableInstallments[i].amount || '0') 
               : installmentAmount;
 
             installments.push({
@@ -568,7 +568,7 @@ export function NewTransactionModal({
                 </div>
                 {(() => {
                   const sumOfInstallments = variableInstallments.reduce(
-                    (sum, inst) => sum + parseFloat(inst.amount.replace(/[^\d,]/g, '').replace(',', '.') || '0'),
+                    (sum, inst) => sum + parseFloat(inst.amount || '0'),
                     0
                   );
                   const difference = Math.abs(sumOfInstallments - totalAmount);
