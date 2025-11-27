@@ -1,4 +1,4 @@
-import { Bell, ChevronDown, Home, CreditCard, Settings } from "lucide-react";
+import { ChevronDown, Home, CreditCard, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCompanySettings } from "@/contexts/CompanySettingsContext";
+import { NotificationBell } from "./NotificationBell";
 import logo from "@/assets/logo.png";
 
 interface HeaderProps {
@@ -84,10 +85,7 @@ export function Header({ currentMonth, onOpenCompanySettings }: HeaderProps) {
           </DropdownMenu>
 
           {/* Notificações */}
-          <Button variant="ghost" size="icon" className="relative">
-            <Bell className="h-5 w-5 text-muted-foreground" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
-          </Button>
+          <NotificationBell />
 
           {/* Avatar e Menu */}
           <DropdownMenu>
