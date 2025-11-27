@@ -377,6 +377,21 @@ export function NewTransactionModal({
           </DialogHeader>
           
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Nome */}
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-sm text-muted-foreground">
+                Nome *
+              </Label>
+              <Input
+                id="description"
+                placeholder="Ex: Aluguel, Salário, Compra de material..."
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className="border-input bg-white focus-visible:ring-primary"
+                required
+              />
+            </div>
+
             {/* Valor Total */}
             <div className="space-y-2">
               <Label htmlFor="amount" className="text-sm text-muted-foreground">
