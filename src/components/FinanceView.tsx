@@ -14,6 +14,7 @@ import { TransactionDetailModal } from "./TransactionDetailModal";
 import { useFinancialSummary } from "@/hooks/useFinancialSummary";
 import { useToast } from "@/hooks/use-toast";
 import { Header } from "./Header";
+import { OnboardingTour } from "./OnboardingTour";
 
 export function FinanceView() {
   const { toast } = useToast();
@@ -204,27 +205,31 @@ export function FinanceView() {
 
   return (
     <div className="min-h-screen bg-background">
+      <OnboardingTour />
       <Header currentMonth={currentMonth} />
       
       <div className="max-w-[1320px] mx-auto px-6 py-8 space-y-8 mt-8">
 
-        <FinancialSummaryCards
-          saldoProjetado={summary.saldoProjetado}
-          receitaTotalRecebida={summary.receitaTotalRecebida}
-          receitasFuturas={summary.receitasFuturas}
-          despesasFuturas={summary.despesasFuturas}
-          receitasDoMes={summary.receitasDoMes}
-          totalAPagarNoMes={summary.totalAPagarNoMes}
-          listaReceitaTotalRecebida={summary.listaReceitaTotalRecebida}
-          listaReceitasFuturas={summary.listaReceitasFuturas}
-          listaDespesasFuturas={summary.listaDespesasFuturas}
-          listaReceitasDoMes={summary.listaReceitasDoMes}
-          listaDespesasDoMes={summary.listaDespesasDoMes}
-          teamToolExpensesDoMes={teamToolExpensesDoMes}
-        />
+        <div data-tour="summary-cards">
+          <FinancialSummaryCards
+            saldoProjetado={summary.saldoProjetado}
+            receitaTotalRecebida={summary.receitaTotalRecebida}
+            receitasFuturas={summary.receitasFuturas}
+            despesasFuturas={summary.despesasFuturas}
+            receitasDoMes={summary.receitasDoMes}
+            totalAPagarNoMes={summary.totalAPagarNoMes}
+            listaReceitaTotalRecebida={summary.listaReceitaTotalRecebida}
+            listaReceitasFuturas={summary.listaReceitasFuturas}
+            listaDespesasFuturas={summary.listaDespesasFuturas}
+            listaReceitasDoMes={summary.listaReceitasDoMes}
+            listaDespesasDoMes={summary.listaDespesasDoMes}
+            teamToolExpensesDoMes={teamToolExpensesDoMes}
+          />
+        </div>
 
         <div className="flex items-center gap-6">
           <Button 
+            data-tour="new-transaction"
             onClick={() => setModalOpen(true)} 
             className="gap-2 bg-primary hover:bg-primary-dark text-primary-foreground rounded-[10px] px-6 py-2.5 font-medium shadow-md hover:shadow-lg transition-all"
           >
@@ -232,7 +237,7 @@ export function FinanceView() {
             Novo Lançamento
           </Button>
 
-          <div className="flex items-center gap-3 bg-card border border-border rounded-lg px-5 py-2.5 shadow-sm">
+          <div data-tour="month-selector" className="flex items-center gap-3 bg-card border border-border rounded-lg px-5 py-2.5 shadow-sm">
             <Button 
               variant="ghost" 
               size="icon"
@@ -258,26 +263,30 @@ export function FinanceView() {
         <Card className="p-8 space-y-6 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border-border">
           <div>
             <h2 className="text-xl font-semibold mb-6 text-foreground">Lista de Lançamentos</h2>
-            <FinancialFilters
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              typeFilter={typeFilter}
-              onTypeFilterChange={setTypeFilter}
-              paymentMethodFilter={paymentMethodFilter}
-              onPaymentMethodFilterChange={setPaymentMethodFilter}
-              costCenterFilter={costCenterFilter}
-              onCostCenterFilterChange={setCostCenterFilter}
-              onClearFilters={handleClearFilters}
-            />
+            <div data-tour="filters">
+              <FinancialFilters
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                typeFilter={typeFilter}
+                onTypeFilterChange={setTypeFilter}
+                paymentMethodFilter={paymentMethodFilter}
+                onPaymentMethodFilterChange={setPaymentMethodFilter}
+                costCenterFilter={costCenterFilter}
+                onCostCenterFilterChange={setCostCenterFilter}
+                onClearFilters={handleClearFilters}
+              />
+            </div>
           </div>
 
-          <FinancialTransactionsTable
-            transactions={filteredTransactions || []}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onViewDetails={handleViewDetails}
-            onMarkAsPaid={handleMarkAsPaid}
-          />
+          <div data-tour="transactions-table">
+            <FinancialTransactionsTable
+              transactions={filteredTransactions || []}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onViewDetails={handleViewDetails}
+              onMarkAsPaid={handleMarkAsPaid}
+            />
+          </div>
         </Card>
 
         <div className="grid gap-5 md:grid-cols-2">
@@ -300,7 +309,9 @@ export function FinanceView() {
           </Card>
         </div>
 
-        <FinancePieCharts data={summary.transactionsByCategory} />
+        <div data-tour="charts">
+          <FinancePieCharts data={summary.transactionsByCategory} />
+        </div>
 
         <NewTransactionModal
           open={modalOpen}
