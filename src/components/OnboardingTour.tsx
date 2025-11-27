@@ -115,7 +115,6 @@ export function OnboardingTour({ forceRun, onComplete }: OnboardingTourProps) {
         last: 'Finalizar',
         next: 'Próximo',
         skip: 'Pular tour',
-        nextLabelWithProgress: 'Próximo (Passo {step} de {size})',
       }}
     />
   );
