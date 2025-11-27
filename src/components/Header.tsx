@@ -1,4 +1,4 @@
-import { Bell, ChevronDown, Home, CreditCard } from "lucide-react";
+import { Bell, ChevronDown, Home, CreditCard, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,18 +8,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCompanySettings } from "@/contexts/CompanySettingsContext";
 import logo from "@/assets/logo.png";
 
 interface HeaderProps {
   currentMonth: Date;
+  onOpenCompanySettings?: () => void;
 }
 
-export function Header({ currentMonth }: HeaderProps) {
+export function Header({ currentMonth, onOpenCompanySettings }: HeaderProps) {
   const navigate = useNavigate();
   const { user, subscription, signOut } = useAuth();
+  const { settings } = useCompanySettings();
 
   const handleLogout = async () => {
     await signOut();
@@ -29,20 +32,35 @@ export function Header({ currentMonth }: HeaderProps) {
   return (
     <header className="bg-background border-b border-border/20 h-[72px] sticky top-0 z-50 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto h-full px-8 flex items-center justify-between">
-        {/* Back to Home Button */}
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/")}
-          className="text-muted-foreground hover:text-primary gap-2"
-        >
-          <Home className="h-4 w-4" />
-          Voltar para home
-        </Button>
+        {/* Company Logo/Name or Back Button */}
+        <div className="flex items-center gap-3">
+          {settings?.logo_url ? (
+            <img 
+              src={settings.logo_url} 
+              alt={settings.company_name} 
+              className="w-10 h-10 object-contain rounded-lg"
+            />
+          ) : (
+            <Button
+              variant="ghost"
+              onClick={() => navigate("/")}
+              className="text-muted-foreground hover:text-primary gap-2"
+            >
+              <Home className="h-4 w-4" />
+              Voltar para home
+            </Button>
+          )}
+          {settings?.company_name && (
+            <h1 className="text-lg font-semibold text-foreground">
+              {settings.company_name}
+            </h1>
+          )}
+        </div>
 
-        {/* Logo */}
+        {/* System Logo - Center */}
         <div className="flex items-center gap-3">
           <img src={logo} alt="Logo" className="w-11 h-11" />
-          <h1 className="text-xl font-semibold text-foreground">Finance</h1>
+          <span className="text-xl font-semibold text-foreground">Finance</span>
         </div>
 
         {/* Dropdowns e Actions */}
@@ -104,7 +122,10 @@ export function Header({ currentMonth }: HeaderProps) {
               <DropdownMenuItem onClick={() => navigate("/pricing")}>
                 {subscription?.subscribed ? "Gerenciar assinatura" : "Ver planos"}
               </DropdownMenuItem>
-              <DropdownMenuItem>Configurações</DropdownMenuItem>
+              <DropdownMenuItem onClick={onOpenCompanySettings}>
+                <Settings className="h-4 w-4 mr-2" />
+                Configurações da Empresa
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                 Sair
