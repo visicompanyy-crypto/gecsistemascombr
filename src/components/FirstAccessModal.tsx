@@ -100,11 +100,30 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
     return data.publicUrl;
   };
 
-  const createCostCenters = async () => {
+  const createCompany = async (logoUrl: string | null): Promise<string> => {
+    if (!user) throw new Error("Usuário não autenticado");
+
+    const { data, error } = await supabase
+      .from("companies")
+      .insert({
+        name: companyName.trim(),
+        logo_url: logoUrl,
+        primary_color: selectedColor,
+        created_by: user.id,
+      })
+      .select("id")
+      .single();
+
+    if (error) throw error;
+    return data.id;
+  };
+
+  const createCostCenters = async (companyId: string) => {
     if (!user || selectedCostCenters.length === 0) return;
 
     const costCentersToCreate = selectedCostCenters.map((name) => ({
       user_id: user.id,
+      company_id: companyId,
       name,
       description: DEFAULT_COST_CENTERS.find((c) => c.name === name)?.description || `Centro de custo: ${name}`,
     }));
@@ -137,15 +156,19 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
       // Upload logo if exists
       const logoUrl = await uploadLogo();
 
-      // Create cost centers
-      await createCostCenters();
+      // Create company record first
+      const companyId = await createCompany(logoUrl);
 
-      // Save company settings
+      // Create cost centers with company_id
+      await createCostCenters(companyId);
+
+      // Save company settings with company_id reference
       await updateSettings({
         company_name: companyName.trim(),
         logo_url: logoUrl,
         primary_color: selectedColor,
         onboarding_completed: true,
+        company_id: companyId,
       });
 
       toast({

@@ -14,8 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      companies: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          logo_url: string | null
+          name: string
+          primary_color: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          primary_color?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          primary_color?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       company_settings: {
         Row: {
+          company_id: string | null
           company_name: string
           created_at: string
           id: string
@@ -26,6 +57,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          company_id?: string | null
           company_name: string
           created_at?: string
           id?: string
@@ -36,6 +68,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          company_id?: string | null
           company_name?: string
           created_at?: string
           id?: string
@@ -45,12 +78,21 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "company_settings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cost_centers: {
         Row: {
           annual_budget: number | null
           code: string | null
+          company_id: string | null
           created_at: string | null
           deleted_at: string | null
           description: string | null
@@ -66,6 +108,7 @@ export type Database = {
         Insert: {
           annual_budget?: number | null
           code?: string | null
+          company_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
           description?: string | null
@@ -81,6 +124,7 @@ export type Database = {
         Update: {
           annual_budget?: number | null
           code?: string | null
+          company_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
           description?: string | null
@@ -95,6 +139,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "cost_centers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "cost_centers_parent_id_fkey"
             columns: ["parent_id"]
             isOneToOne: false
@@ -106,6 +157,7 @@ export type Database = {
       financial_categories: {
         Row: {
           color: string | null
+          company_id: string | null
           created_at: string | null
           description: string | null
           icon: string | null
@@ -118,6 +170,7 @@ export type Database = {
         }
         Insert: {
           color?: string | null
+          company_id?: string | null
           created_at?: string | null
           description?: string | null
           icon?: string | null
@@ -130,6 +183,7 @@ export type Database = {
         }
         Update: {
           color?: string | null
+          company_id?: string | null
           created_at?: string | null
           description?: string | null
           icon?: string | null
@@ -141,6 +195,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "financial_categories_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "financial_categories_parent_id_fkey"
             columns: ["parent_id"]
@@ -156,6 +217,7 @@ export type Database = {
           attachment_url: string[] | null
           bank_account: string | null
           category: string | null
+          company_id: string | null
           cost_center_id: string | null
           created_at: string | null
           deleted_at: string | null
@@ -194,6 +256,7 @@ export type Database = {
           attachment_url?: string[] | null
           bank_account?: string | null
           category?: string | null
+          company_id?: string | null
           cost_center_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
@@ -232,6 +295,7 @@ export type Database = {
           attachment_url?: string[] | null
           bank_account?: string | null
           category?: string | null
+          company_id?: string | null
           cost_center_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
@@ -267,6 +331,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "financial_transactions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "financial_transactions_parent_transaction_id_fkey"
             columns: ["parent_transaction_id"]
             isOneToOne: false
@@ -291,6 +362,7 @@ export type Database = {
       }
       team_members: {
         Row: {
+          company_id: string | null
           created_at: string | null
           deleted_at: string | null
           department: string | null
@@ -309,6 +381,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          company_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
           department?: string | null
@@ -327,6 +400,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          company_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
           department?: string | null
@@ -344,11 +418,20 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "team_members_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       team_tool_expenses: {
         Row: {
           amount: number
+          company_id: string | null
           cost_center_id: string | null
           created_at: string | null
           deleted_at: string | null
@@ -368,6 +451,7 @@ export type Database = {
         }
         Insert: {
           amount: number
+          company_id?: string | null
           cost_center_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
@@ -387,6 +471,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          company_id?: string | null
           cost_center_id?: string | null
           created_at?: string | null
           deleted_at?: string | null
@@ -405,6 +490,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "team_tool_expenses_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "team_tool_expenses_cost_center_id_fkey"
             columns: ["cost_center_id"]
@@ -432,6 +524,7 @@ export type Database = {
         Row: {
           billing_frequency: string | null
           category: string | null
+          company_id: string | null
           cost_per_license: number | null
           created_at: string | null
           deleted_at: string | null
@@ -448,6 +541,7 @@ export type Database = {
         Insert: {
           billing_frequency?: string | null
           category?: string | null
+          company_id?: string | null
           cost_per_license?: number | null
           created_at?: string | null
           deleted_at?: string | null
@@ -464,6 +558,7 @@ export type Database = {
         Update: {
           billing_frequency?: string | null
           category?: string | null
+          company_id?: string | null
           cost_per_license?: number | null
           created_at?: string | null
           deleted_at?: string | null
@@ -477,7 +572,15 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tools_software_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

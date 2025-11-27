@@ -8,6 +8,7 @@ interface CompanySettings {
   logo_url: string | null;
   primary_color: string;
   onboarding_completed: boolean;
+  company_id: string | null;
 }
 
 interface CompanySettingsContextType {
@@ -91,6 +92,7 @@ export const CompanySettingsProvider = ({ children }: { children: ReactNode }) =
             logo_url: updates.logo_url || null,
             primary_color: updates.primary_color || "green",
             onboarding_completed: updates.onboarding_completed || false,
+            company_id: updates.company_id || null,
           });
         if (error) throw error;
       }
