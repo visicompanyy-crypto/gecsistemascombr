@@ -13,6 +13,7 @@ import { NewTransactionModal } from "./NewTransactionModal";
 import { TransactionDetailModal } from "./TransactionDetailModal";
 import { FirstAccessModal } from "./FirstAccessModal";
 import { WelcomeCard } from "./WelcomeCard";
+import { DailyReminder } from "./DailyReminder";
 import { useFinancialSummary } from "@/hooks/useFinancialSummary";
 import { useToast } from "@/hooks/use-toast";
 import { Header } from "./Header";
@@ -278,7 +279,7 @@ export function FinanceView() {
         <div className="grid gap-5 md:grid-cols-2">
           <Card className="p-8 bg-card rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-border">
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-income uppercase tracking-wide">Total de Receitas Pagas</h3>
+              <h3 className="text-sm font-semibold text-income uppercase tracking-wide">Total de Receitas Recebidas</h3>
               <p className="text-5xl font-bold text-income">
                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.receitaTotalRecebida)}
               </p>
@@ -322,6 +323,9 @@ export function FinanceView() {
           onComplete={handleFirstAccessComplete}
         />
       </div>
+      
+      {/* Daily reminder popup */}
+      <DailyReminder />
     </div>
   );
 }

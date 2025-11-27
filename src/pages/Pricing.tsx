@@ -129,7 +129,7 @@ const Pricing = () => {
       <div className="max-w-[1200px] mx-auto px-6">
         <Button
           variant="ghost"
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
           className="mb-8 text-white hover:text-white/80 hover:bg-white/10"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
