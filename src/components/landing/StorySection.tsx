@@ -43,16 +43,6 @@ export const StorySection = () => {
           <FloatingCardsDisplay images={pollutedImages} variant="polluted" />
         </div>
 
-        {/* Highlight quotes */}
-        <div className="text-center space-y-4 mb-20 max-w-3xl mx-auto">
-          <p className="text-2xl md:text-3xl font-bold text-white">
-            "Você só queria saber quanto entrou e quanto saiu."
-          </p>
-          <p className="text-xl md:text-2xl font-semibold text-[#ff2d55]">
-            "Informação demais, clareza de menos."
-          </p>
-        </div>
-
         {/* Divider */}
         <div className="w-24 h-1 bg-gradient-to-r from-[#00ff88] to-[#00ff88]/50 mx-auto mb-20 rounded-full" />
 
@@ -81,14 +71,6 @@ export const StorySection = () => {
           <FloatingCardsDisplay images={cleanImages} variant="clean" />
         </div>
 
-        {/* Closing subtitle */}
-        <div className="text-center max-w-3xl mx-auto">
-          <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-            Simples de usar, feito para o empreendedor brasileiro que precisa de{" "}
-            <span className="text-[#00ff88] font-medium">controle com clareza</span> e{" "}
-            <span className="text-[#00ff88] font-medium">praticidade</span>.
-          </p>
-        </div>
 
       </div>
     </section>
