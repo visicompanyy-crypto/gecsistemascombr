@@ -67,8 +67,8 @@ export const Footer = () => {
         </div>
       </div>
 
-      {/* Balão Flutuante - GEC SISTEMAS */}
-      <div className="fixed bottom-6 right-6 z-50">
+      {/* Balão - GEC SISTEMAS (dentro do footer) */}
+      <div className="absolute bottom-4 right-4">
         <div className="flex items-center gap-3 bg-black/50 backdrop-blur-sm border border-white/10 rounded-full px-4 py-2">
           <p className="text-xs text-gray-400">
             Criado por <span className="text-white font-medium">GEC SISTEMAS</span>
