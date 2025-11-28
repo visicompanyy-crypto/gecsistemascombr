@@ -32,32 +32,32 @@ export const FeaturesSection = () => {
 
   const features = [
     {
-      icon: <Zap className="text-white" size={28} />,
+      icon: <Zap className="text-white" size={24} />,
       title: "Lançamentos rápidos",
       description: "Adicione receitas e despesas em poucos cliques",
     },
     {
-      icon: <Calendar className="text-white" size={28} />,
+      icon: <Calendar className="text-white" size={24} />,
       title: "Parcelamentos automáticos",
       description: "Divida valores em parcelas fixas ou variáveis",
     },
     {
-      icon: <TrendingUp className="text-white" size={28} />,
+      icon: <TrendingUp className="text-white" size={24} />,
       title: "Fluxo de caixa organizado",
       description: "Visualize entradas e saídas por período",
     },
     {
-      icon: <Target className="text-white" size={28} />,
+      icon: <Target className="text-white" size={24} />,
       title: "Projeção automática",
       description: "Veja quanto vai entrar e sair nos próximos meses",
     },
     {
-      icon: <Bell className="text-white" size={28} />,
+      icon: <Bell className="text-white" size={24} />,
       title: "Alertas de vencimento",
       description: "Nunca mais esqueça uma conta a pagar",
     },
     {
-      icon: <BarChart3 className="text-white" size={28} />,
+      icon: <BarChart3 className="text-white" size={24} />,
       title: "Relatórios claros",
       description: "Gráficos simples para entender seu financeiro",
     },

@@ -5,7 +5,7 @@ export const FinalCTASection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="bg-gradient-to-br from-[#00ff88] to-[#00cc6f] py-24 md:py-32 overflow-hidden relative">
+    <section className="bg-gradient-to-br from-[#00ff88] to-[#00cc6f] py-20 md:py-28 overflow-hidden relative">
       {/* Grid Pattern Background */}
       <div 
         className="absolute inset-0 opacity-10"

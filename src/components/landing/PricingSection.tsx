@@ -2,8 +2,8 @@ import { PricingCard } from "./PricingCard";
 
 export const PricingSection = () => {
   return (
-    <section id="precos" className="py-20 md:py-32">
-      <div className="max-w-[1200px] mx-auto px-6">
+    <section id="precos" className="py-20 md:py-28">
+      <div className="max-w-[1320px] mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
             Mesma plataforma, três formas de pagar. Você escolhe.

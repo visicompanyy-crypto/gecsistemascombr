@@ -34,20 +34,20 @@ const FAQSection = () => {
   ];
 
   return (
-    <section className="py-20 px-6">
-      <div className="max-w-4xl mx-auto">
+    <section className="py-20 md:py-28">
+      <div className="max-w-[1320px] mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16 animate-fade-in">
-          <h2 className="font-public-sans text-4xl md:text-5xl font-bold text-white mb-4">
+          <h2 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
             Perguntas Frequentes
           </h2>
-          <p className="text-lg text-gray-300">
+          <p className="text-lg md:text-xl text-gray-300">
             Tudo o que você precisa saber sobre a Saldar
           </p>
         </div>
 
         {/* FAQ Accordion */}
-        <div className="space-y-4">
+        <div className="space-y-4 max-w-4xl mx-auto">
           {faqs.map((faq, index) => (
             <div 
               key={index}

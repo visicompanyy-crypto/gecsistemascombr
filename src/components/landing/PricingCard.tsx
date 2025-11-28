@@ -84,12 +84,12 @@ export const PricingCard = ({
       )}
 
       <div
-        className={`rounded-3xl p-10 transition-all duration-500 hover:-translate-y-2 relative bg-[#0f1410]/80 backdrop-blur-sm border-2 ${styles.border} ${styles.shadow} ${styles.glow} ${
+        className={`rounded-2xl p-8 transition-all duration-500 hover:-translate-y-2 relative bg-[#0f1410]/80 backdrop-blur-sm border-2 ${styles.border} ${styles.shadow} ${styles.glow} ${
           highlighted ? "scale-105" : ""
         }`}
       >
         {/* Glow effect background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#00ff88]/5 to-transparent opacity-50 rounded-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#00ff88]/5 to-transparent opacity-50 rounded-2xl" />
         
         <div className="relative z-10">
           <h3 className={`text-2xl font-bold mb-2 ${styles.title}`}>
