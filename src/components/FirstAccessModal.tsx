@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCompanySettings, COLOR_THEMES } from "@/contexts/CompanySettingsContext";
-import { Building2, Layers, Palette, Upload, Plus, Check, ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { Building2, Layers, Palette, Upload, Plus, Check, ArrowLeft, ArrowRight, Sparkles, TrendingUp, TrendingDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
@@ -18,13 +18,29 @@ interface FirstAccessModalProps {
   onComplete?: () => void;
 }
 
-const DEFAULT_COST_CENTERS = [
-  { name: "Vendas", description: "Receitas de vendas" },
-  { name: "Operacional", description: "Custos operacionais" },
-  { name: "Administrativo", description: "Despesas administrativas" },
-  { name: "Marketing", description: "Investimentos em marketing" },
-  { name: "Impostos", description: "Tributos e taxas" },
-  { name: "Fornecedores", description: "Pagamentos a fornecedores" },
+interface CostCenterOption {
+  name: string;
+  description: string;
+  type: 'receita' | 'despesa';
+}
+
+const DEFAULT_REVENUE_COST_CENTERS: CostCenterOption[] = [
+  { name: "Vendas", description: "Receitas de vendas de produtos", type: 'receita' },
+  { name: "Serviços", description: "Receitas de prestação de serviços", type: 'receita' },
+  { name: "Recorrência", description: "Receitas recorrentes (assinaturas)", type: 'receita' },
+  { name: "Projetos", description: "Receitas de projetos específicos", type: 'receita' },
+  { name: "Mensalidades", description: "Receitas de mensalidades", type: 'receita' },
+  { name: "Outros Recebimentos", description: "Outras fontes de receita", type: 'receita' },
+];
+
+const DEFAULT_EXPENSE_COST_CENTERS: CostCenterOption[] = [
+  { name: "Marketing", description: "Investimentos em marketing", type: 'despesa' },
+  { name: "Operacional", description: "Custos operacionais", type: 'despesa' },
+  { name: "Impostos", description: "Tributos e taxas", type: 'despesa' },
+  { name: "Fornecedores", description: "Pagamentos a fornecedores", type: 'despesa' },
+  { name: "Software", description: "Assinaturas de software", type: 'despesa' },
+  { name: "Mão de Obra", description: "Salários e encargos", type: 'despesa' },
+  { name: "Serviços Contratados", description: "Serviços terceirizados", type: 'despesa' },
 ];
 
 const COLOR_OPTIONS = [
@@ -49,13 +65,13 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
-  // Step 2
-  const [selectedCostCenters, setSelectedCostCenters] = useState<string[]>([
-    "Vendas",
-    "Operacional",
-    "Administrativo",
-  ]);
-  const [newCostCenter, setNewCostCenter] = useState("");
+  // Step 2 - Separate revenue and expense cost centers
+  const [selectedRevenueCenters, setSelectedRevenueCenters] = useState<string[]>(["Vendas", "Serviços"]);
+  const [selectedExpenseCenters, setSelectedExpenseCenters] = useState<string[]>(["Marketing", "Operacional", "Impostos"]);
+  const [newRevenueCostCenter, setNewRevenueCostCenter] = useState("");
+  const [newExpenseCostCenter, setNewExpenseCostCenter] = useState("");
+  const [customRevenueCenters, setCustomRevenueCenters] = useState<CostCenterOption[]>([]);
+  const [customExpenseCenters, setCustomExpenseCenters] = useState<CostCenterOption[]>([]);
 
   // Step 3
   const [selectedColor, setSelectedColor] = useState("green");
@@ -72,15 +88,40 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
     }
   };
 
-  const handleAddCostCenter = () => {
-    if (newCostCenter.trim() && !selectedCostCenters.includes(newCostCenter.trim())) {
-      setSelectedCostCenters([...selectedCostCenters, newCostCenter.trim()]);
-      setNewCostCenter("");
+  const handleAddRevenueCostCenter = () => {
+    if (newRevenueCostCenter.trim() && !selectedRevenueCenters.includes(newRevenueCostCenter.trim())) {
+      const newCenter: CostCenterOption = {
+        name: newRevenueCostCenter.trim(),
+        description: "Centro de receita personalizado",
+        type: 'receita'
+      };
+      setCustomRevenueCenters([...customRevenueCenters, newCenter]);
+      setSelectedRevenueCenters([...selectedRevenueCenters, newRevenueCostCenter.trim()]);
+      setNewRevenueCostCenter("");
     }
   };
 
-  const toggleCostCenter = (name: string) => {
-    setSelectedCostCenters((prev) =>
+  const handleAddExpenseCostCenter = () => {
+    if (newExpenseCostCenter.trim() && !selectedExpenseCenters.includes(newExpenseCostCenter.trim())) {
+      const newCenter: CostCenterOption = {
+        name: newExpenseCostCenter.trim(),
+        description: "Centro de despesa personalizado",
+        type: 'despesa'
+      };
+      setCustomExpenseCenters([...customExpenseCenters, newCenter]);
+      setSelectedExpenseCenters([...selectedExpenseCenters, newExpenseCostCenter.trim()]);
+      setNewExpenseCostCenter("");
+    }
+  };
+
+  const toggleRevenueCostCenter = (name: string) => {
+    setSelectedRevenueCenters((prev) =>
+      prev.includes(name) ? prev.filter((c) => c !== name) : [...prev, name]
+    );
+  };
+
+  const toggleExpenseCostCenter = (name: string) => {
+    setSelectedExpenseCenters((prev) =>
       prev.includes(name) ? prev.filter((c) => c !== name) : [...prev, name]
     );
   };
@@ -120,7 +161,7 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
   };
 
   const createCostCenters = async (companyId: string) => {
-    if (!user || selectedCostCenters.length === 0) return;
+    if (!user) return;
 
     // First, check which cost centers already exist for this user
     const { data: existingCenters } = await supabase
@@ -131,17 +172,42 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
 
     const existingNames = new Set(existingCenters?.map((c) => c.name) || []);
 
-    // Filter out cost centers that already exist
-    const newCostCenters = selectedCostCenters.filter((name) => !existingNames.has(name));
+    // All cost center options
+    const allRevenueCenters = [...DEFAULT_REVENUE_COST_CENTERS, ...customRevenueCenters];
+    const allExpenseCenters = [...DEFAULT_EXPENSE_COST_CENTERS, ...customExpenseCenters];
 
-    if (newCostCenters.length === 0) return;
+    // Build list of cost centers to create
+    const costCentersToCreate: { user_id: string; company_id: string; name: string; description: string; type: string }[] = [];
 
-    const costCentersToCreate = newCostCenters.map((name) => ({
-      user_id: user.id,
-      company_id: companyId,
-      name,
-      description: DEFAULT_COST_CENTERS.find((c) => c.name === name)?.description || `Centro de custo: ${name}`,
-    }));
+    // Add selected revenue centers
+    selectedRevenueCenters.forEach((name) => {
+      if (!existingNames.has(name)) {
+        const center = allRevenueCenters.find((c) => c.name === name);
+        costCentersToCreate.push({
+          user_id: user.id,
+          company_id: companyId,
+          name,
+          description: center?.description || `Centro de receita: ${name}`,
+          type: 'receita',
+        });
+      }
+    });
+
+    // Add selected expense centers
+    selectedExpenseCenters.forEach((name) => {
+      if (!existingNames.has(name)) {
+        const center = allExpenseCenters.find((c) => c.name === name);
+        costCentersToCreate.push({
+          user_id: user.id,
+          company_id: companyId,
+          name,
+          description: center?.description || `Centro de despesa: ${name}`,
+          type: 'despesa',
+        });
+      }
+    });
+
+    if (costCentersToCreate.length === 0) return;
 
     const { error } = await supabase.from("cost_centers").insert(costCentersToCreate);
     if (error) throw error;
@@ -301,62 +367,91 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
         </p>
       </div>
 
+      {/* Revenue Cost Centers */}
       <div className="space-y-3">
-        {DEFAULT_COST_CENTERS.map((center) => (
-          <div
-            key={center.name}
-            onClick={() => toggleCostCenter(center.name)}
-            className={cn(
-              "flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all",
-              selectedCostCenters.includes(center.name)
-                ? "border-primary bg-primary/5"
-                : "border-border hover:border-primary/30"
-            )}
-          >
-            <Checkbox
-              checked={selectedCostCenters.includes(center.name)}
-              onCheckedChange={() => toggleCostCenter(center.name)}
-            />
-            <div className="flex-1">
-              <p className="font-medium text-sm">{center.name}</p>
-              <p className="text-xs text-muted-foreground">{center.description}</p>
-            </div>
-          </div>
-        ))}
-
-        {selectedCostCenters
-          .filter((c) => !DEFAULT_COST_CENTERS.find((d) => d.name === c))
-          .map((name) => (
+        <div className="flex items-center gap-2">
+          <TrendingUp className="w-5 h-5 text-green-500" />
+          <h3 className="font-medium text-sm text-foreground">Centros de Receita</h3>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {[...DEFAULT_REVENUE_COST_CENTERS, ...customRevenueCenters].map((center) => (
             <div
-              key={name}
-              onClick={() => toggleCostCenter(name)}
-              className="flex items-center gap-3 p-3 rounded-lg border border-primary bg-primary/5 cursor-pointer"
+              key={center.name}
+              onClick={() => toggleRevenueCostCenter(center.name)}
+              className={cn(
+                "flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-all",
+                selectedRevenueCenters.includes(center.name)
+                  ? "border-green-500 bg-green-50 dark:bg-green-950/20"
+                  : "border-border hover:border-green-300"
+              )}
             >
-              <Checkbox checked onCheckedChange={() => toggleCostCenter(name)} />
-              <div className="flex-1">
-                <p className="font-medium text-sm">{name}</p>
-                <p className="text-xs text-muted-foreground">Centro de custo personalizado</p>
-              </div>
+              <Checkbox
+                checked={selectedRevenueCenters.includes(center.name)}
+                onCheckedChange={() => toggleRevenueCostCenter(center.name)}
+                className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+              />
+              <span className="text-sm font-medium">{center.name}</span>
             </div>
           ))}
-
-        <div className="flex gap-2 mt-4">
+        </div>
+        <div className="flex gap-2">
           <Input
-            placeholder="Novo centro de custo"
-            value={newCostCenter}
-            onChange={(e) => setNewCostCenter(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAddCostCenter()}
-            className="flex-1"
+            placeholder="Novo centro de receita"
+            value={newRevenueCostCenter}
+            onChange={(e) => setNewRevenueCostCenter(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAddRevenueCostCenter()}
+            className="flex-1 h-9"
           />
-          <Button variant="outline" size="icon" onClick={handleAddCostCenter}>
+          <Button variant="outline" size="sm" onClick={handleAddRevenueCostCenter} className="h-9">
             <Plus className="h-4 w-4" />
           </Button>
         </div>
-
-        <p className="text-xs text-muted-foreground text-center mt-2">
-          Você poderá editar ou excluir os centros de custo futuramente nas configurações
-        </p>
       </div>
+
+      {/* Expense Cost Centers */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <TrendingDown className="w-5 h-5 text-red-500" />
+          <h3 className="font-medium text-sm text-foreground">Centros de Despesa</h3>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {[...DEFAULT_EXPENSE_COST_CENTERS, ...customExpenseCenters].map((center) => (
+            <div
+              key={center.name}
+              onClick={() => toggleExpenseCostCenter(center.name)}
+              className={cn(
+                "flex items-center gap-2 p-2.5 rounded-lg border cursor-pointer transition-all",
+                selectedExpenseCenters.includes(center.name)
+                  ? "border-red-500 bg-red-50 dark:bg-red-950/20"
+                  : "border-border hover:border-red-300"
+              )}
+            >
+              <Checkbox
+                checked={selectedExpenseCenters.includes(center.name)}
+                onCheckedChange={() => toggleExpenseCostCenter(center.name)}
+                className="data-[state=checked]:bg-red-500 data-[state=checked]:border-red-500"
+              />
+              <span className="text-sm font-medium">{center.name}</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <Input
+            placeholder="Novo centro de despesa"
+            value={newExpenseCostCenter}
+            onChange={(e) => setNewExpenseCostCenter(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAddExpenseCostCenter()}
+            className="flex-1 h-9"
+          />
+          <Button variant="outline" size="sm" onClick={handleAddExpenseCostCenter} className="h-9">
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+
+      <p className="text-xs text-muted-foreground text-center">
+        Você poderá editar ou excluir os centros de custo futuramente nas configurações
+      </p>
     </div>
   );
 
@@ -410,7 +505,7 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] p-6" aria-describedby="first-access-description">
+      <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto p-6" aria-describedby="first-access-description">
         <VisuallyHidden>
           <DialogTitle>Configuração Inicial da Empresa</DialogTitle>
           <DialogDescription id="first-access-description">
