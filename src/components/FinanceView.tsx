@@ -51,8 +51,10 @@ export function FinanceView() {
     setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
   };
 
+  const { user } = useAuth();
+
   const { data: transactions, refetch: refetchTransactions } = useQuery({
-    queryKey: ['financial-transactions'],
+    queryKey: ['financial-transactions', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('financial_transactions')
@@ -68,10 +70,11 @@ export function FinanceView() {
       if (error) throw error;
       return data;
     },
+    enabled: !!user?.id,
   });
 
   const { data: teamToolExpenses, refetch: refetchTeamToolExpenses } = useQuery({
-    queryKey: ['team-tool-expenses'],
+    queryKey: ['team-tool-expenses', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('team_tool_expenses')
@@ -82,6 +85,7 @@ export function FinanceView() {
       if (error) throw error;
       return data;
     },
+    enabled: !!user?.id,
   });
 
 

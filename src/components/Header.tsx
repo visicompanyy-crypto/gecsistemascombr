@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCompanySettings } from "@/contexts/CompanySettingsContext";
+import { useQueryClient } from "@tanstack/react-query";
 import { NotificationBell } from "./NotificationBell";
 import logo from "@/assets/logo.png";
 
@@ -24,8 +25,11 @@ export function Header({ currentMonth, onOpenCompanySettings }: HeaderProps) {
   const navigate = useNavigate();
   const { user, subscription, signOut } = useAuth();
   const { settings } = useCompanySettings();
+  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
+    // Clear all cached data before logout (security: prevent data leakage)
+    queryClient.clear();
     await signOut();
     navigate("/");
   };

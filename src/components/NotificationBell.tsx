@@ -27,7 +27,7 @@ export function NotificationBell() {
   const [open, setOpen] = useState(false);
 
   const { data: pendingTransactions } = useQuery({
-    queryKey: ['pending-transactions-notifications'],
+    queryKey: ['pending-transactions-notifications', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('financial_transactions')
@@ -40,7 +40,7 @@ export function NotificationBell() {
       if (error) throw error;
       return data as Transaction[];
     },
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   const formatCurrency = (value: number) => {

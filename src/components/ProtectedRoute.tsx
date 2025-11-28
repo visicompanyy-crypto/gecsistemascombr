@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Navigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { Session } from "@supabase/supabase-js";
 import { useAuth } from "@/contexts/AuthContext";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -10,6 +9,21 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, subscription, loading, subscriptionLoading } = useAuth();
+  const queryClient = useQueryClient();
+  const previousUserIdRef = useRef<string | null>(null);
+
+  // Clear cache when user changes (security: prevent data leakage between users)
+  useEffect(() => {
+    const currentUserId = user?.id ?? null;
+    
+    if (previousUserIdRef.current !== null && 
+        previousUserIdRef.current !== currentUserId) {
+      console.log('User changed, clearing query cache for security');
+      queryClient.clear();
+    }
+    
+    previousUserIdRef.current = currentUserId;
+  }, [user?.id, queryClient]);
 
   if (loading || subscriptionLoading) {
     return (
