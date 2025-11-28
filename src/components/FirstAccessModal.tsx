@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCompanySettings, COLOR_THEMES } from "@/contexts/CompanySettingsContext";
 import { Building2, Layers, Palette, Upload, Plus, Check, ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface FirstAccessModalProps {
   open: boolean;
@@ -121,7 +122,21 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
   const createCostCenters = async (companyId: string) => {
     if (!user || selectedCostCenters.length === 0) return;
 
-    const costCentersToCreate = selectedCostCenters.map((name) => ({
+    // First, check which cost centers already exist for this user
+    const { data: existingCenters } = await supabase
+      .from("cost_centers")
+      .select("name")
+      .eq("user_id", user.id)
+      .is("deleted_at", null);
+
+    const existingNames = new Set(existingCenters?.map((c) => c.name) || []);
+
+    // Filter out cost centers that already exist
+    const newCostCenters = selectedCostCenters.filter((name) => !existingNames.has(name));
+
+    if (newCostCenters.length === 0) return;
+
+    const costCentersToCreate = newCostCenters.map((name) => ({
       user_id: user.id,
       company_id: companyId,
       name,
@@ -395,7 +410,14 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px] p-6">
+      <DialogContent className="sm:max-w-[480px] p-6" aria-describedby="first-access-description">
+        <VisuallyHidden>
+          <DialogTitle>Configuração Inicial da Empresa</DialogTitle>
+          <DialogDescription id="first-access-description">
+            Configure sua empresa em 3 passos simples: nome, centros de custo e cor do sistema.
+          </DialogDescription>
+        </VisuallyHidden>
+        
         {renderStepIndicator()}
 
         {step === 1 && renderStep1()}
