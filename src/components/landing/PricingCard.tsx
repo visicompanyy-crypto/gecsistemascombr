@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface PricingCardProps {
   name: string;
   price: string;
   period: string;
+  priceId: string;
   billingInfo?: string;
   badge?: string;
   description?: string;
@@ -20,6 +20,7 @@ export const PricingCard = ({
   name, 
   price, 
   period, 
+  priceId,
   billingInfo,
   badge, 
   description,
@@ -34,7 +35,6 @@ export const PricingCard = ({
   ]
 }: PricingCardProps) => {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const neonStyles = {
     green: {
@@ -66,11 +66,7 @@ export const PricingCard = ({
   const styles = neonStyles[neonColor];
 
   const handleClick = () => {
-    if (!user) {
-      navigate("/auth");
-    } else {
-      navigate("/pricing");
-    }
+    navigate(`/checkout?plan=${priceId}`);
   };
 
   return (
