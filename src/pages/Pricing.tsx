@@ -51,15 +51,9 @@ const Pricing = () => {
 
 
   const handleSubscribe = async (priceId: string, planName: string) => {
-    if (!user) {
-      toast({
-        title: "Login necessário",
-        description: "Faça login para assinar um plano.",
-        variant: "destructive",
-      });
-      navigate("/login");
-      return;
-    }
+    // Navegar para página de checkout com o plano selecionado
+    // Se não estiver logado, a página de checkout redirecionará para login
+    navigate(`/checkout?plan=${priceId}`);
 
     setLoadingPlan(priceId);
 
