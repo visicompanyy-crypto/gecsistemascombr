@@ -2,6 +2,7 @@ import { CompanyMenu } from "./header/CompanyMenu";
 import { QuickAddMenu } from "./header/QuickAddMenu";
 import { UserMenu } from "./header/UserMenu";
 import { NotificationBell } from "./NotificationBell";
+import logo from "@/assets/logo.png";
 
 interface HeaderProps {
   currentMonth: Date;
@@ -29,15 +30,19 @@ export function Header({
           onOpenCostCenterManager={onOpenCostCenterManager}
         />
 
-        {/* Centro - Botão Adicionar */}
-        <QuickAddMenu 
-          onNewTransaction={onNewTransaction}
-          onAddClient={onAddClient}
-          onAddCostCenter={onAddCostCenter}
-        />
+        {/* Centro - Logo Saldar */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-3">
+          <img src={logo} alt="Saldar" className="w-11 h-11" />
+          <span className="text-xl font-semibold text-foreground">Saldar</span>
+        </div>
 
-        {/* Direita - Notificações + Usuário */}
+        {/* Direita - Adicionar + Notificações + Usuário */}
         <div className="flex items-center gap-3">
+          <QuickAddMenu 
+            onNewTransaction={onNewTransaction}
+            onAddClient={onAddClient}
+            onAddCostCenter={onAddCostCenter}
+          />
           <NotificationBell />
           <UserMenu />
         </div>
