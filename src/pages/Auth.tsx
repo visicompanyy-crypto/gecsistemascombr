@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,12 +13,17 @@ import logo from "@/assets/logo.png";
 
 export default function Auth() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+
+  // Verificar se há redirect pendente (ex: plano selecionado antes do login)
+  const redirectPath = searchParams.get("redirect");
+  const planId = searchParams.get("plan");
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +54,12 @@ export default function Auth() {
       if (signInError) {
         // Se falhar o login automático, redireciona para pricing
         navigate("/pricing");
+        return;
+      }
+
+      // Se houver redirect pendente (ex: plano selecionado), vai para lá
+      if (redirectPath && planId) {
+        navigate(`${redirectPath}?plan=${planId}`);
         return;
       }
 
@@ -97,6 +108,12 @@ export default function Auth() {
         title: "Login realizado!",
         description: "Bem-vindo ao sistema financeiro.",
       });
+
+      // Se houver redirect pendente (ex: plano selecionado), vai para lá
+      if (redirectPath && planId) {
+        navigate(`${redirectPath}?plan=${planId}`);
+        return;
+      }
 
       // Verificar assinatura e redirecionar
       const { data: session } = await supabase.auth.getSession();
