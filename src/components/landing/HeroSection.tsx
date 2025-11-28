@@ -6,7 +6,7 @@ export const HeroSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-20 md:py-32">
+    <section className="py-20 md:py-28">
       <div className="max-w-[1320px] mx-auto px-6">
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Left Column - Text */}
