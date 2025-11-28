@@ -268,6 +268,9 @@ function DonutChart({ data, colors, emptyMessage, type, expanded = false }: Donu
 export function FinancePieCharts({ data, currentMonth }: FinancePieChartsProps) {
   const [expandedChart, setExpandedChart] = useState<'income' | 'expense' | null>(null);
 
+  // Safety check - ensure data is always an object
+  const safeData = data || {};
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -275,7 +278,7 @@ export function FinancePieCharts({ data, currentMonth }: FinancePieChartsProps) 
     }).format(value);
   };
 
-  const receitasData: ChartDataItem[] = Object.entries(data)
+  const receitasData: ChartDataItem[] = Object.entries(safeData)
     .filter(([_, values]) => values.receitas > 0)
     .map(([name, values]) => ({
       name,
@@ -288,7 +291,7 @@ export function FinancePieCharts({ data, currentMonth }: FinancePieChartsProps) 
     item.percentage = totalReceitas > 0 ? (item.value / totalReceitas) * 100 : 0;
   });
 
-  const despesasData: ChartDataItem[] = Object.entries(data)
+  const despesasData: ChartDataItem[] = Object.entries(safeData)
     .filter(([_, values]) => values.despesas > 0)
     .map(([name, values]) => ({
       name,
