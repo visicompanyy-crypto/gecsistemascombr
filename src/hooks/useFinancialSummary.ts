@@ -42,6 +42,9 @@ export function useFinancialSummary(
         receitasDoMes: 0,
         totalAPagarNoMes: 0,
         transactionsByCategory: {},
+        transactionsByCategoryDoMes: {},
+        receitaTotalRecebidaDoMes: 0,
+        listaReceitaTotalRecebidaDoMes: [],
         transactionsByMonth: [],
         // Listas detalhadas para os modais
         listaReceitaTotalRecebida: [],
