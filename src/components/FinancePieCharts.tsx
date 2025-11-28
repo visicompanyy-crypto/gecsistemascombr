@@ -1,6 +1,14 @@
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Sector } from 'recharts';
 import { useState } from 'react';
+import { Expand } from 'lucide-react';
 
 interface CategoryData {
   [key: string]: {
@@ -11,6 +19,7 @@ interface CategoryData {
 
 interface FinancePieChartsProps {
   data: CategoryData;
+  currentMonth: Date;
 }
 
 // Paleta de cores para receitas (tons de verde)
@@ -40,7 +49,7 @@ interface ChartDataItem {
 }
 
 const renderActiveShape = (props: any) => {
-  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill, payload, percent } = props;
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
 
   return (
     <g>
@@ -67,7 +76,7 @@ const renderActiveShape = (props: any) => {
   );
 };
 
-const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name, index, colors }: any) => {
+const CustomLabel = ({ cx, cy, midAngle, outerRadius, percent, name, index, colors }: any) => {
   const RADIAN = Math.PI / 180;
   const radius = outerRadius + 30;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -101,7 +110,7 @@ const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name
         x={x + (isLeft ? -8 : 8)}
         y={y - 6}
         textAnchor={textAnchor}
-        fill="hsl(0, 0%, 29%)"
+        fill="hsl(var(--foreground))"
         fontSize={12}
         fontWeight={500}
         fontFamily="Inter"
@@ -113,7 +122,7 @@ const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name
         x={x + (isLeft ? -8 : 8)}
         y={y + 10}
         textAnchor={textAnchor}
-        fill="hsl(0, 0%, 45%)"
+        fill="hsl(var(--muted-foreground))"
         fontSize={11}
         fontFamily="Inter"
       >
@@ -123,40 +132,15 @@ const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name
   );
 };
 
-const CenterLabel = ({ cx, cy, text, value }: { cx: number; cy: number; text: string; value: string }) => (
-  <g>
-    <text
-      x={cx}
-      y={cy - 8}
-      textAnchor="middle"
-      fill="hsl(0, 0%, 29%)"
-      fontSize={14}
-      fontWeight={600}
-      fontFamily="Inter"
-    >
-      100%
-    </text>
-    <text
-      x={cx}
-      y={cy + 12}
-      textAnchor="middle"
-      fill="hsl(0, 0%, 45%)"
-      fontSize={11}
-      fontFamily="Inter"
-    >
-      {text}
-    </text>
-  </g>
-);
-
 interface DonutChartProps {
   data: ChartDataItem[];
   colors: string[];
   emptyMessage: string;
   type: 'income' | 'expense';
+  expanded?: boolean;
 }
 
-function DonutChart({ data, colors, emptyMessage, type }: DonutChartProps) {
+function DonutChart({ data, colors, emptyMessage, type, expanded = false }: DonutChartProps) {
   const [activeIndex, setActiveIndex] = useState<number | undefined>(undefined);
 
   const formatCurrency = (value: number) => {
@@ -176,7 +160,7 @@ function DonutChart({ data, colors, emptyMessage, type }: DonutChartProps) {
 
   if (data.length === 0) {
     return (
-      <div className="h-[320px] flex items-center justify-center text-muted-foreground text-sm">
+      <div className={`${expanded ? 'h-[400px]' : 'h-[320px]'} flex items-center justify-center text-muted-foreground text-sm`}>
         {emptyMessage}
       </div>
     );
@@ -185,14 +169,17 @@ function DonutChart({ data, colors, emptyMessage, type }: DonutChartProps) {
   const isSingleItem = data.length === 1;
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
+  const innerRadius = expanded ? 100 : 70;
+  const outerRadius = expanded ? 160 : 105;
+
   return (
-    <div className="relative h-[320px]">
+    <div className={`relative ${expanded ? 'h-[400px]' : 'h-[320px]'}`}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <defs>
             {/* Gradientes sutis para cada fatia */}
             {colors.map((color, index) => (
-              <linearGradient key={`gradient-${index}`} id={`gradient-${type}-${index}`} x1="0" y1="0" x2="1" y2="1">
+              <linearGradient key={`gradient-${index}`} id={`gradient-${type}-${expanded ? 'exp-' : ''}${index}`} x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor={color} stopOpacity={1} />
                 <stop offset="100%" stopColor={color} stopOpacity={0.85} />
               </linearGradient>
@@ -202,8 +189,8 @@ function DonutChart({ data, colors, emptyMessage, type }: DonutChartProps) {
             data={data}
             cx="50%"
             cy="50%"
-            innerRadius={70}
-            outerRadius={105}
+            innerRadius={innerRadius}
+            outerRadius={outerRadius}
             paddingAngle={data.length > 1 ? 2 : 0}
             dataKey="value"
             animationBegin={0}
@@ -213,7 +200,7 @@ function DonutChart({ data, colors, emptyMessage, type }: DonutChartProps) {
             activeShape={renderActiveShape}
             onMouseEnter={onPieEnter}
             onMouseLeave={onPieLeave}
-            label={!isSingleItem ? (props) => <CustomLabel {...props} colors={colors} /> : false}
+            label={!isSingleItem && !expanded ? (props) => <CustomLabel {...props} colors={colors} /> : false}
             labelLine={false}
             stroke="rgba(255,255,255,0.8)"
             strokeWidth={2}
@@ -221,7 +208,7 @@ function DonutChart({ data, colors, emptyMessage, type }: DonutChartProps) {
             {data.map((_, index) => (
               <Cell 
                 key={`cell-${index}`} 
-                fill={`url(#gradient-${type}-${index})`}
+                fill={`url(#gradient-${type}-${expanded ? 'exp-' : ''}${index})`}
                 style={{ 
                   filter: activeIndex === index ? 'brightness(1.1)' : 'none',
                   transition: 'filter 0.2s ease'
@@ -232,7 +219,7 @@ function DonutChart({ data, colors, emptyMessage, type }: DonutChartProps) {
           <Tooltip 
             formatter={(value: number, name: string) => [formatCurrency(value), name]}
             contentStyle={{
-              backgroundColor: 'hsl(0, 0%, 100%)',
+              backgroundColor: 'hsl(var(--card))',
               border: 'none',
               borderRadius: '12px',
               boxShadow: '0 10px 40px -10px rgba(0,0,0,0.2)',
@@ -240,11 +227,11 @@ function DonutChart({ data, colors, emptyMessage, type }: DonutChartProps) {
               padding: '12px 16px',
             }}
             itemStyle={{
-              color: 'hsl(0, 0%, 29%)',
+              color: 'hsl(var(--foreground))',
               fontWeight: 500,
             }}
             labelStyle={{
-              color: 'hsl(0, 0%, 45%)',
+              color: 'hsl(var(--muted-foreground))',
               marginBottom: '4px',
             }}
           />
@@ -255,8 +242,8 @@ function DonutChart({ data, colors, emptyMessage, type }: DonutChartProps) {
       {isSingleItem && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="text-center -mt-1">
-            <p className="text-2xl font-bold text-foreground">100%</p>
-            <p className="text-xs text-muted-foreground mt-1 max-w-[100px] truncate">
+            <p className={`${expanded ? 'text-4xl' : 'text-2xl'} font-bold text-foreground`}>100%</p>
+            <p className={`${expanded ? 'text-sm' : 'text-xs'} text-muted-foreground mt-1 max-w-[100px] truncate`}>
               {data[0].name}
             </p>
           </div>
@@ -267,8 +254,8 @@ function DonutChart({ data, colors, emptyMessage, type }: DonutChartProps) {
       {!isSingleItem && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="text-center -mt-1">
-            <p className="text-xs text-muted-foreground">Total</p>
-            <p className="text-lg font-semibold text-foreground">
+            <p className={`${expanded ? 'text-sm' : 'text-xs'} text-muted-foreground`}>Total</p>
+            <p className={`${expanded ? 'text-2xl' : 'text-lg'} font-semibold text-foreground`}>
               {formatCurrency(total)}
             </p>
           </div>
@@ -278,7 +265,16 @@ function DonutChart({ data, colors, emptyMessage, type }: DonutChartProps) {
   );
 }
 
-export function FinancePieCharts({ data }: FinancePieChartsProps) {
+export function FinancePieCharts({ data, currentMonth }: FinancePieChartsProps) {
+  const [expandedChart, setExpandedChart] = useState<'income' | 'expense' | null>(null);
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value);
+  };
+
   const receitasData: ChartDataItem[] = Object.entries(data)
     .filter(([_, values]) => values.receitas > 0)
     .map(([name, values]) => ({
@@ -305,31 +301,115 @@ export function FinancePieCharts({ data }: FinancePieChartsProps) {
     item.percentage = totalDespesas > 0 ? (item.value / totalDespesas) * 100 : 0;
   });
 
-  return (
-    <div className="grid gap-6 md:grid-cols-2 mt-6">
-      <Card className="p-6 rounded-2xl shadow-[0_5px_25px_rgba(0,0,0,0.06)] border border-border bg-card overflow-hidden">
-        <h3 className="text-base font-semibold text-foreground text-center mb-2">
-          Receitas por Centro de Custo
-        </h3>
-        <DonutChart 
-          data={receitasData} 
-          colors={INCOME_COLORS}
-          emptyMessage="Nenhuma receita paga cadastrada"
-          type="income"
-        />
-      </Card>
+  const expandedData = expandedChart === 'income' ? receitasData : despesasData;
+  const expandedColors = expandedChart === 'income' ? INCOME_COLORS : EXPENSE_COLORS;
+  const expandedTitle = expandedChart === 'income' ? 'Receitas' : 'Despesas';
 
-      <Card className="p-6 rounded-2xl shadow-[0_5px_25px_rgba(0,0,0,0.06)] border border-border bg-card overflow-hidden">
-        <h3 className="text-base font-semibold text-foreground text-center mb-2">
-          Despesas por Centro de Custo
-        </h3>
-        <DonutChart 
-          data={despesasData} 
-          colors={EXPENSE_COLORS}
-          emptyMessage="Nenhuma despesa paga cadastrada"
-          type="expense"
-        />
-      </Card>
-    </div>
+  return (
+    <>
+      <div className="grid gap-6 md:grid-cols-2 mt-6">
+        <Card className="p-6 rounded-2xl shadow-[0_5px_25px_rgba(0,0,0,0.06)] border border-border bg-card overflow-hidden">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-base font-semibold text-foreground">
+              Receitas por Centro de Custo
+            </h3>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setExpandedChart('income')}
+              className="h-8 w-8 hover:bg-muted"
+              title="Expandir gráfico"
+            >
+              <Expand className="h-4 w-4" />
+            </Button>
+          </div>
+          <DonutChart 
+            data={receitasData} 
+            colors={INCOME_COLORS}
+            emptyMessage="Nenhuma receita paga no mês"
+            type="income"
+          />
+        </Card>
+
+        <Card className="p-6 rounded-2xl shadow-[0_5px_25px_rgba(0,0,0,0.06)] border border-border bg-card overflow-hidden">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-base font-semibold text-foreground">
+              Despesas por Centro de Custo
+            </h3>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setExpandedChart('expense')}
+              className="h-8 w-8 hover:bg-muted"
+              title="Expandir gráfico"
+            >
+              <Expand className="h-4 w-4" />
+            </Button>
+          </div>
+          <DonutChart 
+            data={despesasData} 
+            colors={EXPENSE_COLORS}
+            emptyMessage="Nenhuma despesa paga no mês"
+            type="expense"
+          />
+        </Card>
+      </div>
+
+      {/* Modal Expandido */}
+      <Dialog open={expandedChart !== null} onOpenChange={() => setExpandedChart(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
+          <div className="p-8 animate-scale-in">
+            <DialogHeader className="mb-4">
+              <DialogTitle className="text-2xl">
+                {expandedTitle} por Centro de Custo
+              </DialogTitle>
+              <p className="text-sm text-muted-foreground capitalize">
+                {currentMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+              </p>
+            </DialogHeader>
+            
+            {/* Gráfico Ampliado */}
+            <div className="my-6">
+              {expandedChart && (
+                <DonutChart 
+                  data={expandedData}
+                  colors={expandedColors}
+                  emptyMessage={`Nenhum${expandedChart === 'income' ? 'a receita' : 'a despesa'} pag${expandedChart === 'income' ? 'a' : 'a'} no mês`}
+                  type={expandedChart}
+                  expanded={true}
+                />
+              )}
+            </div>
+            
+            {/* Lista detalhada */}
+            {expandedData.length > 0 && (
+              <div className="space-y-3 max-h-[200px] overflow-y-auto">
+                <h4 className="font-semibold text-foreground">Detalhamento</h4>
+                {expandedData.map((item, index) => (
+                  <div 
+                    key={index} 
+                    className="flex justify-between items-center p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div 
+                        className="w-3 h-3 rounded-full flex-shrink-0" 
+                        style={{ backgroundColor: expandedColors[index % expandedColors.length] }}
+                      />
+                      <span className="font-medium text-foreground">{item.name}</span>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-foreground">{formatCurrency(item.value)}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.percentage.toFixed(1).replace('.', ',')}%
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

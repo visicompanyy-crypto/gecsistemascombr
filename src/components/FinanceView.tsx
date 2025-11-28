@@ -279,9 +279,9 @@ export function FinanceView() {
         <div className="grid gap-5 md:grid-cols-2">
           <Card className="p-8 bg-card rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border border-border">
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-income uppercase tracking-wide">Total de Receitas Recebidas</h3>
+              <h3 className="text-sm font-semibold text-income uppercase tracking-wide">Total de Receitas Recebidas no Mês</h3>
               <p className="text-5xl font-bold text-income">
-                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.receitaTotalRecebida)}
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(summary.receitaTotalRecebidaDoMes)}
               </p>
             </div>
           </Card>
@@ -297,7 +297,10 @@ export function FinanceView() {
         </div>
 
         <div data-tour="charts">
-          <FinancePieCharts data={summary.transactionsByCategory} />
+          <FinancePieCharts 
+            data={summary.transactionsByCategoryDoMes} 
+            currentMonth={currentMonth}
+          />
         </div>
 
         <NewTransactionModal
