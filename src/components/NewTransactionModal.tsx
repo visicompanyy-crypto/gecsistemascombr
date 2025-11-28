@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import CurrencyInput from 'react-currency-input-field';
 import { CostCenterManagerModal } from "./CostCenterManagerModal";
+import { ClientSelector } from "./ClientSelector";
 
 
 interface NewTransactionModalProps {
@@ -42,6 +43,11 @@ export function NewTransactionModal({
   const [loading, setLoading] = useState(false);
   const [costCenterModalOpen, setCostCenterModalOpen] = useState(false);
   const [costCenters, setCostCenters] = useState<CostCenter[]>([]);
+  
+  // PIX client state
+  const [selectedClientId, setSelectedClientId] = useState('');
+  const [selectedPixKey, setSelectedPixKey] = useState('');
+  const [selectedClientName, setSelectedClientName] = useState('');
   
   const [formData, setFormData] = useState({
     description: '',
@@ -77,9 +83,35 @@ export function NewTransactionModal({
           transaction_date: new Date(transaction.transaction_date),
           notes: transaction.notes || '',
         });
+        // Load client data if PIX transaction
+        if (transaction.client_id) {
+          setSelectedClientId(transaction.client_id);
+          setSelectedPixKey(transaction.pix_key || '');
+          setSelectedClientName(transaction.pix_recipient_name || '');
+        }
+      } else {
+        // Reset client selection for new transactions
+        setSelectedClientId('');
+        setSelectedPixKey('');
+        setSelectedClientName('');
       }
     }
   }, [open, transaction]);
+
+  // Reset client when payment method changes from PIX
+  useEffect(() => {
+    if (formData.payment_method !== 'pix') {
+      setSelectedClientId('');
+      setSelectedPixKey('');
+      setSelectedClientName('');
+    }
+  }, [formData.payment_method]);
+
+  const handleClientChange = (clientId: string, pixKey: string, clientName: string) => {
+    setSelectedClientId(clientId);
+    setSelectedPixKey(pixKey);
+    setSelectedClientName(clientName);
+  };
 
   const fetchCostCenters = async () => {
     try {
@@ -204,17 +236,30 @@ export function NewTransactionModal({
 
       if (transaction) {
         // Edit mode
+        const updateData: any = {
+          description: formData.description,
+          amount: totalAmount,
+          transaction_type: formData.transaction_type,
+          transaction_date: format(formData.transaction_date, 'yyyy-MM-dd'),
+          payment_method: formData.payment_method || null,
+          notes: formData.notes || null,
+          cost_center_id: formData.cost_center_id || null,
+        };
+
+        // Add PIX client data if payment method is PIX
+        if (formData.payment_method === 'pix' && selectedClientId) {
+          updateData.client_id = selectedClientId;
+          updateData.pix_key = selectedPixKey;
+          updateData.pix_recipient_name = selectedClientName;
+        } else {
+          updateData.client_id = null;
+          updateData.pix_key = null;
+          updateData.pix_recipient_name = null;
+        }
+
         const { error } = await supabase
           .from('financial_transactions')
-          .update({
-            description: formData.description,
-            amount: totalAmount,
-            transaction_type: formData.transaction_type,
-            transaction_date: format(formData.transaction_date, 'yyyy-MM-dd'),
-            payment_method: formData.payment_method || null,
-            notes: formData.notes || null,
-            cost_center_id: formData.cost_center_id || null,
-          })
+          .update(updateData)
           .eq('id', transaction.id);
 
         if (error) throw error;
@@ -227,6 +272,13 @@ export function NewTransactionModal({
         // Create mode
         const firstDate = formData.first_installment_date;
         const purchaseDate = format(formData.transaction_date, 'yyyy-MM-dd');
+
+        // Build PIX data if applicable
+        const pixData = formData.payment_method === 'pix' && selectedClientId ? {
+          client_id: selectedClientId,
+          pix_key: selectedPixKey,
+          pix_recipient_name: selectedClientName,
+        } : {};
 
         if (numInstallments === 1 && formData.variation_type !== 'recorrente') {
           // Lançamento simples (sem parcelamento)
@@ -247,6 +299,7 @@ export function NewTransactionModal({
             total_installments: 1,
             parent_transaction_id: null,
             is_recurring: false,
+            ...pixData,
           });
 
           if (error) throw error;
@@ -284,6 +337,7 @@ export function NewTransactionModal({
               parent_transaction_id: null, // A primeira parcela não tem pai
               is_recurring: isRecurring,
               recurrence_frequency: isRecurring ? 'monthly' : null,
+              ...pixData,
             })
             .select()
             .single();
@@ -324,6 +378,7 @@ export function NewTransactionModal({
               parent_transaction_id: parentId,
               is_recurring: isRecurring,
               recurrence_frequency: isRecurring ? 'monthly' : null,
+              ...pixData,
             });
           }
 
@@ -359,6 +414,10 @@ export function NewTransactionModal({
         notes: '',
       });
       setVariableInstallments([]);
+      // Reset client selection
+      setSelectedClientId('');
+      setSelectedPixKey('');
+      setSelectedClientName('');
     } catch (error: any) {
       toast({
         title: "Erro",
@@ -454,6 +513,14 @@ export function NewTransactionModal({
                 </Select>
               </div>
             </div>
+
+            {/* PIX Client Selection - only visible when payment method is PIX */}
+            {formData.payment_method === 'pix' && (
+              <ClientSelector
+                selectedClientId={selectedClientId}
+                onClientChange={handleClientChange}
+              />
+            )}
 
             {/* Tipo de Variação - only visible when installments > 1 */}
             {numInstallments > 1 && (
