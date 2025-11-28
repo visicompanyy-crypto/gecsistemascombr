@@ -2,7 +2,6 @@ import { LandingHeader } from "@/components/landing/LandingHeader";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { StorySection } from "@/components/landing/StorySection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
-import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import FAQSection from "@/components/landing/FAQSection";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { FinalCTASection } from "@/components/landing/FinalCTASection";
@@ -18,7 +17,6 @@ const Landing = () => {
         <HeroSection />
         <StorySection />
         <FeaturesSection />
-        <TestimonialsSection />
         <PricingSection />
         <FAQSection />
         <FinalCTASection />
