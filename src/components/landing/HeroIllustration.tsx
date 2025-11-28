@@ -130,27 +130,27 @@ export const HeroIllustration = () => {
                 ))}
               </div>
             </div>
+            
+            {/* Red X overlay with bounce animation */}
+            <div 
+              className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
+                showBounce ? 'animate-bounce-x' : ''
+              }`}
+            >
+              <div className={`w-20 h-20 rounded-full bg-[#ff2d55] flex items-center justify-center shadow-lg transition-transform duration-300 ${
+                showBounce ? 'scale-150' : 'scale-100'
+              }`}>
+                <X className="text-white" size={40} strokeWidth={3} />
+              </div>
+            </div>
           </div>
           
-        {/* Red X overlay with bounce animation */}
-        <div 
-          className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
-            showBounce ? 'animate-bounce-x' : ''
-          }`}
-        >
-          <div className={`w-20 h-20 rounded-full bg-[#ff2d55] flex items-center justify-center shadow-lg transition-transform duration-300 ${
-            showBounce ? 'scale-150' : 'scale-100'
-          }`}>
-            <X className="text-white" size={40} strokeWidth={3} />
+          {/* Label ✗ Desorganizado - agora dentro do card */}
+          <div className="mt-3 text-center">
+            <p className="text-sm font-bold text-[#ff2d55]">✗ Desorganizado</p>
           </div>
         </div>
       </div>
-      
-      {/* Label ✗ Desorganizado */}
-      <div className="mt-3 text-center">
-        <p className="text-sm font-bold text-[#ff2d55]">✗ Desorganizado</p>
-      </div>
-    </div>
 
       {/* Arrow indicator */}
       <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-500 ${
