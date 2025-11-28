@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      clients: {
+        Row: {
+          company_id: string | null
+          created_at: string
+          id: string
+          name: string
+          pix_key: string
+          pix_key_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          pix_key: string
+          pix_key_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          pix_key?: string
+          pix_key_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           created_at: string
@@ -220,6 +261,7 @@ export type Database = {
           attachment_url: string[] | null
           bank_account: string | null
           category: string | null
+          client_id: string | null
           company_id: string | null
           cost_center_id: string | null
           created_at: string | null
@@ -259,6 +301,7 @@ export type Database = {
           attachment_url?: string[] | null
           bank_account?: string | null
           category?: string | null
+          client_id?: string | null
           company_id?: string | null
           cost_center_id?: string | null
           created_at?: string | null
@@ -298,6 +341,7 @@ export type Database = {
           attachment_url?: string[] | null
           bank_account?: string | null
           category?: string | null
+          client_id?: string | null
           company_id?: string | null
           cost_center_id?: string | null
           created_at?: string | null
@@ -333,6 +377,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "financial_transactions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "financial_transactions_company_id_fkey"
             columns: ["company_id"]
