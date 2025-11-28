@@ -49,12 +49,6 @@ const Pricing = () => {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Redirect to auth if not logged in
-  useEffect(() => {
-    if (!user) {
-      navigate("/auth");
-    }
-  }, [user, navigate]);
 
   const handleSubscribe = async (priceId: string, planName: string) => {
     if (!user) {
