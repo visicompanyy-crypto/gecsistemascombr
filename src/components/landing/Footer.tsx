@@ -1,60 +1,48 @@
-import logo from "@/assets/logo.png";
-
 export const Footer = () => {
   return (
-    <footer className="bg-[#0a0f0b] border-t border-[#00ff88]/20 text-white py-16">
+    <footer className="bg-[#0a0f0b] border-t border-[#00ff88]/20 text-white py-12 relative">
       <div className="max-w-[1320px] mx-auto px-6">
-        <div className="grid md:grid-cols-3 gap-12 mb-12">
-          {/* Logo Column */}
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <img src={logo} alt="Saldar" className="h-10 w-10 brightness-0 invert" />
-              <span className="text-2xl font-bold">Saldar</span>
-            </div>
-            <p className="text-sm text-gray-400 leading-relaxed">
-              Sistema financeiro criado para empresas brasileiras
-            </p>
+        {/* Layout simplificado em 2 colunas */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+          
+          {/* Contato */}
+          <div className="text-center md:text-left">
+            <h3 className="text-lg font-semibold mb-2">Contato</h3>
+            <a 
+              href="mailto:comercial@gecsistemas.com.br" 
+              className="text-gray-400 hover:text-[#00ff88] transition-colors text-sm"
+            >
+              comercial@gecsistemas.com.br
+            </a>
           </div>
 
-          {/* Links Column */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Links rápidos</h3>
-            <ul className="space-y-3">
-              <li>
-                <a href="#" className="text-gray-400 hover:text-[#00ff88] transition-colors text-sm">
-                  Contato
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-[#00ff88] transition-colors text-sm">
-                  Termos de Uso
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-[#00ff88] transition-colors text-sm">
-                  Política de Privacidade
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-[#00ff88] transition-colors text-sm">
-                  FAQ
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Social Column */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Redes sociais</h3>
-            <p className="text-sm text-gray-400">
-              Em breve
-            </p>
+          {/* Redes Sociais */}
+          <div className="text-center md:text-right">
+            <h3 className="text-lg font-semibold mb-2">Redes sociais</h3>
+            <a 
+              href="https://instagram.com/saldar.o" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-[#00ff88] transition-colors text-sm"
+            >
+              @saldar.o
+            </a>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-[#00ff88]/20 text-center">
+        {/* Copyright */}
+        <div className="pt-8 mt-8 border-t border-[#00ff88]/20 text-center">
           <p className="text-xs text-gray-500">
             © 2025 Saldar. Todos os direitos reservados.
+          </p>
+        </div>
+      </div>
+
+      {/* Balão Flutuante - GEC SISTEMAS */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 shadow-lg">
+          <p className="text-xs text-gray-300">
+            Criado por <span className="text-[#00ff88] font-semibold">GEC SISTEMAS</span>
           </p>
         </div>
       </div>
