@@ -7,7 +7,7 @@ interface FeatureCardProps {
 export const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
   return (
     <div className="bg-[#0f1410]/60 backdrop-blur-sm rounded-2xl p-8 shadow-[0_8px_25px_rgba(0,255,136,0.1)] hover:shadow-[0_15px_40px_rgba(0,255,136,0.2)] hover:-translate-y-2 transition-all duration-300 group border border-[#00ff88]/20">
-      <div className="mb-5 w-14 h-14 rounded-2xl bg-gradient-to-br from-[#00ff88] to-[#00cc6f] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+      <div className="mb-5 w-14 h-14 rounded-2xl bg-gradient-to-br from-[#00cc6f] to-[#008f50] flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
         {icon}
       </div>
       
