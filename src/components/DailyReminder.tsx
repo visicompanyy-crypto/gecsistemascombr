@@ -23,7 +23,7 @@ export function DailyReminder() {
   const [dismissed, setDismissed] = useState(false);
 
   const { data: pendingTransactions } = useQuery({
-    queryKey: ['pending-transactions-reminder'],
+    queryKey: ['pending-transactions-reminder', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('financial_transactions')
@@ -36,7 +36,7 @@ export function DailyReminder() {
       if (error) throw error;
       return data as Transaction[];
     },
-    enabled: !!user,
+    enabled: !!user?.id,
   });
 
   useEffect(() => {
