@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -50,33 +50,9 @@ const Pricing = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
 
-  const handleSubscribe = async (priceId: string, planName: string) => {
+  const handleSubscribe = (priceId: string) => {
     // Navegar para página de checkout com o plano selecionado
-    // Se não estiver logado, a página de checkout redirecionará para login
     navigate(`/checkout?plan=${priceId}`);
-
-    setLoadingPlan(priceId);
-
-    try {
-      const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId },
-      });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        window.open(data.url, "_blank");
-      }
-    } catch (error) {
-      console.error("Error creating checkout:", error);
-      toast({
-        title: "Erro",
-        description: "Não foi possível iniciar o checkout. Tente novamente.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoadingPlan(null);
-    }
   };
 
   const handleManageSubscription = async () => {
@@ -228,7 +204,7 @@ const Pricing = () => {
                       ? "bg-green-600 hover:bg-green-700 text-white"
                       : "bg-green-700 hover:bg-green-800 text-white"
                   }`}
-                  onClick={() => handleSubscribe(plan.priceId, plan.name)}
+                  onClick={() => handleSubscribe(plan.priceId)}
                   disabled={loadingPlan !== null || isCurrent}
                 >
                   {loadingPlan === plan.priceId ? (
