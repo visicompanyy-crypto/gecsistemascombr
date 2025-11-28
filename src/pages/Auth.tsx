@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Lock, ArrowLeft, Eye, EyeOff } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -126,7 +127,7 @@ export default function Auth() {
         <div className="flex flex-col items-center mb-8">
           <div className="relative mb-6">
             <img 
-              src="/src/assets/logo.png" 
+              src={logo} 
               alt="Saldar Logo" 
               className="w-20 h-20 object-contain"
             />
