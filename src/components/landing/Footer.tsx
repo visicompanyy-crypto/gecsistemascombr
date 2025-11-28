@@ -1,32 +1,59 @@
-import { Instagram } from "lucide-react";
+import { Instagram, Mail, Phone } from "lucide-react";
 
 export const Footer = () => {
   return (
     <footer className="bg-[#0a0f0b] border-t border-[#00ff88]/20 text-white py-12 relative">
       <div className="max-w-[1320px] mx-auto px-6">
-        {/* Layout simplificado em 2 colunas */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+        {/* Layout em 3 colunas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
           
-          {/* Contato */}
-          <div className="text-center md:text-left">
-            <h3 className="text-lg font-semibold mb-2">Contato</h3>
+          {/* Contato - Email */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Contato</h3>
             <a 
               href="mailto:comercial@gecsistemas.com.br" 
-              className="text-gray-400 hover:text-[#00ff88] transition-colors text-sm"
+              className="flex items-center justify-center md:justify-start gap-2 text-gray-400 hover:text-[#00ff88] transition-colors text-sm"
             >
+              <Mail size={16} />
               comercial@gecsistemas.com.br
             </a>
           </div>
 
+          {/* Telefones */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Suporte</h3>
+            <div className="space-y-3">
+              <a 
+                href="https://wa.me/5551842445505" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center md:justify-start gap-2 text-gray-400 hover:text-[#00ff88] transition-colors text-sm"
+              >
+                <Phone size={16} />
+                <span>Sistema: (51) 8424-4505</span>
+              </a>
+              <a 
+                href="https://wa.me/5551989772978" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center md:justify-start gap-2 text-gray-400 hover:text-[#00ff88] transition-colors text-sm"
+              >
+                <Phone size={16} />
+                <span>Assinaturas: (51) 98977-2978</span>
+              </a>
+            </div>
+          </div>
+
           {/* Redes Sociais */}
-          <div className="text-center md:text-right">
-            <h3 className="text-lg font-semibold mb-2">Redes sociais</h3>
+          <div className="md:text-right">
+            <h3 className="text-lg font-semibold mb-4">Redes sociais</h3>
             <a 
               href="https://www.instagram.com/saldar.o" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-[#00ff88] transition-colors text-sm"
+              className="inline-flex items-center justify-center md:justify-end gap-2 text-gray-400 hover:text-[#00ff88] transition-colors text-sm"
             >
+              <Instagram size={16} />
               @saldar.o
             </a>
           </div>
