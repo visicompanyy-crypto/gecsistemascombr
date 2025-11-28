@@ -16,19 +16,19 @@ export const ProblemSection = () => {
 
         <div className="grid md:grid-cols-3 gap-8">
           <ProblemCard
-            icon={<FileSpreadsheet className="text-landing-negative" size={48} />}
+            icon={<FileSpreadsheet className="text-[#ff2d55]" size={48} />}
             title="Planilhas confusas"
             description="Fórmulas quebradas, versões desatualizadas e informações espalhadas em vários arquivos"
           />
           
           <ProblemCard
-            icon={<AlertCircle className="text-landing-negative" size={48} />}
+            icon={<AlertCircle className="text-[#ff2d55]" size={48} />}
             title="Informações soltas"
             description="Extratos bancários, notas fiscais e boletos em lugares diferentes. Difícil ter visão do todo"
           />
           
           <ProblemCard
-            icon={<EyeOff className="text-landing-negative" size={48} />}
+            icon={<EyeOff className="text-[#ff2d55]" size={48} />}
             title="Decisões no escuro"
             description="Sem saber quanto entra, quanto sai e quanto sobra. Impossível planejar o próximo mês"
           />

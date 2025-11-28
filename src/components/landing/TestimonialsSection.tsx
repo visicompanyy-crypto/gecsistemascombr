@@ -3,13 +3,6 @@ import { TestimonialCard } from "./TestimonialCard";
 export const TestimonialsSection = () => {
   const testimonials = [
     {
-      name: "Maria Santos",
-      location: "Florianópolis, SC",
-      company: "Loja de Roupas",
-      testimonial: "Antes eu perdia horas com planilhas. Agora em 5 minutos eu sei exatamente como está meu financeiro. A Saldar simplificou tudo.",
-      initials: "MS",
-    },
-    {
       name: "João Silva",
       location: "São Paulo, SP",
       company: "Agência de Marketing",
@@ -34,7 +27,7 @@ export const TestimonialsSection = () => {
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {testimonials.map((testimonial, index) => (
             <TestimonialCard key={index} {...testimonial} />
           ))}
