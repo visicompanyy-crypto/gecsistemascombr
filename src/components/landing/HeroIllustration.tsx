@@ -1,4 +1,4 @@
-import { TrendingUp, FileSpreadsheet, X } from "lucide-react";
+import { TrendingUp, FileSpreadsheet, X, CheckSquare, Calendar, DollarSign, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export const HeroIllustration = () => {
@@ -21,39 +21,76 @@ export const HeroIllustration = () => {
 
   return (
     <div className="relative w-full h-full flex items-center justify-center">
-      {/* Organized Dashboard Card */}
+      {/* Organized Dashboard Card - Mini Dashboard */}
       <div 
-        className={`absolute bg-white rounded-2xl p-8 shadow-lg border-2 border-landing-green w-[52%] transition-all duration-700 ease-in-out ${
+        className={`absolute bg-white rounded-2xl p-4 shadow-lg border-2 border-landing-green w-[56%] transition-all duration-700 ease-in-out ${
           showOrganized 
             ? 'left-0 top-1/2 -translate-y-1/2 opacity-100 z-10 scale-100' 
-            : 'left-[48%] top-1/2 -translate-y-1/2 opacity-40 z-0 scale-90'
+            : 'left-[44%] top-1/2 -translate-y-1/2 opacity-40 z-0 scale-90'
         }`}
       >
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 rounded-full bg-landing-green flex items-center justify-center">
-            <TrendingUp className="text-white" size={28} />
+        {/* Header verde com resultado */}
+        <div className="bg-gradient-to-r from-landing-green/20 to-landing-green/10 rounded-lg p-3 mb-3">
+          <div className="flex items-center gap-1 mb-1">
+            <CheckSquare className="w-3 h-3 text-landing-green" />
+            <span className="text-[8px] text-landing-green font-medium uppercase tracking-wide">Resultado do Mês</span>
           </div>
-          <div className="flex-1">
-            <div className="h-3 bg-landing-green/20 rounded-full">
-              <div className="h-3 bg-landing-green rounded-full w-3/4"></div>
-            </div>
+          <p className="text-landing-green font-bold text-lg leading-tight">R$ 4.450,00</p>
+          <p className="text-[7px] text-landing-green/80">Sobrará R$ 4.450,00 este mês</p>
+        </div>
+
+        {/* Mini cards de resumo */}
+        <div className="grid grid-cols-3 gap-1.5 mb-3">
+          <div className="bg-gray-50 rounded-lg p-2 text-center">
+            <TrendingUp className="w-3 h-3 text-landing-green mx-auto mb-0.5" />
+            <p className="text-[6px] text-gray-500 leading-tight">Receita Total</p>
+            <p className="text-[8px] font-bold text-gray-700">R$ 58.900</p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-2 text-center">
+            <Calendar className="w-3 h-3 text-landing-green mx-auto mb-0.5" />
+            <p className="text-[6px] text-gray-500 leading-tight">Receitas Futuras</p>
+            <p className="text-[8px] font-bold text-gray-700">R$ 6.250</p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-2 text-center">
+            <DollarSign className="w-3 h-3 text-landing-green mx-auto mb-0.5" />
+            <p className="text-[6px] text-gray-500 leading-tight">Receita do Mês</p>
+            <p className="text-[8px] font-bold text-gray-700">R$ 4.950</p>
           </div>
         </div>
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-landing-green"></div>
-            <div className="h-3 bg-gray-200 rounded flex-1"></div>
+
+        {/* Botão de novo lançamento + seletor de mês */}
+        <div className="flex items-center justify-between mb-2">
+          <div className="bg-landing-green text-white text-[7px] px-2 py-1 rounded-md flex items-center gap-1 font-medium">
+            <Plus className="w-2 h-2" />
+            Novo Lançamento
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-landing-green"></div>
-            <div className="h-3 bg-gray-200 rounded flex-1"></div>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-landing-green"></div>
-            <div className="h-3 bg-gray-200 rounded flex-1 w-2/3"></div>
+          <div className="text-[7px] text-gray-500 flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md">
+            <ChevronLeft className="w-2 h-2" />
+            <span className="font-medium">NOV 2025</span>
+            <ChevronRight className="w-2 h-2" />
           </div>
         </div>
-        <div className="mt-6 text-center">
+
+        {/* Mini tabela de lançamentos */}
+        <div className="bg-gray-50 rounded-lg p-2">
+          <p className="text-[7px] font-medium text-gray-600 mb-1.5">Lista de Lançamentos</p>
+          <div className="space-y-1.5">
+            {[
+              { color: "bg-landing-green", width: "w-20" },
+              { color: "bg-landing-green", width: "w-16" },
+              { color: "bg-red-400", width: "w-24" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-1.5">
+                <div className={`w-1.5 h-1.5 rounded-full ${item.color}`}></div>
+                <div className={`h-2 bg-gray-200 rounded ${item.width}`}></div>
+                <div className="h-2 w-10 bg-gray-200 rounded ml-auto"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Label ✓ Organizado */}
+        <div className="mt-3 text-center">
           <p className="text-sm font-bold text-landing-green">✓ Organizado</p>
         </div>
       </div>
