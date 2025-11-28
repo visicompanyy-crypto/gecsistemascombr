@@ -97,19 +97,13 @@ export const PricingCard = ({
           </h3>
 
           <div className="mb-6">
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-bold text-white">
-                R$
-              </span>
-              <span className="text-5xl font-extrabold text-white">
-                {price}
-              </span>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-white">R$</span>
+              <span className="text-5xl font-extrabold text-white">{price}</span>
+              <span className="text-lg text-gray-300">/mês</span>
             </div>
-            <span className="text-lg text-gray-300 block mt-1">
-              por {period}
-            </span>
             {billingInfo && (
-              <p className="text-sm text-gray-400 mt-1">{billingInfo}</p>
+              <p className="text-sm text-gray-400 mt-2">{billingInfo}</p>
             )}
           </div>
 
