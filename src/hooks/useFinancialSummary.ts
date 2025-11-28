@@ -128,7 +128,7 @@ export function useFinancialSummary(
     // 💰 RESULTADO DO MÊS - Apenas receitas e despesas do mês atual (sem projeções futuras)
     const resultadoDoMes = receitasDoMes - totalAPagarNoMes;
 
-    // Agrupar por centro de custo
+    // Agrupar por centro de custo (histórico completo)
     const transactionsByCategory = validTransactions.reduce((acc: any, t) => {
       const costCenterName = t.cost_centers?.name || 'Sem centro de custo';
       if (!acc[costCenterName]) {
@@ -141,6 +141,40 @@ export function useFinancialSummary(
       }
       return acc;
     }, {});
+
+    // 🆕 Agrupar por centro de custo APENAS do mês selecionado (para gráficos dinâmicos)
+    const transactionsByCategoryDoMes = validTransactions
+      .filter(t => {
+        const dataTransacao = new Date(t.transaction_date);
+        return dataTransacao >= primeiroDiaDoMes && 
+               dataTransacao <= ultimoDiaDoMes &&
+               t.status === 'pago';
+      })
+      .reduce((acc: any, t) => {
+        const costCenterName = t.cost_centers?.name || 'Sem centro de custo';
+        if (!acc[costCenterName]) {
+          acc[costCenterName] = { receitas: 0, despesas: 0 };
+        }
+        if (t.transaction_type === 'receita') {
+          acc[costCenterName].receitas += Number(t.amount);
+        } else if (t.transaction_type === 'despesa') {
+          acc[costCenterName].despesas += Number(t.amount);
+        }
+        return acc;
+      }, {});
+
+    // 🆕 Receita total recebida do mês selecionado (apenas pagas no mês)
+    const listaReceitaTotalRecebidaDoMes = validTransactions.filter(t => {
+      const dataTransacao = new Date(t.transaction_date);
+      return t.transaction_type === 'receita' && 
+             t.status === 'pago' &&
+             dataTransacao >= primeiroDiaDoMes && 
+             dataTransacao <= ultimoDiaDoMes;
+    });
+    const receitaTotalRecebidaDoMes = listaReceitaTotalRecebidaDoMes.reduce(
+      (sum, t) => sum + Number(t.amount), 
+      0
+    );
 
     // Agrupar por mês
     const transactionsByMonth = validTransactions.reduce((acc: any[], t) => {
@@ -173,6 +207,10 @@ export function useFinancialSummary(
       totalAPagarNoMes,
       transactionsByCategory,
       transactionsByMonth,
+      // 🆕 Dados filtrados por mês para gráficos dinâmicos
+      transactionsByCategoryDoMes,
+      receitaTotalRecebidaDoMes,
+      listaReceitaTotalRecebidaDoMes,
       // Listas detalhadas para os modais
       listaReceitaTotalRecebida,
       listaReceitasFuturas,
