@@ -1,10 +1,34 @@
 import { TrendingUp, FileSpreadsheet, X } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export const HeroIllustration = () => {
+  const [showOrganized, setShowOrganized] = useState(true);
+  const [showBounce, setShowBounce] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowOrganized(prev => {
+        if (prev) {
+          // When switching to spreadsheet, trigger bounce
+          setTimeout(() => setShowBounce(true), 300);
+          setTimeout(() => setShowBounce(false), 1000);
+        }
+        return !prev;
+      });
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="relative w-full h-full flex items-center justify-center">
-      {/* Organized Dashboard - Left Side (Green) */}
-      <div className="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-2xl p-8 shadow-lg border-2 border-landing-green w-[52%] animate-fade-in">
+      {/* Organized Dashboard Card */}
+      <div 
+        className={`absolute bg-white rounded-2xl p-8 shadow-lg border-2 border-landing-green w-[52%] transition-all duration-700 ease-in-out ${
+          showOrganized 
+            ? 'left-0 top-1/2 -translate-y-1/2 opacity-100 z-10 scale-100' 
+            : 'left-[48%] top-1/2 -translate-y-1/2 opacity-40 z-0 scale-90'
+        }`}
+      >
         <div className="flex items-center gap-4 mb-6">
           <div className="w-14 h-14 rounded-full bg-landing-green flex items-center justify-center">
             <TrendingUp className="text-white" size={28} />
@@ -34,9 +58,15 @@ export const HeroIllustration = () => {
         </div>
       </div>
 
-      {/* Crumpled Paper - Right Side (Being discarded) */}
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[52%] animate-fade-in" style={{ animationDelay: '0.3s' }}>
-        <div className="relative transform rotate-12 opacity-60">
+      {/* Crumpled Paper - Spreadsheet Card */}
+      <div 
+        className={`absolute w-[52%] transition-all duration-700 ease-in-out ${
+          showOrganized 
+            ? 'right-0 top-1/2 -translate-y-1/2 opacity-60 z-0 scale-90' 
+            : 'right-[48%] top-1/2 -translate-y-1/2 opacity-100 z-10 scale-100'
+        }`}
+      >
+        <div className={`relative ${showOrganized ? 'rotate-12' : 'rotate-0'} transition-transform duration-700`}>
           {/* Paper texture effect */}
           <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-300 relative overflow-hidden">
             {/* Crumpled effect with diagonal lines */}
@@ -65,18 +95,26 @@ export const HeroIllustration = () => {
             </div>
           </div>
           
-          {/* Red X overlay */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-20 h-20 rounded-full bg-landing-negative flex items-center justify-center shadow-lg">
+          {/* Red X overlay with bounce animation */}
+          <div 
+            className={`absolute inset-0 flex items-center justify-center transition-all duration-300 ${
+              showBounce ? 'animate-bounce-x' : ''
+            }`}
+          >
+            <div className={`w-20 h-20 rounded-full bg-[#ff2d55] flex items-center justify-center shadow-lg transition-transform duration-300 ${
+              showBounce ? 'scale-150' : 'scale-100'
+            }`}>
               <X className="text-white" size={40} strokeWidth={3} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Arrow pointing from right to left (old to new) */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-        <div className="text-5xl opacity-50">→</div>
+      {/* Arrow indicator */}
+      <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-500 ${
+        showOrganized ? 'opacity-50' : 'opacity-30'
+      }`}>
+        <div className="text-5xl text-white/50">⇄</div>
       </div>
     </div>
   );
