@@ -1,6 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
-import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
+import { FloatingCardsDisplay } from "./FloatingCardsDisplay";
 
 // Import polluted system images
 import pollutedSystem1 from "@/assets/polluted-system-1.png";
@@ -14,81 +12,6 @@ import cleanSystem3 from "@/assets/clean-system-3.png";
 
 const pollutedImages = [pollutedSystem1, pollutedSystem2, pollutedSystem3];
 const cleanImages = [cleanSystem1, cleanSystem2, cleanSystem3];
-
-interface ImageCarouselProps {
-  images: string[];
-  variant: "polluted" | "clean";
-}
-
-const ImageCarousel = ({ images, variant }: ImageCarouselProps) => {
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, align: "center" },
-    [Autoplay({ delay: 4000, stopOnInteraction: false })]
-  );
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-    setSelectedIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-    onSelect();
-    emblaApi.on("select", onSelect);
-    return () => {
-      emblaApi.off("select", onSelect);
-    };
-  }, [emblaApi, onSelect]);
-
-  const borderColor = variant === "polluted" 
-    ? "border-[#ff2d55]/30" 
-    : "border-[#00ff88]/30";
-  
-  const dotActiveColor = variant === "polluted"
-    ? "bg-[#ff2d55]"
-    : "bg-[#00ff88]";
-
-  return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
-        <div className="flex">
-          {images.map((image, index) => (
-            <div
-              key={index}
-              className="flex-[0_0_100%] min-w-0 px-2"
-            >
-              <div className={`rounded-2xl overflow-hidden border-2 ${borderColor} shadow-2xl`}>
-                <img
-                  src={image}
-                  alt={`${variant === "polluted" ? "Sistema complexo" : "Sistema Saldar"} ${index + 1}`}
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      {/* Navigation dots */}
-      <div className="flex justify-center gap-2 mt-6">
-        {images.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => emblaApi?.scrollTo(index)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === selectedIndex 
-                ? `${dotActiveColor} w-6` 
-                : "bg-white/30 hover:bg-white/50"
-            }`}
-            aria-label={`Ir para imagem ${index + 1}`}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
 
 export const StorySection = () => {
   return (
@@ -115,9 +38,9 @@ export const StorySection = () => {
           </p>
         </div>
 
-        {/* Polluted systems carousel */}
+        {/* Polluted systems - Floating Cards */}
         <div className="mb-12">
-          <ImageCarousel images={pollutedImages} variant="polluted" />
+          <FloatingCardsDisplay images={pollutedImages} variant="polluted" />
         </div>
 
         {/* Highlight quotes */}
@@ -153,9 +76,9 @@ export const StorySection = () => {
           </p>
         </div>
 
-        {/* Clean systems carousel */}
+        {/* Clean systems - Floating Cards */}
         <div className="mb-16">
-          <ImageCarousel images={cleanImages} variant="clean" />
+          <FloatingCardsDisplay images={cleanImages} variant="clean" />
         </div>
 
         {/* Closing subtitle */}
