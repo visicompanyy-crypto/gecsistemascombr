@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import logo from "@/assets/logo.png";
 
 export const LandingHeader = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export const LandingHeader = () => {
     <header className="sticky top-0 z-50 bg-[#0a0f0b]/95 backdrop-blur-md border-b border-[#00ff88]/20 shadow-lg shadow-[#00ff88]/5">
       <div className="max-w-[1320px] mx-auto px-6 h-20 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src="/src/assets/logo.png" alt="Saldar" className="h-10 w-10" />
+          <img src={logo} alt="Saldar" className="h-10 w-10" />
           <span className="text-2xl font-bold text-white">Saldar</span>
         </div>
 
