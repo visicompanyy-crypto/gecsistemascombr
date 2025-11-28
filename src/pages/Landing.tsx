@@ -1,7 +1,6 @@
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { HeroSection } from "@/components/landing/HeroSection";
-import { ProblemSection } from "@/components/landing/ProblemSection";
-import { SolutionSection } from "@/components/landing/SolutionSection";
+import { StorySection } from "@/components/landing/StorySection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import FAQSection from "@/components/landing/FAQSection";
@@ -17,8 +16,7 @@ const Landing = () => {
       <div className="relative z-10">
         <LandingHeader />
         <HeroSection />
-        <ProblemSection />
-        <SolutionSection />
+        <StorySection />
         <FeaturesSection />
         <TestimonialsSection />
         <PricingSection />
