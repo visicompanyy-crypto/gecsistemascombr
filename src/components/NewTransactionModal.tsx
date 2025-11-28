@@ -29,6 +29,7 @@ interface CostCenter {
   id: string;
   name: string;
   code?: string;
+  type: 'receita' | 'despesa';
 }
 
 export function NewTransactionModal({
@@ -87,13 +88,16 @@ export function NewTransactionModal({
 
       const { data, error } = await supabase
         .from('cost_centers')
-        .select('id, name, code')
+        .select('id, name, code, type')
         .is('deleted_at', null)
         .eq('user_id', user.id)
         .order('name');
 
       if (error) throw error;
-      setCostCenters(data || []);
+      setCostCenters((data || []).map(c => ({
+        ...c,
+        type: (c.type as 'receita' | 'despesa') || 'despesa'
+      })));
     } catch (error: any) {
       console.error('Error fetching cost centers:', error);
     }
@@ -617,7 +621,7 @@ export function NewTransactionModal({
                 <Label className="text-sm text-muted-foreground">Tipo *</Label>
                 <Select
                   value={formData.transaction_type}
-                  onValueChange={(value) => setFormData({ ...formData, transaction_type: value })}
+                  onValueChange={(value) => setFormData({ ...formData, transaction_type: value, cost_center_id: '' })}
                 >
                   <SelectTrigger className="border-input bg-white focus:ring-primary">
                     <SelectValue placeholder="Selecione" />
@@ -652,11 +656,18 @@ export function NewTransactionModal({
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
                   <SelectContent>
-                    {costCenters.map((center) => (
-                      <SelectItem key={center.id} value={center.id}>
-                        {center.name} {center.code ? `(${center.code})` : ''}
-                      </SelectItem>
-                    ))}
+                    {costCenters
+                      .filter((center) => center.type === formData.transaction_type)
+                      .map((center) => (
+                        <SelectItem key={center.id} value={center.id}>
+                          {center.name} {center.code ? `(${center.code})` : ''}
+                        </SelectItem>
+                      ))}
+                    {costCenters.filter((center) => center.type === formData.transaction_type).length === 0 && (
+                      <div className="px-2 py-4 text-sm text-muted-foreground text-center">
+                        Nenhum centro de {formData.transaction_type === 'receita' ? 'receita' : 'despesa'} cadastrado
+                      </div>
+                    )}
                   </SelectContent>
                 </Select>
               </div>

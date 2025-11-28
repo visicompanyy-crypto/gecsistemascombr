@@ -102,6 +102,7 @@ export type Database = {
           monthly_budget: number | null
           name: string
           parent_id: string | null
+          type: string
           updated_at: string | null
           user_id: string
         }
@@ -118,6 +119,7 @@ export type Database = {
           monthly_budget?: number | null
           name: string
           parent_id?: string | null
+          type?: string
           updated_at?: string | null
           user_id: string
         }
@@ -134,6 +136,7 @@ export type Database = {
           monthly_budget?: number | null
           name?: string
           parent_id?: string | null
+          type?: string
           updated_at?: string | null
           user_id?: string
         }

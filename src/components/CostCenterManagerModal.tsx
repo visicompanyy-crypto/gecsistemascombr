@@ -3,15 +3,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, TrendingUp, TrendingDown } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 interface CostCenter {
   id: string;
   name: string;
   description?: string;
+  type: 'receita' | 'despesa';
 }
 
 interface CostCenterManagerModalProps {
@@ -32,6 +35,7 @@ export function CostCenterManagerModal({
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    type: 'despesa' as 'receita' | 'despesa',
   });
 
   useEffect(() => {
@@ -47,13 +51,17 @@ export function CostCenterManagerModal({
 
       const { data, error } = await supabase
         .from('cost_centers')
-        .select('*')
+        .select('id, name, description, type')
         .is('deleted_at', null)
         .eq('user_id', user.id)
+        .order('type')
         .order('name');
 
       if (error) throw error;
-      setCostCenters(data || []);
+      setCostCenters((data || []).map(c => ({
+        ...c,
+        type: (c.type as 'receita' | 'despesa') || 'despesa'
+      })));
     } catch (error: any) {
       toast({
         title: "Erro ao carregar centros de custo",
@@ -77,6 +85,7 @@ export function CostCenterManagerModal({
           .update({
             name: formData.name,
             description: formData.description || null,
+            type: formData.type,
           })
           .eq('id', editingId);
 
@@ -88,6 +97,7 @@ export function CostCenterManagerModal({
           .insert({
             name: formData.name,
             description: formData.description || null,
+            type: formData.type,
             user_id: user.id,
           });
 
@@ -95,7 +105,7 @@ export function CostCenterManagerModal({
         toast({ title: "Centro de custo criado com sucesso" });
       }
 
-      setFormData({ name: '', description: '' });
+      setFormData({ name: '', description: '', type: 'despesa' });
       setEditingId(null);
       fetchCostCenters();
       if (onUpdate) onUpdate();
@@ -115,6 +125,7 @@ export function CostCenterManagerModal({
     setFormData({
       name: center.name,
       description: center.description || '',
+      type: center.type,
     });
   };
 
@@ -140,8 +151,62 @@ export function CostCenterManagerModal({
 
   const handleCancel = () => {
     setEditingId(null);
-    setFormData({ name: '', description: '' });
+    setFormData({ name: '', description: '', type: 'despesa' });
   };
+
+  const revenueCenters = costCenters.filter(c => c.type === 'receita');
+  const expenseCenters = costCenters.filter(c => c.type === 'despesa');
+
+  const renderCostCenterTable = (centers: CostCenter[], title: string, icon: React.ReactNode, badgeVariant: 'default' | 'destructive') => (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        {icon}
+        <h3 className="text-sm font-medium text-foreground">{title}</h3>
+        <Badge variant={badgeVariant === 'default' ? 'default' : 'destructive'} className="ml-auto">
+          {centers.length}
+        </Badge>
+      </div>
+      {centers.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-4 bg-muted/30 rounded-lg">
+          Nenhum centro de custo cadastrado
+        </p>
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nome</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {centers.map((center) => (
+              <TableRow key={center.id}>
+                <TableCell className="font-medium">{center.name}</TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleEdit(center)}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDelete(center.id)}
+                    >
+                      <Trash2 className="w-4 h-4 text-destructive" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -153,18 +218,48 @@ export function CostCenterManagerModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 border-b border-border pb-4">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="text-sm text-muted-foreground">
-              Nome *
-            </Label>
-            <Input
-              id="name"
-              placeholder="Ex: Marketing Digital"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-              className="border-input"
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm text-muted-foreground">
+                Nome *
+              </Label>
+              <Input
+                id="name"
+                placeholder="Ex: Marketing Digital"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+                className="border-input"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="type" className="text-sm text-muted-foreground">
+                Tipo *
+              </Label>
+              <Select
+                value={formData.type}
+                onValueChange={(value: 'receita' | 'despesa') => setFormData({ ...formData, type: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="receita">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-green-500" />
+                      Receita
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="despesa">
+                    <div className="flex items-center gap-2">
+                      <TrendingDown className="w-4 h-4 text-red-500" />
+                      Despesa
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -201,48 +296,19 @@ export function CostCenterManagerModal({
           </div>
         </form>
 
-        <div className="space-y-3">
-          <h3 className="text-sm font-medium text-muted-foreground">
-            Centros de Custo Existentes
-          </h3>
-          {costCenters.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">
-              Nenhum centro de custo cadastrado
-            </p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {costCenters.map((center) => (
-                  <TableRow key={center.id}>
-                    <TableCell className="font-medium">{center.name}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEdit(center)}
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(center.id)}
-                        >
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+        <div className="space-y-6 pt-2">
+          {renderCostCenterTable(
+            revenueCenters,
+            "Centros de Receita",
+            <TrendingUp className="w-5 h-5 text-green-500" />,
+            'default'
+          )}
+
+          {renderCostCenterTable(
+            expenseCenters,
+            "Centros de Despesa",
+            <TrendingDown className="w-5 h-5 text-red-500" />,
+            'destructive'
           )}
         </div>
 
