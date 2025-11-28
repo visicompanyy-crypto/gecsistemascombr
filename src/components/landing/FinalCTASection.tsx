@@ -28,7 +28,7 @@ export const FinalCTASection = () => {
         </p>
 
         <Button
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/pricing")}
           className="bg-[#0a0f0b] hover:bg-[#0f1410] text-[#00ff88] px-16 py-8 rounded-2xl text-xl font-bold transition-all hover:scale-105 shadow-[0_15px_50px_rgba(10,15,11,0.3)]"
         >
           Assinar plano
