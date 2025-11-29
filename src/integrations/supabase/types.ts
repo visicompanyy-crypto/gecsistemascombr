@@ -414,6 +414,51 @@ export type Database = {
           },
         ]
       }
+      subscriptions: {
+        Row: {
+          asaas_customer_id: string | null
+          asaas_subscription_id: string | null
+          billing_cycle: string
+          created_at: string | null
+          id: string
+          next_due_date: string | null
+          plan_id: string
+          plan_name: string
+          status: string | null
+          updated_at: string | null
+          user_id: string
+          value: number
+        }
+        Insert: {
+          asaas_customer_id?: string | null
+          asaas_subscription_id?: string | null
+          billing_cycle: string
+          created_at?: string | null
+          id?: string
+          next_due_date?: string | null
+          plan_id: string
+          plan_name: string
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+          value: number
+        }
+        Update: {
+          asaas_customer_id?: string | null
+          asaas_subscription_id?: string | null
+          billing_cycle?: string
+          created_at?: string | null
+          id?: string
+          next_due_date?: string | null
+          plan_id?: string
+          plan_name?: string
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+          value?: number
+        }
+        Relationships: []
+      }
       team_members: {
         Row: {
           company_id: string | null

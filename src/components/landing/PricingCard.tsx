@@ -6,7 +6,7 @@ interface PricingCardProps {
   name: string;
   price: string;
   period: string;
-  priceId: string;
+  planId: string;
   billingInfo?: string;
   badge?: string;
   description?: string;
@@ -20,7 +20,7 @@ export const PricingCard = ({
   name, 
   price, 
   period, 
-  priceId,
+  planId,
   billingInfo,
   badge, 
   description,
@@ -66,7 +66,7 @@ export const PricingCard = ({
   const styles = neonStyles[neonColor];
 
   const handleClick = () => {
-    navigate(`/checkout?plan=${priceId}`);
+    navigate(`/checkout?plan=${planId}`);
   };
 
   return (

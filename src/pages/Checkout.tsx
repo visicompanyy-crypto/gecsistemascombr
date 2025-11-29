@@ -5,30 +5,33 @@ import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Check, ArrowLeft, Loader2 } from "lucide-react";
+import { Check, ArrowLeft, Loader2, CreditCard, QrCode } from "lucide-react";
 import { TrashBackground } from "@/components/checkout/TrashBackground";
 
 const plans = [
   {
+    id: "yearly",
     name: "Plano Anual",
-    price: "99",
+    price: "99,90",
+    totalPrice: "1.198,80",
     period: "ano",
-    priceId: "price_1SX0tMHBNcHovPNJRDUQnTd3",
-    productId: "prod_TTyrsADHJ2kqDE",
+    value: 1198.80,
   },
   {
+    id: "quarterly",
     name: "Plano Trimestral",
-    price: "119",
-    period: "3 meses",
-    priceId: "price_1SX0uXHBNcHovPNJu11958UU",
-    productId: "prod_TTysnvfLhDnz9L",
+    price: "119,90",
+    totalPrice: "359,00",
+    period: "trimestre",
+    value: 359.00,
   },
   {
+    id: "monthly",
     name: "Plano Mensal",
-    price: "139",
+    price: "139,90",
+    totalPrice: "139,90",
     period: "mês",
-    priceId: "price_1SX0vxHBNcHovPNJcjAdKS7a",
-    productId: "prod_TTyt9F1mm17zg6",
+    value: 139.90,
   },
 ];
 
@@ -37,7 +40,7 @@ const benefits = [
   "Gestão de centros de custo",
   "Relatórios e gráficos detalhados",
   "Gestão de equipe e ferramentas",
-  "Suporte prioritário",
+  "Suporte prioritário via WhatsApp",
 ];
 
 const Checkout = () => {
@@ -48,7 +51,7 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
 
   const planId = searchParams.get("plan");
-  const selectedPlan = plans.find(p => p.priceId === planId);
+  const selectedPlan = plans.find(p => p.id === planId);
 
   useEffect(() => {
     if (!planId || !selectedPlan) {
@@ -58,7 +61,6 @@ const Checkout = () => {
 
   useEffect(() => {
     if (!user) {
-      // Redirecionar para login mantendo o plano selecionado
       navigate(`/auth?redirect=/checkout&plan=${planId}`);
     }
   }, [user, navigate, planId]);
@@ -70,13 +72,19 @@ const Checkout = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { priceId: selectedPlan.priceId },
+        body: { planId: selectedPlan.id },
       });
 
       if (error) throw error;
 
       if (data?.url) {
         window.open(data.url, "_blank");
+        toast({
+          title: "Redirecionando para pagamento",
+          description: "Complete o pagamento na página do Asaas. Você pode pagar via PIX ou Cartão.",
+        });
+      } else {
+        throw new Error("URL de pagamento não recebida");
       }
     } catch (error) {
       console.error("Error creating checkout:", error);
@@ -134,9 +142,27 @@ const Checkout = () => {
               </h2>
               <div className="flex items-baseline justify-center gap-2">
                 <span className="text-4xl font-bold text-gray-900">
-                  R$ {selectedPlan.price}
+                  R$ {selectedPlan.totalPrice}
                 </span>
                 <span className="text-gray-600">/ {selectedPlan.period}</span>
+              </div>
+              {selectedPlan.id !== "monthly" && (
+                <p className="text-sm text-green-600 mt-1">
+                  Equivalente a R$ {selectedPlan.price}/mês
+                </p>
+              )}
+            </div>
+
+            {/* Payment methods */}
+            <div className="flex items-center justify-center gap-4 mb-6 p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <QrCode className="h-5 w-5 text-green-600" />
+                <span>PIX</span>
+              </div>
+              <div className="h-4 w-px bg-gray-300" />
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <CreditCard className="h-5 w-5 text-blue-600" />
+                <span>Cartão de Crédito</span>
               </div>
             </div>
 
@@ -162,7 +188,7 @@ const Checkout = () => {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Processando...
+                  Gerando link de pagamento...
                 </>
               ) : (
                 "Finalizar assinatura"
@@ -170,7 +196,7 @@ const Checkout = () => {
             </Button>
 
             <p className="text-xs text-gray-500 text-center mt-4">
-              Pagamento seguro via Stripe. Cancele quando quiser.
+              Pagamento seguro via Asaas. Cancele quando quiser.
             </p>
           </Card>
         </div>
