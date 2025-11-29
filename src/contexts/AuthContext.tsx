@@ -21,19 +21,28 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const PLAN_DETAILS = {
-  "prod_TTyrsADHJ2kqDE": {
-    name: "Plano Anual",
-    priceId: "price_1SX0tMHBNcHovPNJRDUQnTd3",
-  },
-  "prod_TTysnvfLhDnz9L": {
-    name: "Plano Trimestral",
-    priceId: "price_1SX0uXHBNcHovPNJu11958UU",
-  },
-  "prod_TTyt9F1mm17zg6": {
+// Planos Asaas - IDs correspondem aos retornados por check-subscription
+export const PLAN_DETAILS = {
+  monthly: {
     name: "Plano Mensal",
-    priceId: "price_1SX0vxHBNcHovPNJcjAdKS7a",
+    value: 139.90,
+    cycle: "MONTHLY"
   },
+  quarterly: {
+    name: "Plano Trimestral",
+    value: 359.00,
+    cycle: "QUARTERLY"
+  },
+  yearly: {
+    name: "Plano Anual",
+    value: 1198.80,
+    cycle: "YEARLY"
+  },
+  whitelisted: {
+    name: "Acesso Gratuito",
+    value: 0,
+    cycle: null
+  }
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -104,8 +113,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => authSubscription.unsubscribe();
   }, []);
 
-  // Removido: interval de 60 segundos que causava atualizações automáticas indesejadas
-
   const signOut = async () => {
     try {
       await supabase.auth.signOut();
@@ -150,5 +157,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-export { PLAN_DETAILS };
