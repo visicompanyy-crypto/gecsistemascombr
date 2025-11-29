@@ -21,6 +21,7 @@ import { OnboardingTour } from "./OnboardingTour";
 import { useCompanySettings } from "@/contexts/CompanySettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { CostCenterManagerModal } from "./CostCenterManagerModal";
+import { AddClientModal } from "./AddClientModal";
 
 export function FinanceView() {
   const { toast } = useToast();
@@ -31,6 +32,7 @@ export function FinanceView() {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [firstAccessModalOpen, setFirstAccessModalOpen] = useState(false);
   const [costCenterManagerOpen, setCostCenterManagerOpen] = useState(false);
+  const [addClientModalOpen, setAddClientModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -200,13 +202,7 @@ export function FinanceView() {
         onOpenCompanySettings={() => setFirstAccessModalOpen(true)}
         onOpenCostCenterManager={() => setCostCenterManagerOpen(true)}
         onNewTransaction={() => setModalOpen(true)}
-        onAddClient={() => {
-          toast({
-            title: "Em breve",
-            description: "Funcionalidade de adicionar cliente será implementada em breve.",
-          });
-        }}
-        onAddCostCenter={() => setCostCenterManagerOpen(true)}
+        onAddClient={() => setAddClientModalOpen(true)}
       />
       
       <div className="max-w-[1320px] mx-auto px-6 py-8 space-y-8 mt-8">
@@ -344,6 +340,11 @@ export function FinanceView() {
         <CostCenterManagerModal
           open={costCenterManagerOpen}
           onOpenChange={setCostCenterManagerOpen}
+        />
+
+        <AddClientModal
+          open={addClientModalOpen}
+          onOpenChange={setAddClientModalOpen}
         />
       </div>
       

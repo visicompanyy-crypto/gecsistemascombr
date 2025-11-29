@@ -1,5 +1,4 @@
 import { CompanyMenu } from "./header/CompanyMenu";
-import { QuickAddMenu } from "./header/QuickAddMenu";
 import { UserMenu } from "./header/UserMenu";
 import { NotificationBell } from "./NotificationBell";
 import logo from "@/assets/logo.png";
@@ -10,7 +9,6 @@ interface HeaderProps {
   onOpenCostCenterManager?: () => void;
   onNewTransaction?: () => void;
   onAddClient?: () => void;
-  onAddCostCenter?: () => void;
 }
 
 export function Header({ 
@@ -19,7 +17,6 @@ export function Header({
   onOpenCostCenterManager,
   onNewTransaction,
   onAddClient,
-  onAddCostCenter,
 }: HeaderProps) {
   return (
     <header className="bg-background border-b border-border/20 h-[72px] sticky top-0 z-50 backdrop-blur-sm">
@@ -28,6 +25,8 @@ export function Header({
         <CompanyMenu 
           onOpenCompanySettings={onOpenCompanySettings}
           onOpenCostCenterManager={onOpenCostCenterManager}
+          onNewTransaction={onNewTransaction}
+          onAddClient={onAddClient}
         />
 
         {/* Centro - Logo Saldar */}
@@ -36,13 +35,8 @@ export function Header({
           <span className="text-xl font-semibold text-foreground">Saldar</span>
         </div>
 
-        {/* Direita - Adicionar + Notificações + Usuário */}
+        {/* Direita - Notificações + Usuário */}
         <div className="flex items-center gap-3">
-          <QuickAddMenu 
-            onNewTransaction={onNewTransaction}
-            onAddClient={onAddClient}
-            onAddCostCenter={onAddCostCenter}
-          />
           <NotificationBell />
           <UserMenu />
         </div>
