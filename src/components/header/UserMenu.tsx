@@ -1,4 +1,4 @@
-import { User, CreditCard, LogOut, UserCircle } from "lucide-react";
+import { User, CreditCard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -73,10 +73,6 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="gap-3 py-2.5 cursor-pointer">
-          <UserCircle className="h-4 w-4 text-muted-foreground" />
-          <span>Perfil</span>
-        </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => navigate("/pricing")}
           className="gap-3 py-2.5 cursor-pointer"
