@@ -1,4 +1,4 @@
-import { Building2, Settings, FolderKanban, ChevronDown, DollarSign, UserPlus } from "lucide-react";
+import { Building2, Settings, FolderKanban, ChevronDown, DollarSign, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +15,7 @@ interface CompanyMenuProps {
   onOpenCompanySettings?: () => void;
   onOpenCostCenterManager?: () => void;
   onNewTransaction?: () => void;
-  onAddClient?: () => void;
+  onManageClients?: () => void;
 }
 
 function getInitials(name: string): string {
@@ -27,7 +27,7 @@ function getInitials(name: string): string {
   return (words[0][0] + words[1][0]).toUpperCase();
 }
 
-export function CompanyMenu({ onOpenCompanySettings, onOpenCostCenterManager, onNewTransaction, onAddClient }: CompanyMenuProps) {
+export function CompanyMenu({ onOpenCompanySettings, onOpenCostCenterManager, onNewTransaction, onManageClients }: CompanyMenuProps) {
   const { settings } = useCompanySettings();
   
   const companyName = settings?.company_name || "Minha Empresa";
@@ -62,11 +62,11 @@ export function CompanyMenu({ onOpenCompanySettings, onOpenCostCenterManager, on
           <span className="font-medium">Novo lançamento</span>
         </DropdownMenuItem>
         <DropdownMenuItem 
-          onClick={onAddClient}
+          onClick={onManageClients}
           className="gap-3 py-2.5 cursor-pointer"
         >
-          <UserPlus className="h-4 w-4 text-primary" />
-          <span className="font-medium">Adicionar cliente</span>
+          <Users className="h-4 w-4 text-primary" />
+          <span className="font-medium">Gerenciar Clientes</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem 
