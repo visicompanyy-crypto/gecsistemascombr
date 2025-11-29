@@ -21,7 +21,7 @@ import { OnboardingTour } from "./OnboardingTour";
 import { useCompanySettings } from "@/contexts/CompanySettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { CostCenterManagerModal } from "./CostCenterManagerModal";
-import { AddClientModal } from "./AddClientModal";
+import { ClientManagerModal } from "./ClientManagerModal";
 
 export function FinanceView() {
   const { toast } = useToast();
@@ -32,7 +32,7 @@ export function FinanceView() {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [firstAccessModalOpen, setFirstAccessModalOpen] = useState(false);
   const [costCenterManagerOpen, setCostCenterManagerOpen] = useState(false);
-  const [addClientModalOpen, setAddClientModalOpen] = useState(false);
+  const [clientManagerOpen, setClientManagerOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -202,7 +202,7 @@ export function FinanceView() {
         onOpenCompanySettings={() => setFirstAccessModalOpen(true)}
         onOpenCostCenterManager={() => setCostCenterManagerOpen(true)}
         onNewTransaction={() => setModalOpen(true)}
-        onAddClient={() => setAddClientModalOpen(true)}
+        onManageClients={() => setClientManagerOpen(true)}
       />
       
       <div className="max-w-[1320px] mx-auto px-6 py-8 space-y-8 mt-8">
@@ -342,9 +342,9 @@ export function FinanceView() {
           onOpenChange={setCostCenterManagerOpen}
         />
 
-        <AddClientModal
-          open={addClientModalOpen}
-          onOpenChange={setAddClientModalOpen}
+        <ClientManagerModal
+          open={clientManagerOpen}
+          onOpenChange={setClientManagerOpen}
         />
       </div>
       
