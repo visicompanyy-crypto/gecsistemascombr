@@ -52,13 +52,49 @@ const Pricing = () => {
   const [showCPFModal, setShowCPFModal] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
-  const handleSubscribeClick = (planId: string) => {
+  const handleSubscribeClick = async (planId: string) => {
     if (!user) {
-      navigate(`/auth?redirect=/pricing`);
+      navigate(`/signup?redirect=/pricing&plan=${planId}`);
       return;
     }
-    setSelectedPlanId(planId);
-    setShowCPFModal(true);
+    
+    // Check if user has CPF in metadata (from signup)
+    const userCpf = user.user_metadata?.cpf;
+    
+    if (userCpf) {
+      // User already has CPF, go directly to checkout
+      setLoadingPlan(planId);
+      try {
+        const { data, error } = await supabase.functions.invoke("create-checkout", {
+          body: { planId, cpfCnpj: userCpf },
+        });
+
+        if (error) throw error;
+
+        if (data?.url) {
+          window.open(data.url, "_blank");
+          toast({
+            title: "Redirecionando para pagamento",
+            description: "Complete o pagamento na página do Asaas.",
+          });
+        } else {
+          throw new Error("URL de pagamento não recebida");
+        }
+      } catch (error) {
+        console.error("Error creating checkout:", error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível iniciar o checkout. Tente novamente.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoadingPlan(null);
+      }
+    } else {
+      // Old user without CPF, show modal
+      setSelectedPlanId(planId);
+      setShowCPFModal(true);
+    }
   };
 
   const handleConfirmSubscription = async (cpfCnpj: string) => {
