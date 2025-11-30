@@ -206,6 +206,7 @@ serve(async (req) => {
     }
 
     // Save or update subscription in database
+    // Use the status from Asaas (ACTIVE) not PENDING
     const subscriptionRecord = {
       user_id: user.id,
       asaas_customer_id: asaasCustomerId,
@@ -214,7 +215,7 @@ serve(async (req) => {
       plan_name: plan.name,
       billing_cycle: plan.cycle,
       value: plan.value,
-      status: "PENDING",
+      status: subscriptionData.status || "ACTIVE",
       next_due_date: formattedDate,
     };
 
