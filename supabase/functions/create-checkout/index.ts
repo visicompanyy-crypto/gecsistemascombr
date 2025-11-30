@@ -37,6 +37,36 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
 };
 
+// Helper function to safely fetch and parse Asaas API response
+async function asaasFetch(url: string, options: RequestInit, apiKey: string) {
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      "access_token": apiKey,
+      ...options.headers,
+    },
+  });
+
+  const responseText = await response.text();
+  logStep("Asaas API response", { 
+    status: response.status, 
+    statusText: response.statusText,
+    url: url,
+    bodyPreview: responseText.substring(0, 500)
+  });
+
+  if (!response.ok) {
+    throw new Error(`Asaas API error (${response.status}): ${responseText.substring(0, 500)}`);
+  }
+
+  try {
+    return JSON.parse(responseText);
+  } catch {
+    throw new Error(`Invalid JSON response from Asaas: ${responseText.substring(0, 500)}`);
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -52,7 +82,7 @@ serve(async (req) => {
 
     const asaasApiKey = Deno.env.get("ASAAS_API_KEY");
     if (!asaasApiKey) throw new Error("ASAAS_API_KEY is not set");
-    logStep("Asaas API key verified");
+    logStep("Asaas API key verified", { keyLength: asaasApiKey.length, keyPrefix: asaasApiKey.substring(0, 10) });
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header provided");
@@ -84,20 +114,20 @@ serve(async (req) => {
     // Create or get Asaas customer
     if (!asaasCustomerId) {
       logStep("Creating new Asaas customer");
-      const customerResponse = await fetch(`${ASAAS_API_URL}/customers`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "access_token": asaasApiKey,
+      
+      const customerData = await asaasFetch(
+        `${ASAAS_API_URL}/customers`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            name: user.user_metadata?.full_name || user.email?.split("@")[0] || "Cliente",
+            email: user.email,
+            notificationDisabled: false,
+          }),
         },
-        body: JSON.stringify({
-          name: user.user_metadata?.full_name || user.email?.split("@")[0] || "Cliente",
-          email: user.email,
-          notificationDisabled: false,
-        }),
-      });
+        asaasApiKey
+      );
 
-      const customerData = await customerResponse.json();
       if (customerData.errors) {
         throw new Error(`Asaas customer error: ${JSON.stringify(customerData.errors)}`);
       }
@@ -109,7 +139,7 @@ serve(async (req) => {
 
     // Create subscription in Asaas
     const nextDueDate = new Date();
-    nextDueDate.setDate(nextDueDate.getDate() + 1); // Primeira cobrança amanhã
+    nextDueDate.setDate(nextDueDate.getDate() + 1);
     const formattedDate = nextDueDate.toISOString().split("T")[0];
 
     logStep("Creating Asaas subscription", { 
@@ -119,24 +149,23 @@ serve(async (req) => {
       nextDueDate: formattedDate
     });
 
-    const subscriptionResponse = await fetch(`${ASAAS_API_URL}/subscriptions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "access_token": asaasApiKey,
+    const subscriptionData = await asaasFetch(
+      `${ASAAS_API_URL}/subscriptions`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          customer: asaasCustomerId,
+          billingType: "UNDEFINED",
+          value: plan.value,
+          nextDueDate: formattedDate,
+          cycle: plan.cycle,
+          description: plan.description,
+          externalReference: user.id,
+        }),
       },
-      body: JSON.stringify({
-        customer: asaasCustomerId,
-        billingType: "UNDEFINED", // Permite PIX ou Cartão
-        value: plan.value,
-        nextDueDate: formattedDate,
-        cycle: plan.cycle,
-        description: plan.description,
-        externalReference: user.id,
-      }),
-    });
+      asaasApiKey
+    );
 
-    const subscriptionData = await subscriptionResponse.json();
     if (subscriptionData.errors) {
       throw new Error(`Asaas subscription error: ${JSON.stringify(subscriptionData.errors)}`);
     }
@@ -146,18 +175,13 @@ serve(async (req) => {
     });
 
     // Get the first payment link
-    const paymentsResponse = await fetch(
+    const paymentsData = await asaasFetch(
       `${ASAAS_API_URL}/subscriptions/${subscriptionData.id}/payments`,
-      {
-        headers: {
-          "access_token": asaasApiKey,
-        },
-      }
+      { method: "GET" },
+      asaasApiKey
     );
 
-    const paymentsData = await paymentsResponse.json();
     let invoiceUrl = null;
-
     if (paymentsData.data && paymentsData.data.length > 0) {
       const firstPayment = paymentsData.data[0];
       invoiceUrl = firstPayment.invoiceUrl;
