@@ -8,6 +8,7 @@ import { CompanySettingsProvider } from "./contexts/CompanySettingsContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import Pricing from "./pages/Pricing";
@@ -36,6 +37,7 @@ const App = () => (
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Auth />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/signup" element={<Signup />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/checkout" element={<Navigate to="/pricing" replace />} />
               <Route path="/subscription-success" element={<SubscriptionSuccess />} />
