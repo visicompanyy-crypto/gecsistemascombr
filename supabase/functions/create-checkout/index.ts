@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const ASAAS_API_URL = "https://sandbox.asaas.com/api/v3"; // Mudar para https://api.asaas.com/api/v3 em produção
+const ASAAS_API_URL = "https://api.asaas.com/api/v3";
 
 const PLANS = {
   monthly: {
