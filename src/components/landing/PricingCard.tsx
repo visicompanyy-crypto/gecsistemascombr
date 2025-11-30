@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { CPFModal } from "@/components/CPFModal";
 
 interface PricingCardProps {
   name: string;
@@ -42,6 +43,7 @@ export const PricingCard = ({
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [showCPFModal, setShowCPFModal] = useState(false);
 
   const neonStyles = {
     green: {
@@ -72,23 +74,27 @@ export const PricingCard = ({
 
   const styles = neonStyles[neonColor];
 
-  const handleClick = async () => {
+  const handleClick = () => {
     if (!user) {
       navigate(`/auth?redirect=/pricing`);
       return;
     }
+    setShowCPFModal(true);
+  };
 
+  const handleConfirmSubscription = async (cpfCnpj: string) => {
     setLoading(true);
 
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { planId },
+        body: { planId, cpfCnpj },
       });
 
       if (error) throw error;
 
       if (data?.url) {
         window.open(data.url, "_blank");
+        setShowCPFModal(false);
         toast({
           title: "Redirecionando para pagamento",
           description: "Complete o pagamento na página do Asaas.",
@@ -171,6 +177,14 @@ export const PricingCard = ({
           </Button>
         </div>
       </div>
+
+      <CPFModal
+        isOpen={showCPFModal}
+        onClose={() => setShowCPFModal(false)}
+        onConfirm={handleConfirmSubscription}
+        isLoading={loading}
+        planName={name}
+      />
     </div>
   );
 };
