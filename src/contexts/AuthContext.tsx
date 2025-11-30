@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const PLAN_DETAILS = {
   monthly: {
     name: "Plano Mensal",
-    value: 5.00, // TESTE - valor original: 139.90 (mínimo Asaas: R$ 5,00)
+    value: 139.90,
     cycle: "MONTHLY"
   },
   quarterly: {
