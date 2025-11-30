@@ -12,7 +12,7 @@ const PLANS = {
   monthly: {
     id: "monthly",
     name: "Plano Mensal",
-    value: 5.00, // TESTE - valor original: 139.90 (mínimo Asaas: R$ 5,00)
+    value: 139.90,
     cycle: "MONTHLY",
     description: "Assinatura mensal Saldar"
   },
