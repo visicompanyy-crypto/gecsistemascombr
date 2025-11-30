@@ -21,7 +21,7 @@ export const HeroSection = () => {
 
             <div className="pt-2 flex justify-center md:justify-start">
               <Button
-                onClick={() => navigate("/login")}
+                onClick={() => navigate("/signup")}
                 className="bg-landing-green hover:bg-landing-green/90 text-white px-12 py-7 rounded-2xl text-xl font-bold transition-all hover:scale-105 shadow-[0_8px_30px_rgba(0,110,93,0.3)]"
               >
                 Começar agora
