@@ -1,6 +1,10 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface PricingCardProps {
   name: string;
@@ -35,6 +39,9 @@ export const PricingCard = ({
   ]
 }: PricingCardProps) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
 
   const neonStyles = {
     green: {
@@ -65,8 +72,40 @@ export const PricingCard = ({
 
   const styles = neonStyles[neonColor];
 
-  const handleClick = () => {
-    navigate(`/checkout?plan=${planId}`);
+  const handleClick = async () => {
+    if (!user) {
+      navigate(`/auth?redirect=/pricing`);
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { planId },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, "_blank");
+        toast({
+          title: "Redirecionando para pagamento",
+          description: "Complete o pagamento na página do Asaas.",
+        });
+      } else {
+        throw new Error("URL de pagamento não recebida");
+      }
+    } catch (error) {
+      console.error("Error creating checkout:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível iniciar o checkout. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -118,9 +157,17 @@ export const PricingCard = ({
 
           <Button
             onClick={handleClick}
+            disabled={loading}
             className={`w-full py-6 rounded-xl text-base font-bold transition-all duration-300 hover:scale-105 text-[#0a0f0b] shadow-lg ${styles.button}`}
           >
-            {buttonText}
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Gerando link...
+              </>
+            ) : (
+              buttonText
+            )}
           </Button>
         </div>
       </div>
