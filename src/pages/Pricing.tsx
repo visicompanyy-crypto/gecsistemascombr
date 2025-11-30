@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Check, ArrowLeft, Loader2 } from "lucide-react";
 import { PremiumBackground } from "@/components/landing/PremiumBackground";
+import { CPFModal } from "@/components/CPFModal";
 
 const plans = [
   {
@@ -48,24 +49,33 @@ const Pricing = () => {
   const { toast } = useToast();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showCPFModal, setShowCPFModal] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
-  const handleSubscribe = async (planId: string) => {
+  const handleSubscribeClick = (planId: string) => {
     if (!user) {
       navigate(`/auth?redirect=/pricing`);
       return;
     }
+    setSelectedPlanId(planId);
+    setShowCPFModal(true);
+  };
 
-    setLoadingPlan(planId);
+  const handleConfirmSubscription = async (cpfCnpj: string) => {
+    if (!selectedPlanId) return;
+    
+    setLoadingPlan(selectedPlanId);
 
     try {
       const { data, error } = await supabase.functions.invoke("create-checkout", {
-        body: { planId },
+        body: { planId: selectedPlanId, cpfCnpj },
       });
 
       if (error) throw error;
 
       if (data?.url) {
         window.open(data.url, "_blank");
+        setShowCPFModal(false);
         toast({
           title: "Redirecionando para pagamento",
           description: "Complete o pagamento na página do Asaas.",
@@ -220,7 +230,7 @@ const Pricing = () => {
                       ? "bg-green-600 hover:bg-green-700 text-white"
                       : "bg-green-700 hover:bg-green-800 text-white"
                   }`}
-                  onClick={() => handleSubscribe(plan.id)}
+                  onClick={() => handleSubscribeClick(plan.id)}
                   disabled={loadingPlan !== null || isCurrent}
                 >
                   {loadingPlan === plan.id ? (
@@ -239,6 +249,17 @@ const Pricing = () => {
           })}
         </div>
       </div>
+
+      <CPFModal
+        isOpen={showCPFModal}
+        onClose={() => {
+          setShowCPFModal(false);
+          setSelectedPlanId(null);
+        }}
+        onConfirm={handleConfirmSubscription}
+        isLoading={loadingPlan !== null}
+        planName={plans.find(p => p.id === selectedPlanId)?.name || ""}
+      />
     </PremiumBackground>
   );
 };

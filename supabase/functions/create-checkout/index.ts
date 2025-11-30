@@ -95,12 +95,15 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const { planId } = await req.json();
+    const { planId, cpfCnpj } = await req.json();
     if (!planId || !PLANS[planId as keyof typeof PLANS]) {
       throw new Error("Invalid plan ID. Valid options: monthly, quarterly, yearly");
     }
+    if (!cpfCnpj) {
+      throw new Error("CPF ou CNPJ é obrigatório");
+    }
     const plan = PLANS[planId as keyof typeof PLANS];
-    logStep("Plan selected", { planId, planName: plan.name, value: plan.value });
+    logStep("Plan selected", { planId, planName: plan.name, value: plan.value, cpfCnpj: cpfCnpj.substring(0, 3) + "***" });
 
     // Check if user already has a subscription
     const { data: existingSub } = await supabaseClient
@@ -122,6 +125,7 @@ serve(async (req) => {
           body: JSON.stringify({
             name: user.user_metadata?.full_name || user.email?.split("@")[0] || "Cliente",
             email: user.email,
+            cpfCnpj: cpfCnpj,
             notificationDisabled: false,
           }),
         },
@@ -134,7 +138,20 @@ serve(async (req) => {
       asaasCustomerId = customerData.id;
       logStep("Asaas customer created", { customerId: asaasCustomerId });
     } else {
-      logStep("Using existing Asaas customer", { customerId: asaasCustomerId });
+      logStep("Updating existing Asaas customer with CPF/CNPJ", { customerId: asaasCustomerId });
+      
+      // Update existing customer with CPF/CNPJ
+      await asaasFetch(
+        `${ASAAS_API_URL}/customers/${asaasCustomerId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            cpfCnpj: cpfCnpj,
+          }),
+        },
+        asaasApiKey
+      );
+      logStep("Existing Asaas customer updated", { customerId: asaasCustomerId });
     }
 
     // Create subscription in Asaas
