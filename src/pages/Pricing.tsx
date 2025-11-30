@@ -1,13 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth, PLAN_DETAILS } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Check, ArrowLeft, Loader2 } from "lucide-react";
+import { Check, ArrowLeft, Loader2, CreditCard } from "lucide-react";
 import { PremiumBackground } from "@/components/landing/PremiumBackground";
 import { CPFModal } from "@/components/CPFModal";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const plans = [
   {
@@ -51,6 +58,52 @@ const Pricing = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showCPFModal, setShowCPFModal] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+      }
+    };
+  }, []);
+
+  // Start polling for payment status
+  const startPaymentPolling = () => {
+    setIsCheckingPayment(true);
+    
+    // Check every 5 seconds
+    pollingRef.current = setInterval(async () => {
+      await refreshSubscription();
+    }, 5000);
+  };
+
+  // Stop polling
+  const stopPaymentPolling = () => {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+    setIsCheckingPayment(false);
+    setShowPaymentModal(false);
+  };
+
+  // Watch subscription status and redirect when active
+  useEffect(() => {
+    if (subscription?.subscribed && showPaymentModal) {
+      stopPaymentPolling();
+      toast({
+        title: "Pagamento confirmado!",
+        description: "Bem-vindo ao Saldar! Redirecionando para o dashboard...",
+      });
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1500);
+    }
+  }, [subscription?.subscribed, showPaymentModal, navigate, toast]);
 
   const handleSubscribeClick = async (planId: string) => {
     if (!user) {
@@ -73,10 +126,8 @@ const Pricing = () => {
 
         if (data?.url) {
           window.open(data.url, "_blank");
-          toast({
-            title: "Redirecionando para pagamento",
-            description: "Complete o pagamento na página do Asaas.",
-          });
+          setShowPaymentModal(true);
+          startPaymentPolling();
         } else {
           throw new Error("URL de pagamento não recebida");
         }
@@ -112,10 +163,8 @@ const Pricing = () => {
       if (data?.url) {
         window.open(data.url, "_blank");
         setShowCPFModal(false);
-        toast({
-          title: "Redirecionando para pagamento",
-          description: "Complete o pagamento na página do Asaas.",
-        });
+        setShowPaymentModal(true);
+        startPaymentPolling();
       } else {
         throw new Error("URL de pagamento não recebida");
       }
@@ -296,6 +345,68 @@ const Pricing = () => {
         isLoading={loadingPlan !== null}
         planName={plans.find(p => p.id === selectedPlanId)?.name || ""}
       />
+
+      {/* Payment Status Modal */}
+      <Dialog open={showPaymentModal} onOpenChange={(open) => {
+        if (!open) stopPaymentPolling();
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-green-600" />
+              Aguardando pagamento
+            </DialogTitle>
+            <DialogDescription>
+              Complete o pagamento na aba do Asaas que foi aberta.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex flex-col items-center py-6 space-y-4">
+            <div className="relative">
+              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+              </div>
+            </div>
+            
+            <div className="text-center space-y-2">
+              <p className="text-sm text-gray-600">
+                {isCheckingPayment ? "Verificando pagamento..." : "Aguardando confirmação..."}
+              </p>
+              <p className="text-xs text-gray-500">
+                Assim que o pagamento for confirmado, você será redirecionado automaticamente.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Button
+              variant="outline"
+              onClick={async () => {
+                setIsRefreshing(true);
+                await refreshSubscription();
+                setIsRefreshing(false);
+              }}
+              disabled={isRefreshing}
+            >
+              {isRefreshing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Verificando...
+                </>
+              ) : (
+                "Já paguei, verificar agora"
+              )}
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={stopPaymentPolling}
+              className="text-gray-500"
+            >
+              Cancelar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </PremiumBackground>
   );
 };
