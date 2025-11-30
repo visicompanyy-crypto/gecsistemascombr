@@ -11,8 +11,8 @@ import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import Pricing from "./pages/Pricing";
-import Checkout from "./pages/Checkout";
 import SubscriptionSuccess from "./pages/SubscriptionSuccess";
+import { Navigate } from "react-router-dom";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,7 +37,7 @@ const App = () => (
               <Route path="/login" element={<Auth />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/pricing" element={<Pricing />} />
-              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/checkout" element={<Navigate to="/pricing" replace />} />
               <Route path="/subscription-success" element={<SubscriptionSuccess />} />
               <Route path="/dashboard" element={
                 <ProtectedRoute>

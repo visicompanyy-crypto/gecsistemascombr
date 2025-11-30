@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth, PLAN_DETAILS } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Check, ArrowLeft, Loader2 } from "lucide-react";
 import { PremiumBackground } from "@/components/landing/PremiumBackground";
@@ -48,8 +49,40 @@ const Pricing = () => {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const handleSubscribe = (planId: string) => {
-    navigate(`/checkout?plan=${planId}`);
+  const handleSubscribe = async (planId: string) => {
+    if (!user) {
+      navigate(`/auth?redirect=/pricing`);
+      return;
+    }
+
+    setLoadingPlan(planId);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("create-checkout", {
+        body: { planId },
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, "_blank");
+        toast({
+          title: "Redirecionando para pagamento",
+          description: "Complete o pagamento na página do Asaas.",
+        });
+      } else {
+        throw new Error("URL de pagamento não recebida");
+      }
+    } catch (error) {
+      console.error("Error creating checkout:", error);
+      toast({
+        title: "Erro",
+        description: "Não foi possível iniciar o checkout. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingPlan(null);
+    }
   };
 
   const handleRefreshSubscription = async () => {
