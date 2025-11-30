@@ -71,8 +71,30 @@ export function CostCenterManagerModal({
     }
   };
 
+  const checkDuplicate = (name: string, type: string, excludeId?: string) => {
+    return costCenters.some(
+      (c) => 
+        c.name.toLowerCase().trim() === name.toLowerCase().trim() && 
+        c.type === type && 
+        c.id !== excludeId
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check for duplicate before submitting
+    const isDuplicate = checkDuplicate(formData.name, formData.type, editingId || undefined);
+    if (isDuplicate) {
+      const typeLabel = formData.type === 'receita' ? 'Receita' : 'Despesa';
+      toast({
+        title: "Centro de custo já existe",
+        description: `Já existe um centro de custo "${formData.name}" do tipo ${typeLabel}. Use um nome diferente ou edite o existente.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -110,11 +132,21 @@ export function CostCenterManagerModal({
       fetchCostCenters();
       if (onUpdate) onUpdate();
     } catch (error: any) {
-      toast({
-        title: "Erro",
-        description: error.message,
-        variant: "destructive",
-      });
+      // Handle specific duplicate error from database
+      if (error.message?.includes('unique constraint') || error.code === '23505') {
+        const typeLabel = formData.type === 'receita' ? 'Receita' : 'Despesa';
+        toast({
+          title: "Centro de custo já existe",
+          description: `Já existe um centro de custo "${formData.name}" do tipo ${typeLabel}. Use um nome diferente.`,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
