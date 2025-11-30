@@ -29,8 +29,8 @@ const plans = [
   {
     id: "monthly",
     name: "Plano Mensal",
-    price: "139,90",
-    totalPrice: "139,90",
+    price: "1,00", // TESTE - valor original: 139,90
+    totalPrice: "1,00",
     period: "mês",
   },
 ];
