@@ -29,8 +29,8 @@ const plans = [
   {
     id: "monthly",
     name: "Plano Mensal",
-    price: "1,00", // TESTE - valor original: 139,90
-    totalPrice: "1,00",
+    price: "5,00", // TESTE - valor original: 139,90 (mínimo Asaas: R$ 5,00)
+    totalPrice: "5,00",
     period: "mês",
   },
 ];
