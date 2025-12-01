@@ -64,7 +64,7 @@ export const FloatingCardsDisplay = ({ images, variant }: FloatingCardsDisplayPr
   return (
     <div className="relative w-full max-w-3xl mx-auto">
       {/* Cards container */}
-      <div className="relative h-[780px] md:h-[1040px] lg:h-[1170px]">
+      <div className="relative h-[400px] md:h-[520px] lg:h-[600px]">
         {images.map((image, index) => {
           const { className, style } = getCardStyles(index);
           return (
@@ -83,21 +83,6 @@ export const FloatingCardsDisplay = ({ images, variant }: FloatingCardsDisplayPr
         })}
       </div>
 
-      {/* Navigation dots */}
-      <div className="flex justify-center gap-2 mt-6">
-        {images.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setActiveIndex(index)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              index === activeIndex 
-                ? `${dotActiveColor} w-6` 
-                : "bg-white/30 hover:bg-white/50"
-            }`}
-            aria-label={`Ir para imagem ${index + 1}`}
-          />
-        ))}
-      </div>
     </div>
   );
 };
