@@ -57,17 +57,6 @@ export const NeonBackground = () => {
         }}
       />
       
-      {/* Light particles */}
-      <div className="absolute top-1/3 left-1/4 w-2 h-2 bg-[#00ff88] rounded-full opacity-60 animate-pulse" />
-      <div className="absolute top-1/2 right-1/3 w-1.5 h-1.5 bg-[#00ff88] rounded-full opacity-40" 
-        style={{ animationDelay: '1s' }} 
-      />
-      <div className="absolute bottom-1/3 left-1/2 w-1 h-1 bg-[#00cc6f] rounded-full opacity-50 animate-pulse" 
-        style={{ animationDelay: '2s' }} 
-      />
-      <div className="absolute top-2/3 right-1/4 w-1.5 h-1.5 bg-[#00ff88] rounded-full opacity-30 animate-pulse" 
-        style={{ animationDelay: '3s' }} 
-      />
       
       {/* Sweeping light effect */}
       <div 
