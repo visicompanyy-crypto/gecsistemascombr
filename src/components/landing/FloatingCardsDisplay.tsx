@@ -41,7 +41,7 @@ export const FloatingCardsDisplay = ({ images, variant }: FloatingCardsDisplayPr
       return {
         className: `${baseClasses} ${borderColor}/50 z-20`,
         style: {
-          transform: `translateX(-50%) translateX(15%) rotate(${variant === "polluted" ? "8deg" : "6deg"}) scale(0.9)`,
+          transform: `translateX(-50%) translateX(10%) rotate(${variant === "polluted" ? "6deg" : "5deg"}) scale(0.9)`,
           left: "50%",
           opacity: 0.7,
         }
@@ -51,7 +51,7 @@ export const FloatingCardsDisplay = ({ images, variant }: FloatingCardsDisplayPr
       return {
         className: `${baseClasses} ${borderColor}/30 z-10`,
         style: {
-          transform: `translateX(-50%) translateX(-15%) rotate(${variant === "polluted" ? "-8deg" : "-6deg"}) scale(0.85)`,
+          transform: `translateX(-50%) translateX(-10%) rotate(${variant === "polluted" ? "-6deg" : "-5deg"}) scale(0.85)`,
           left: "50%",
           opacity: 0.5,
         }
@@ -62,9 +62,9 @@ export const FloatingCardsDisplay = ({ images, variant }: FloatingCardsDisplayPr
   const dotActiveColor = variant === "polluted" ? "bg-[#ff2d55]" : "bg-[#00ff88]";
 
   return (
-    <div className="relative w-full max-w-3xl mx-auto">
+    <div className="relative w-full max-w-4xl mx-auto px-4">
       {/* Cards container */}
-      <div className="relative h-[540px] md:h-[705px] lg:h-[825px]">
+      <div className="relative h-[280px] md:h-[400px] lg:h-[500px]">
         {images.map((image, index) => {
           const { className, style } = getCardStyles(index);
           return (
@@ -76,7 +76,7 @@ export const FloatingCardsDisplay = ({ images, variant }: FloatingCardsDisplayPr
               <img
                 src={image}
                 alt={`${variant === "polluted" ? "Sistema complexo" : "Sistema Saldar"} ${index + 1}`}
-                className="w-[8112px] md:w-[10140px] lg:w-[12168px] h-auto object-cover"
+                className="w-[400px] md:w-[600px] lg:w-[800px] h-auto object-cover"
               />
             </div>
           );
