@@ -64,7 +64,7 @@ export const FloatingCardsDisplay = ({ images, variant }: FloatingCardsDisplayPr
   return (
     <div className="relative w-full max-w-4xl mx-auto px-4">
       {/* Cards container */}
-      <div className="relative h-[280px] md:h-[400px] lg:h-[500px]">
+      <div className="relative h-[220px] sm:h-[320px] md:h-[400px] lg:h-[500px]">
         {images.map((image, index) => {
           const { className, style } = getCardStyles(index);
           return (
@@ -76,7 +76,7 @@ export const FloatingCardsDisplay = ({ images, variant }: FloatingCardsDisplayPr
               <img
                 src={image}
                 alt={`${variant === "polluted" ? "Sistema complexo" : "Sistema Saldar"} ${index + 1}`}
-                className="w-[400px] md:w-[600px] lg:w-[800px] h-auto object-cover"
+                className="w-[320px] sm:w-[500px] md:w-[600px] lg:w-[800px] h-auto object-cover"
               />
             </div>
           );
