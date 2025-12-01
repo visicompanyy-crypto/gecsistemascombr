@@ -62,9 +62,9 @@ export const FloatingCardsDisplay = ({ images, variant }: FloatingCardsDisplayPr
   const dotActiveColor = variant === "polluted" ? "bg-[#ff2d55]" : "bg-[#00ff88]";
 
   return (
-    <div className="relative w-full max-w-4xl mx-auto px-4">
+    <div className="relative w-full max-w-full md:max-w-4xl mx-auto px-0 md:px-4">
       {/* Cards container */}
-      <div className="relative h-[650px] sm:h-[750px] md:h-[400px] lg:h-[500px]">
+      <div className="relative h-[700px] sm:h-[800px] md:h-[400px] lg:h-[500px]">
         {images.map((image, index) => {
           const { className, style } = getCardStyles(index);
           return (
