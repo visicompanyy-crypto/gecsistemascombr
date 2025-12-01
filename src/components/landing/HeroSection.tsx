@@ -29,10 +29,9 @@ export const HeroSection = () => {
             </div>
 
             <div className="pt-3 flex justify-center md:justify-start">
-              <div className="flex items-center gap-4 bg-[#00ff88]/10 border border-[#00ff88]/30 rounded-2xl px-6 py-4">
-                <span className="text-3xl">🇧🇷</span>
+              <div className="bg-[#00ff88]/10 border border-[#00ff88]/30 rounded-2xl px-6 py-4">
                 <div className="flex flex-col">
-                  <span className="text-white text-lg md:text-xl font-bold leading-tight">Empreender no Brasil já é difícil.</span>
+                  <span className="text-white text-lg md:text-xl font-bold leading-tight">Empreender já é difícil.</span>
                   <span className="text-[#00ff88] text-lg md:text-xl font-extrabold leading-tight">Seu financeiro não precisa ser também.</span>
                 </div>
               </div>
