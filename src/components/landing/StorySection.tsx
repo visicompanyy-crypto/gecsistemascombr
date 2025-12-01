@@ -67,7 +67,7 @@ export const StorySection = () => {
         </div>
 
         {/* Clean systems - Floating Cards */}
-        <div className="mb-16">
+        <div className="mb-4">
           <FloatingCardsDisplay images={cleanImages} variant="clean" />
         </div>
 
