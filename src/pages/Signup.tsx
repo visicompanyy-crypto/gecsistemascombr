@@ -113,8 +113,25 @@ export default function Signup() {
         body: { email }
       });
 
+      // Extrair mensagem de erro do response
+      let errorMessage: string | null = null;
+      
       if (response.error) {
-        throw new Error(response.error.message || 'Erro ao enviar código');
+        // Tentar extrair do context (quando Edge Function retorna non-2xx)
+        if (response.error.context) {
+          try {
+            const contextText = typeof response.error.context === 'string' 
+              ? response.error.context 
+              : await response.error.context.text?.();
+            if (contextText) {
+              const errorData = JSON.parse(contextText);
+              errorMessage = errorData.error;
+            }
+          } catch {
+            // Se não conseguir parsear, usar mensagem padrão
+          }
+        }
+        throw new Error(errorMessage || response.error.message || 'Erro ao enviar código');
       }
 
       if (response.data?.error) {
@@ -158,8 +175,24 @@ export default function Signup() {
         body: { email, code: verificationCode }
       });
 
+      // Extrair mensagem de erro do response
+      let errorMessage: string | null = null;
+      
       if (response.error) {
-        throw new Error(response.error.message || 'Erro ao verificar código');
+        if (response.error.context) {
+          try {
+            const contextText = typeof response.error.context === 'string' 
+              ? response.error.context 
+              : await response.error.context.text?.();
+            if (contextText) {
+              const errorData = JSON.parse(contextText);
+              errorMessage = errorData.error;
+            }
+          } catch {
+            // Se não conseguir parsear, usar mensagem padrão
+          }
+        }
+        throw new Error(errorMessage || response.error.message || 'Erro ao verificar código');
       }
 
       if (response.data?.error) {
@@ -193,8 +226,24 @@ export default function Signup() {
         body: { email }
       });
 
+      // Extrair mensagem de erro do response
+      let errorMessage: string | null = null;
+      
       if (response.error) {
-        throw new Error(response.error.message || 'Erro ao reenviar código');
+        if (response.error.context) {
+          try {
+            const contextText = typeof response.error.context === 'string' 
+              ? response.error.context 
+              : await response.error.context.text?.();
+            if (contextText) {
+              const errorData = JSON.parse(contextText);
+              errorMessage = errorData.error;
+            }
+          } catch {
+            // Se não conseguir parsear, usar mensagem padrão
+          }
+        }
+        throw new Error(errorMessage || response.error.message || 'Erro ao reenviar código');
       }
 
       if (response.data?.error) {
