@@ -80,7 +80,7 @@ serve(async (req) => {
 
     // Send email via Resend
     const emailResponse = await resend.emails.send({
-      from: "Saldar <onboarding@resend.dev>",
+      from: "Saldar <comercial@gecsistemas.com.br>",
       to: [email],
       subject: "Código de Verificação - Saldar",
       html: `
