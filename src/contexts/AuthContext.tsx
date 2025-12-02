@@ -5,8 +5,10 @@ import { useToast } from "@/hooks/use-toast";
 
 interface SubscriptionData {
   subscribed: boolean;
+  status: string | null;
   product_id: string | null;
   subscription_end: string | null;
+  days_until_renewal: number | null;
 }
 
 interface AuthContextType {
@@ -72,7 +74,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSubscription(data);
     } catch (error) {
       console.error("Error checking subscription:", error);
-      setSubscription({ subscribed: false, product_id: null, subscription_end: null });
+      setSubscription({ 
+        subscribed: false, 
+        status: null,
+        product_id: null, 
+        subscription_end: null,
+        days_until_renewal: null
+      });
     } finally {
       setSubscriptionLoading(false);
     }

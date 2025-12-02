@@ -206,7 +206,7 @@ serve(async (req) => {
     }
 
     // Save or update subscription in database
-    // Use the status from Asaas (ACTIVE) not PENDING
+    // IMPORTANT: Always set status to PENDING until webhook confirms payment
     const subscriptionRecord = {
       user_id: user.id,
       asaas_customer_id: asaasCustomerId,
@@ -215,7 +215,7 @@ serve(async (req) => {
       plan_name: plan.name,
       billing_cycle: plan.cycle,
       value: plan.value,
-      status: subscriptionData.status || "ACTIVE",
+      status: "PENDING", // Always PENDING until payment is confirmed via webhook
       next_due_date: formattedDate,
     };
 

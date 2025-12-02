@@ -19,6 +19,18 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CHECK-SUBSCRIPTION] ${step}${detailsStr}`);
 };
 
+// Calculate days until a date
+const calculateDaysUntil = (dateStr: string | null): number | null => {
+  if (!dateStr) return null;
+  const targetDate = new Date(dateStr);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  targetDate.setHours(0, 0, 0, 0);
+  const diffTime = targetDate.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -50,8 +62,10 @@ serve(async (req) => {
       logStep("Whitelisted email detected - granting free access", { email: user.email });
       return new Response(JSON.stringify({ 
         subscribed: true, 
+        status: "ACTIVE",
         product_id: "whitelisted",
-        subscription_end: null 
+        subscription_end: null,
+        days_until_renewal: null
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -69,8 +83,10 @@ serve(async (req) => {
       logStep("No subscription found in database");
       return new Response(JSON.stringify({ 
         subscribed: false,
+        status: null,
         product_id: null,
-        subscription_end: null
+        subscription_end: null,
+        days_until_renewal: null
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -83,13 +99,29 @@ serve(async (req) => {
       nextDueDate: subscription.next_due_date
     });
 
-    // Check if subscription is active
+    // Check if subscription is active (only ACTIVE status, not PENDING)
     const isActive = subscription.status === "ACTIVE";
     
+    // Check if subscription is expired (next_due_date has passed)
+    const daysUntilRenewal = calculateDaysUntil(subscription.next_due_date);
+    const isExpired = daysUntilRenewal !== null && daysUntilRenewal < 0;
+    
+    // User is subscribed only if status is ACTIVE and not expired
+    const isSubscribed = isActive && !isExpired;
+    
+    logStep("Subscription status calculated", { 
+      isActive, 
+      isExpired, 
+      isSubscribed,
+      daysUntilRenewal
+    });
+    
     return new Response(JSON.stringify({
-      subscribed: isActive,
+      subscribed: isSubscribed,
+      status: subscription.status,
       product_id: subscription.plan_id,
-      subscription_end: subscription.next_due_date
+      subscription_end: subscription.next_due_date,
+      days_until_renewal: daysUntilRenewal
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
