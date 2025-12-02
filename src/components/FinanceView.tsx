@@ -22,6 +22,7 @@ import { useCompanySettings } from "@/contexts/CompanySettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { CostCenterManagerModal } from "./CostCenterManagerModal";
 import { ClientManagerModal } from "./ClientManagerModal";
+import { RenewalAlert } from "./RenewalAlert";
 
 export function FinanceView() {
   const { toast } = useToast();
@@ -215,6 +216,7 @@ export function FinanceView() {
       />
       
       <div className="max-w-[1320px] mx-auto px-6 py-8 space-y-8 mt-8">
+        <RenewalAlert />
         <WelcomeCard />
 
         <div data-tour="summary-cards">
