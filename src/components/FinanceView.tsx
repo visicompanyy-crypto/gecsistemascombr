@@ -39,11 +39,18 @@ export function FinanceView() {
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
   const [costCenterFilter, setCostCenterFilter] = useState("all");
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [canStartTour, setCanStartTour] = useState(false);
 
   // Show first access modal if user is subscribed but hasn't completed onboarding
   useEffect(() => {
-    if (!settingsLoading && subscription?.subscribed && !settings?.onboarding_completed) {
-      setFirstAccessModalOpen(true);
+    if (!settingsLoading && subscription?.subscribed) {
+      if (!settings?.onboarding_completed) {
+        setFirstAccessModalOpen(true);
+        setCanStartTour(false);
+      } else {
+        // Onboarding already completed, tour can start
+        setCanStartTour(true);
+      }
     }
   }, [settingsLoading, subscription, settings]);
 
@@ -192,11 +199,13 @@ export function FinanceView() {
     await refreshSettings();
     // Refetch transactions to include newly created cost centers
     refetchTransactions();
+    // Allow tour to start after onboarding is complete
+    setCanStartTour(true);
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <OnboardingTour />
+      <OnboardingTour shouldRun={canStartTour && !firstAccessModalOpen} />
       <Header 
         currentMonth={currentMonth} 
         onOpenCompanySettings={() => setFirstAccessModalOpen(true)}

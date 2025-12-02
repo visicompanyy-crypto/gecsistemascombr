@@ -4,33 +4,33 @@ import { useState, useEffect } from 'react';
 const steps: Step[] = [
   {
     target: '[data-tour="summary-cards"]',
-    content: 'Bem-vindo ao seu painel financeiro! O card principal mostra o Resultado do Mês: se vai sobrar ou faltar dinheiro baseado nas receitas e despesas lançadas.',
+    content: 'Este é o Resultado do Mês - mostra se vai sobrar ou faltar dinheiro. Verde = positivo, Vermelho = negativo. Os cards abaixo mostram receitas recebidas, receitas futuras, despesas futuras e totais do mês.',
     placement: 'bottom',
     disableBeacon: true,
   },
   {
     target: '[data-tour="new-transaction"]',
-    content: 'Clique aqui para adicionar uma nova receita ou despesa. Você pode categorizar, definir vencimentos e formas de pagamento.',
+    content: 'Clique aqui para adicionar receitas ou despesas. Você pode definir: nome, valor, data de vencimento, forma de pagamento (PIX, cartão, boleto), centro de custo, e associar a um cliente para facilitar pagamentos futuros.',
     placement: 'bottom',
   },
   {
     target: '[data-tour="month-selector"]',
-    content: 'Navegue entre os meses para ver o histórico financeiro e planejar o futuro.',
+    content: 'Navegue entre os meses para ver o histórico ou planejar o futuro. Você pode lançar despesas e receitas com vencimento em qualquer mês.',
     placement: 'bottom',
   },
   {
     target: '[data-tour="filters"]',
-    content: 'Use os filtros para encontrar transações específicas por nome, tipo, forma de pagamento ou centro de custo.',
+    content: 'Use os filtros para encontrar transações específicas. Filtre por nome, tipo (receita/despesa), forma de pagamento ou centro de custo que você configurou.',
     placement: 'bottom',
   },
   {
     target: '[data-tour="transactions-table"]',
-    content: 'Aqui estão todas as suas transações do mês. Você pode visualizar detalhes, editar, excluir ou marcar como paga.',
+    content: 'Aqui estão todas as transações do mês. Você pode: ver detalhes, editar, excluir ou marcar como paga. Transações pagas ficam com status diferente das pendentes.',
     placement: 'top',
   },
   {
     target: '[data-tour="charts"]',
-    content: 'Visualize a distribuição das suas finanças por categoria em gráficos intuitivos. Tour finalizado! 🎉',
+    content: 'Visualize a distribuição das suas finanças por centro de custo. Receitas e despesas são separadas para você entender melhor para onde vai seu dinheiro. Tour finalizado! 🎉',
     placement: 'top',
   },
 ];
@@ -38,12 +38,19 @@ const steps: Step[] = [
 interface OnboardingTourProps {
   forceRun?: boolean;
   onComplete?: () => void;
+  shouldRun?: boolean;
 }
 
-export function OnboardingTour({ forceRun, onComplete }: OnboardingTourProps) {
+export function OnboardingTour({ forceRun, onComplete, shouldRun = true }: OnboardingTourProps) {
   const [run, setRun] = useState(false);
 
   useEffect(() => {
+    // Don't start if shouldRun is false (e.g., FirstAccessModal is still open)
+    if (!shouldRun) {
+      setRun(false);
+      return;
+    }
+
     if (forceRun) {
       setRun(true);
       return;
@@ -55,7 +62,7 @@ export function OnboardingTour({ forceRun, onComplete }: OnboardingTourProps) {
       const timer = setTimeout(() => setRun(true), 500);
       return () => clearTimeout(timer);
     }
-  }, [forceRun]);
+  }, [forceRun, shouldRun]);
 
   const handleCallback = (data: CallBackProps) => {
     const { status } = data;
