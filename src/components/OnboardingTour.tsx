@@ -94,11 +94,13 @@ export function OnboardingTour({ forceRun, onComplete, shouldRun = true }: Onboa
       showProgress
       showSkipButton
       scrollToFirstStep
-      scrollOffset={120}
+      scrollOffset={200}
       disableScrolling={false}
+      scrollDuration={300}
       callback={handleCallback}
       floaterProps={{
         disableAnimation: true,
+        disableFlip: true,
       }}
       styles={{
         options: {
