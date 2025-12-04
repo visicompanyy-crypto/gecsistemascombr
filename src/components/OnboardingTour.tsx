@@ -30,8 +30,13 @@ const steps: Step[] = [
   },
   {
     target: '[data-tour="charts"]',
-    content: 'Visualize a distribuição das suas finanças por centro de custo. Receitas e despesas são separadas para você entender melhor para onde vai seu dinheiro. Tour finalizado! 🎉',
+    content: 'Visualize a distribuição das suas finanças por centro de custo. Receitas e despesas são separadas para você entender melhor para onde vai seu dinheiro.',
     placement: 'top',
+  },
+  {
+    target: '[data-tour="ai-assistant"]',
+    content: 'Precisa de ajuda? 🤖 Clique aqui para conversar com nosso assistente virtual! Ele pode tirar suas dúvidas sobre o sistema, explicar funcionalidades e ajudar você a usar o Saldar da melhor forma. Tour finalizado! 🎉',
+    placement: 'top-start',
   },
 ];
 

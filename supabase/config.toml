@@ -11,3 +11,12 @@ verify_jwt = true
 
 [functions.asaas-webhook]
 verify_jwt = false
+
+[functions.send-verification-code]
+verify_jwt = false
+
+[functions.verify-email-code]
+verify_jwt = false
+
+[functions.ai-assistant]
+verify_jwt = false
