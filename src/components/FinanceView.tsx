@@ -23,7 +23,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { CostCenterManagerModal } from "./CostCenterManagerModal";
 import { ClientManagerModal } from "./ClientManagerModal";
 import { RenewalAlert } from "./RenewalAlert";
-
+import { AIAssistantButton } from "./AIAssistant";
 export function FinanceView() {
   const { toast } = useToast();
   const { settings, loading: settingsLoading, refreshSettings } = useCompanySettings();
@@ -361,6 +361,9 @@ export function FinanceView() {
       
       {/* Daily reminder popup */}
       <DailyReminder />
+      
+      {/* AI Assistant floating button */}
+      <AIAssistantButton />
     </div>
   );
 }
