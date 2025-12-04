@@ -12,6 +12,7 @@ const WHITELISTED_EMAILS: string[] = [
   "teste1@gmail.com",
   "teste3@gmail.com",
   "gustavogostoso@gmail.com",
+  "eduardotndl@gmail.com",
 ];
 
 const logStep = (step: string, details?: any) => {
