@@ -7,36 +7,43 @@ const steps: Step[] = [
     content: 'Este é o Resultado do Mês - mostra se vai sobrar ou faltar dinheiro. Verde = positivo, Vermelho = negativo. Os cards abaixo mostram receitas recebidas, receitas futuras, despesas futuras e totais do mês.',
     placement: 'bottom',
     disableBeacon: true,
+    spotlightPadding: 10,
   },
   {
     target: '[data-tour="new-transaction"]',
     content: 'Clique aqui para adicionar receitas ou despesas. Você pode definir: nome, valor, data de vencimento, forma de pagamento (PIX, cartão, boleto), centro de custo, e associar a um cliente para facilitar pagamentos futuros.',
     placement: 'bottom',
+    spotlightPadding: 8,
   },
   {
     target: '[data-tour="month-selector"]',
     content: 'Navegue entre os meses para ver o histórico ou planejar o futuro. Você pode lançar despesas e receitas com vencimento em qualquer mês.',
     placement: 'bottom',
+    spotlightPadding: 8,
   },
   {
     target: '[data-tour="filters"]',
     content: 'Use os filtros para encontrar transações específicas. Filtre por nome, tipo (receita/despesa), forma de pagamento ou centro de custo que você configurou.',
     placement: 'bottom',
+    spotlightPadding: 8,
   },
   {
     target: '[data-tour="transactions-table"]',
     content: 'Aqui estão todas as transações do mês. Você pode: ver detalhes, editar, excluir ou marcar como paga. Transações pagas ficam com status diferente das pendentes.',
     placement: 'top',
+    spotlightPadding: 8,
   },
   {
     target: '[data-tour="charts"]',
     content: 'Visualize a distribuição das suas finanças por centro de custo. Receitas e despesas são separadas para você entender melhor para onde vai seu dinheiro.',
     placement: 'top',
+    spotlightPadding: 8,
   },
   {
     target: '[data-tour="ai-assistant"]',
     content: 'Precisa de ajuda? 🤖 Clique aqui para conversar com nosso assistente virtual! Ele pode tirar suas dúvidas sobre o sistema, explicar funcionalidades e ajudar você a usar o Saldar da melhor forma. Tour finalizado! 🎉',
     placement: 'top-start',
+    spotlightPadding: 8,
   },
 ];
 
@@ -87,8 +94,12 @@ export function OnboardingTour({ forceRun, onComplete, shouldRun = true }: Onboa
       showProgress
       showSkipButton
       scrollToFirstStep
+      scrollOffset={120}
       disableScrolling={false}
       callback={handleCallback}
+      floaterProps={{
+        disableAnimation: true,
+      }}
       styles={{
         options: {
           primaryColor: 'hsl(142, 76%, 36%)',
