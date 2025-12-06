@@ -71,16 +71,17 @@ export function NewTransactionModal({
     if (open) {
       fetchCostCenters();
       if (transaction) {
+        // Ao editar: transaction_date = data de pagamento, purchase_date = data de lançamento
         setFormData({
           description: transaction.description,
           amount: transaction.amount.toString(),
           installments: '1',
           payment_method: transaction.payment_method || '',
           variation_type: 'fixa',
-          first_installment_date: new Date(),
+          first_installment_date: new Date(transaction.transaction_date), // Data de pagamento
           cost_center_id: transaction.cost_center_id || '',
           transaction_type: transaction.transaction_type,
-          transaction_date: new Date(transaction.transaction_date),
+          transaction_date: transaction.purchase_date ? new Date(transaction.purchase_date) : new Date(), // Data de lançamento
           notes: transaction.notes || '',
         });
         // Load client data if PIX transaction
@@ -235,12 +236,13 @@ export function NewTransactionModal({
       const installmentAmount = isRecurring ? totalAmount : totalAmount / numInstallments;
 
       if (transaction) {
-        // Edit mode
+        // Edit mode - first_installment_date é a data de pagamento, transaction_date é data de lançamento
         const updateData: any = {
           description: formData.description,
           amount: totalAmount,
           transaction_type: formData.transaction_type,
-          transaction_date: format(formData.transaction_date, 'yyyy-MM-dd'),
+          transaction_date: format(formData.first_installment_date, 'yyyy-MM-dd'), // Data de pagamento vai para transaction_date
+          purchase_date: format(formData.transaction_date, 'yyyy-MM-dd'), // Data de lançamento vai para purchase_date
           payment_method: formData.payment_method || null,
           notes: formData.notes || null,
           cost_center_id: formData.cost_center_id || null,
