@@ -243,6 +243,15 @@ export function NewTransactionModal({
 
       if (transaction) {
         // Edit mode - payment_date vai para DB transaction_date, launch_date vai para DB purchase_date
+        
+        // DEBUG: verificar datas
+        console.log('=== DEBUG SAVE ===');
+        console.log('formData.payment_date:', formData.payment_date);
+        console.log('formData.payment_date.toISOString():', formData.payment_date.toISOString());
+        console.log('format result:', format(formData.payment_date, 'yyyy-MM-dd'));
+        console.log('formData.launch_date:', formData.launch_date);
+        console.log('format launch_date:', format(formData.launch_date, 'yyyy-MM-dd'));
+        
         const updateData: any = {
           description: formData.description,
           amount: totalAmount,
