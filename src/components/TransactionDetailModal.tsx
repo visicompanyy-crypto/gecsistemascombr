@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { Calendar, DollarSign, FileText, Tag, CreditCard, MapPin, Users, Pencil } from "lucide-react";
+import { parseDateLocal } from "@/lib/utils";
 
 interface Transaction {
   id: string;
@@ -50,7 +51,7 @@ export function TransactionDetailModal({
   };
 
   const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'dd/MM/yyyy');
+    return format(parseDateLocal(dateString), 'dd/MM/yyyy');
   };
 
   return (
