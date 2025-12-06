@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2, Eye, CheckCircle2, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
+import { parseDateLocal } from "@/lib/utils";
 
 interface Transaction {
   id: string;
@@ -71,7 +72,7 @@ export function FinancialTransactionsTable({
         </TableHeader>
         <TableBody>
           {transactions.map((transaction, idx) => {
-            const daysOverdue = Math.floor((new Date().getTime() - new Date(transaction.transaction_date).getTime()) / (1000 * 60 * 60 * 24));
+            const daysOverdue = Math.floor((new Date().getTime() - parseDateLocal(transaction.transaction_date).getTime()) / (1000 * 60 * 60 * 24));
             const alertBadge = getAlertBadge(transaction.status, daysOverdue);
             
             return (
@@ -93,7 +94,7 @@ export function FinancialTransactionsTable({
                   )}
                 </TableCell>
                 <TableCell className="font-medium text-foreground">
-                  {format(new Date(transaction.transaction_date), 'dd/MM/yyyy')}
+                  {format(parseDateLocal(transaction.transaction_date), 'dd/MM/yyyy')}
                 </TableCell>
                 <TableCell>
                   {transaction.transaction_type === 'receita' ? (
