@@ -9,7 +9,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, Settings2, AlertCircle } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { format, addMonths } from "date-fns";
+import { format, addMonths, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -67,6 +67,12 @@ export function NewTransactionModal({
     date: Date;
   }>>([]);
 
+  // Helper para parsear data do banco sem problema de timezone
+  const parseDateFromDB = (dateStr: string): Date => {
+    // parseISO trata a string como local, não UTC
+    return parseISO(dateStr);
+  };
+
   useEffect(() => {
     if (open) {
       fetchCostCenters();
@@ -78,10 +84,10 @@ export function NewTransactionModal({
           installments: '1',
           payment_method: transaction.payment_method || '',
           variation_type: 'fixa',
-          payment_date: new Date(transaction.transaction_date),  // DB transaction_date → form payment_date
+          payment_date: parseDateFromDB(transaction.transaction_date),  // DB transaction_date → form payment_date
           cost_center_id: transaction.cost_center_id || '',
           transaction_type: transaction.transaction_type,
-          launch_date: transaction.purchase_date ? new Date(transaction.purchase_date) : new Date(),  // DB purchase_date → form launch_date
+          launch_date: transaction.purchase_date ? parseDateFromDB(transaction.purchase_date) : new Date(),  // DB purchase_date → form launch_date
           notes: transaction.notes || '',
         });
         // Load client data if PIX transaction
