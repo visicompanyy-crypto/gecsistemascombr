@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -156,7 +157,7 @@ export function FinanceView() {
         .from('financial_transactions')
         .update({
           status: 'pago',
-          payment_date: new Date().toISOString(),
+          payment_date: format(new Date(), 'yyyy-MM-dd'),
         })
         .eq('id', id);
 
