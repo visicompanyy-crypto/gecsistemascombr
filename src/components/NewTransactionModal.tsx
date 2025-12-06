@@ -542,9 +542,11 @@ export function NewTransactionModal({
               </div>
             )}
 
-            {/* Data da Primeira Parcela */}
+            {/* Data de Pagamento / Data da Primeira Parcela */}
             <div className="space-y-2">
-              <Label className="text-sm text-muted-foreground">Data da primeira parcela *</Label>
+              <Label className="text-sm text-muted-foreground">
+                {numInstallments > 1 ? 'Data da primeira parcela *' : 'Data de pagamento *'}
+              </Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button 
@@ -742,7 +744,7 @@ export function NewTransactionModal({
 
             {/* Data de Lançamento */}
             <div className="space-y-2">
-              <Label className="text-sm text-muted-foreground">Data de lançamento/compra *</Label>
+              <Label className="text-sm text-muted-foreground">Data de lançamento *</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button 
@@ -766,7 +768,7 @@ export function NewTransactionModal({
                   />
                 </PopoverContent>
               </Popover>
-              <p className="text-xs text-muted-foreground">Data de registro/compra (apenas histórico)</p>
+              <p className="text-xs text-muted-foreground">Data de registro (apenas para controle interno)</p>
             </div>
 
             {/* Observação */}

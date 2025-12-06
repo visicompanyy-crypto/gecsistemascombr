@@ -123,20 +123,10 @@ export function TransactionDetailModal({
             <div className="flex items-center gap-3">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-sm text-muted-foreground">Data da Transação</p>
+                <p className="text-sm text-muted-foreground">Data de Pagamento</p>
                 <p className="font-medium">{formatDate(transaction.transaction_date)}</p>
               </div>
             </div>
-
-            {transaction.payment_date && (
-              <div className="flex items-center gap-3">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <div className="flex-1">
-                  <p className="text-sm text-muted-foreground">Data de Pagamento</p>
-                  <p className="font-medium">{formatDate(transaction.payment_date)}</p>
-                </div>
-              </div>
-            )}
 
             {transaction.due_date && (
               <div className="flex items-center gap-3">
