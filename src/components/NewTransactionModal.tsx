@@ -55,10 +55,10 @@ export function NewTransactionModal({
     installments: '1',
     payment_method: '',
     variation_type: 'fixa',
-    first_installment_date: new Date(),
+    payment_date: new Date(),      // Data de pagamento (vai para DB: transaction_date)
     cost_center_id: '',
     transaction_type: 'despesa',
-    transaction_date: new Date(),
+    launch_date: new Date(),       // Data de lançamento (vai para DB: purchase_date) - controle interno
     notes: '',
   });
 
@@ -71,17 +71,17 @@ export function NewTransactionModal({
     if (open) {
       fetchCostCenters();
       if (transaction) {
-        // Ao editar: transaction_date = data de pagamento, purchase_date = data de lançamento
+        // Ao editar: DB transaction_date = data de pagamento, DB purchase_date = data de lançamento
         setFormData({
           description: transaction.description,
           amount: transaction.amount.toString(),
           installments: '1',
           payment_method: transaction.payment_method || '',
           variation_type: 'fixa',
-          first_installment_date: new Date(transaction.transaction_date), // Data de pagamento
+          payment_date: new Date(transaction.transaction_date),  // DB transaction_date → form payment_date
           cost_center_id: transaction.cost_center_id || '',
           transaction_type: transaction.transaction_type,
-          transaction_date: transaction.purchase_date ? new Date(transaction.purchase_date) : new Date(), // Data de lançamento
+          launch_date: transaction.purchase_date ? new Date(transaction.purchase_date) : new Date(),  // DB purchase_date → form launch_date
           notes: transaction.notes || '',
         });
         // Load client data if PIX transaction
@@ -146,17 +146,17 @@ export function NewTransactionModal({
       const suggestedAmount = (totalAmount / numInstallments).toFixed(2);
       const newInstallments = Array.from({ length: numInstallments }, (_, i) => ({
         amount: suggestedAmount,
-        date: addMonths(formData.first_installment_date, i),
+        date: addMonths(formData.payment_date, i),
       }));
       setVariableInstallments(newInstallments);
     }
-  }, [formData.variation_type, numInstallments, formData.first_installment_date, totalAmount]);
+  }, [formData.variation_type, numInstallments, formData.payment_date, totalAmount]);
 
   const getPreviewText = () => {
     if (numInstallments <= 1 || formData.variation_type === 'recorrente') return null;
 
-    const firstDate = format(formData.first_installment_date, "dd/MM/yyyy");
-    const dayOfMonth = format(formData.first_installment_date, "dd");
+    const firstDate = format(formData.payment_date, "dd/MM/yyyy");
+    const dayOfMonth = format(formData.payment_date, "dd");
     const formattedAmount = new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
@@ -173,7 +173,7 @@ export function NewTransactionModal({
   const getRecurrencePreviewText = () => {
     if (formData.variation_type !== 'recorrente' || numInstallments <= 1) return null;
     
-    const dayOfMonth = format(formData.first_installment_date, "dd");
+    const dayOfMonth = format(formData.payment_date, "dd");
     const formattedTotalAmount = new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
@@ -236,13 +236,13 @@ export function NewTransactionModal({
       const installmentAmount = isRecurring ? totalAmount : totalAmount / numInstallments;
 
       if (transaction) {
-        // Edit mode - first_installment_date é a data de pagamento, transaction_date é data de lançamento
+        // Edit mode - payment_date vai para DB transaction_date, launch_date vai para DB purchase_date
         const updateData: any = {
           description: formData.description,
           amount: totalAmount,
           transaction_type: formData.transaction_type,
-          transaction_date: format(formData.first_installment_date, 'yyyy-MM-dd'), // Data de pagamento vai para transaction_date
-          purchase_date: format(formData.transaction_date, 'yyyy-MM-dd'), // Data de lançamento vai para purchase_date
+          transaction_date: format(formData.payment_date, 'yyyy-MM-dd'),   // form payment_date → DB transaction_date
+          purchase_date: format(formData.launch_date, 'yyyy-MM-dd'),       // form launch_date → DB purchase_date
           payment_method: formData.payment_method || null,
           notes: formData.notes || null,
           cost_center_id: formData.cost_center_id || null,
@@ -272,8 +272,8 @@ export function NewTransactionModal({
         });
       } else {
         // Create mode
-        const firstDate = formData.first_installment_date;
-        const purchaseDate = format(formData.transaction_date, 'yyyy-MM-dd');
+        const firstDate = formData.payment_date;
+        const purchaseDate = format(formData.launch_date, 'yyyy-MM-dd');
 
         // Build PIX data if applicable
         const pixData = formData.payment_method === 'pix' && selectedClientId ? {
@@ -289,9 +289,9 @@ export function NewTransactionModal({
             description: formData.description,
             amount: totalAmount,
             transaction_type: formData.transaction_type,
-            transaction_date: format(formData.first_installment_date, 'yyyy-MM-dd'),
+            transaction_date: format(formData.payment_date, 'yyyy-MM-dd'),
             purchase_date: purchaseDate,
-            first_installment_date: format(formData.first_installment_date, 'yyyy-MM-dd'),
+            first_installment_date: format(formData.payment_date, 'yyyy-MM-dd'),
             payment_method: formData.payment_method,
             cost_center_id: formData.cost_center_id || null,
             notes: formData.notes || null,
@@ -409,10 +409,10 @@ export function NewTransactionModal({
         installments: '1',
         payment_method: '',
         variation_type: 'fixa',
-        first_installment_date: new Date(),
+        payment_date: new Date(),
         cost_center_id: '',
         transaction_type: 'despesa',
-        transaction_date: new Date(),
+        launch_date: new Date(),
         notes: '',
       });
       setVariableInstallments([]);
@@ -555,18 +555,18 @@ export function NewTransactionModal({
                     variant="outline" 
                     className={cn(
                       "w-full justify-start text-left font-normal border-input bg-white hover:bg-white/80",
-                      !formData.first_installment_date && "text-muted-foreground"
+                      !formData.payment_date && "text-muted-foreground"
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
-                    {format(formData.first_installment_date, "dd/MM/yyyy", { locale: ptBR })}
+                    {format(formData.payment_date, "dd/MM/yyyy", { locale: ptBR })}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={formData.first_installment_date}
-                    onSelect={(date) => date && setFormData({ ...formData, first_installment_date: date })}
+                    selected={formData.payment_date}
+                    onSelect={(date) => date && setFormData({ ...formData, payment_date: date })}
                     initialFocus
                     className="pointer-events-auto"
                   />
@@ -753,18 +753,18 @@ export function NewTransactionModal({
                     variant="outline" 
                     className={cn(
                       "w-full justify-start text-left font-normal border-input bg-white hover:bg-white/80",
-                      !formData.transaction_date && "text-muted-foreground"
+                      !formData.launch_date && "text-muted-foreground"
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4 text-primary" />
-                    {format(formData.transaction_date, "dd/MM/yyyy", { locale: ptBR })}
+                    {format(formData.launch_date, "dd/MM/yyyy", { locale: ptBR })}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="single"
-                    selected={formData.transaction_date}
-                    onSelect={(date) => date && setFormData({ ...formData, transaction_date: date })}
+                    selected={formData.launch_date}
+                    onSelect={(date) => date && setFormData({ ...formData, launch_date: date })}
                     initialFocus
                     className="pointer-events-auto"
                   />
