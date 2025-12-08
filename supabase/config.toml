@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.ai-assistant]
 verify_jwt = false
+
+[functions.custom-auth-email]
+verify_jwt = false

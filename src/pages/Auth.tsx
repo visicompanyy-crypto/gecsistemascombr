@@ -146,6 +146,14 @@ export default function Auth() {
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
             </div>
+            <div className="flex justify-end">
+              <Link
+                to="/forgot-password"
+                className="text-xs text-[#3c9247] hover:text-[#2e6b38] font-medium transition-colors"
+              >
+                Esqueceu sua senha?
+              </Link>
+            </div>
           </div>
           
           <Button 
