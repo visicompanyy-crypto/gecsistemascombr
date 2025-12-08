@@ -45,9 +45,17 @@ export default function ForgotPassword() {
       });
     } catch (error: any) {
       console.error("Error sending reset email:", error);
+      
+      // Translate common Supabase error messages
+      let errorMessage = error.message || "Tente novamente mais tarde.";
+      if (error.message?.includes("For security purposes, you can only request this after")) {
+        const seconds = error.message.match(/after (\d+) seconds/)?.[1] || "alguns";
+        errorMessage = `Por motivos de segurança, você só pode solicitar isso após ${seconds} segundos.`;
+      }
+      
       toast({
         title: "Erro ao enviar email",
-        description: error.message || "Tente novamente mais tarde.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
