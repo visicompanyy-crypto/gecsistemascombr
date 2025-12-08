@@ -138,14 +138,15 @@ export function useCustomColumns() {
 
       if (columnError) throw columnError;
 
-      // If copying from another column, create new cost centers with same names
+      // If copying from another column, create new cost centers with same names + column suffix
       if (copyFromColumnId) {
         const sourceCostCenters = getCostCentersForColumn(copyFromColumnId);
         
         if (sourceCostCenters.length > 0) {
+          // Add column name as suffix to avoid unique constraint violation
           const newCostCenters = sourceCostCenters.map(cc => ({
             user_id: user.id,
-            name: cc.name,
+            name: `${cc.name} (${name})`,
             type: cc.type,
             custom_column_id: newColumn.id,
           }));
