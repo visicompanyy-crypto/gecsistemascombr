@@ -11,6 +11,13 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -61,6 +68,7 @@ export function CustomColumnManagerModal({
   const [selectedCostCenters, setSelectedCostCenters] = useState<string[]>([]);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [columnToDelete, setColumnToDelete] = useState<CustomColumn | null>(null);
+  const [copyFromColumnId, setCopyFromColumnId] = useState<string>("");
 
   // Reset form when opening edit mode
   useEffect(() => {
@@ -72,14 +80,27 @@ export function CustomColumnManagerModal({
       setFormName("");
       setFormColor(AVAILABLE_COLORS[0].value);
       setSelectedCostCenters([]);
+      setCopyFromColumnId("");
     }
   }, [editingColumn, columnCostCenters]);
+
+  // Copy cost centers when selecting a column to copy from
+  const handleCopyFromColumn = (columnId: string) => {
+    setCopyFromColumnId(columnId);
+    if (columnId && columnId !== "none") {
+      const costCenterIds = getCostCenterIdsForColumn(columnId);
+      setSelectedCostCenters(costCenterIds);
+    } else {
+      setSelectedCostCenters([]);
+    }
+  };
 
   const handleCreateNew = () => {
     setEditingColumn(null);
     setFormName("");
     setFormColor(AVAILABLE_COLORS[0].value);
     setSelectedCostCenters([]);
+    setCopyFromColumnId("");
     setIsEditing(true);
   };
 
@@ -185,6 +206,41 @@ export function CustomColumnManagerModal({
                   ))}
                 </div>
               </div>
+
+              {/* Copy from existing column - only when creating */}
+              {!editingColumn && columns.length > 0 && (
+                <div className="space-y-2">
+                  <Label>Copiar centros de custo de</Label>
+                  <Select
+                    value={copyFromColumnId}
+                    onValueChange={handleCopyFromColumn}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Nenhum (começar do zero)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum (começar do zero)</SelectItem>
+                      {columns.map((col) => {
+                        const ccCount = getCostCenterIdsForColumn(col.id).length;
+                        return (
+                          <SelectItem key={col.id} value={col.id}>
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-3 h-3 rounded-full"
+                                style={{ backgroundColor: col.color }}
+                              />
+                              <span>{col.name}</span>
+                              <span className="text-muted-foreground text-xs">
+                                ({ccCount} centro{ccCount !== 1 ? "s" : ""})
+                              </span>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label>Centros de custo</Label>
