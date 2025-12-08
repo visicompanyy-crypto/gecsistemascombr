@@ -198,6 +198,83 @@ export type Database = {
           },
         ]
       }
+      custom_column_cost_centers: {
+        Row: {
+          cost_center_id: string
+          created_at: string | null
+          custom_column_id: string
+          id: string
+        }
+        Insert: {
+          cost_center_id: string
+          created_at?: string | null
+          custom_column_id: string
+          id?: string
+        }
+        Update: {
+          cost_center_id?: string
+          created_at?: string | null
+          custom_column_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_column_cost_centers_cost_center_id_fkey"
+            columns: ["cost_center_id"]
+            isOneToOne: false
+            referencedRelation: "cost_centers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_column_cost_centers_custom_column_id_fkey"
+            columns: ["custom_column_id"]
+            isOneToOne: false
+            referencedRelation: "custom_columns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custom_columns: {
+        Row: {
+          color: string | null
+          company_id: string | null
+          created_at: string | null
+          id: string
+          name: string
+          order_index: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          company_id?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          order_index?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          company_id?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          order_index?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_columns_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_verifications: {
         Row: {
           code: string

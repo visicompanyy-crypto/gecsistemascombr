@@ -3,6 +3,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
+interface CostCenter {
+  id: string;
+  name: string;
+  type: string;
+}
+
 interface FinancialFiltersProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
@@ -13,6 +19,7 @@ interface FinancialFiltersProps {
   costCenterFilter: string;
   onCostCenterFilterChange: (value: string) => void;
   onClearFilters: () => void;
+  costCenters?: CostCenter[];
 }
 
 export function FinancialFilters({
@@ -25,6 +32,7 @@ export function FinancialFilters({
   costCenterFilter,
   onCostCenterFilterChange,
   onClearFilters,
+  costCenters = [],
 }: FinancialFiltersProps) {
   return (
     <div className="space-y-6">
@@ -76,10 +84,11 @@ export function FinancialFilters({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos</SelectItem>
-              <SelectItem value="Projetos">Projetos</SelectItem>
-              <SelectItem value="Salário">Salário</SelectItem>
-              <SelectItem value="Operacional">Operacional</SelectItem>
-              <SelectItem value="Impostos e Taxas">Impostos e Taxas</SelectItem>
+              {costCenters.map((cc) => (
+                <SelectItem key={cc.id} value={cc.id}>
+                  {cc.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
