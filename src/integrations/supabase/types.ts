@@ -135,6 +135,7 @@ export type Database = {
           code: string | null
           company_id: string | null
           created_at: string | null
+          custom_column_id: string | null
           deleted_at: string | null
           description: string | null
           id: string
@@ -152,6 +153,7 @@ export type Database = {
           code?: string | null
           company_id?: string | null
           created_at?: string | null
+          custom_column_id?: string | null
           deleted_at?: string | null
           description?: string | null
           id?: string
@@ -169,6 +171,7 @@ export type Database = {
           code?: string | null
           company_id?: string | null
           created_at?: string | null
+          custom_column_id?: string | null
           deleted_at?: string | null
           description?: string | null
           id?: string
@@ -187,6 +190,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cost_centers_custom_column_id_fkey"
+            columns: ["custom_column_id"]
+            isOneToOne: false
+            referencedRelation: "custom_columns"
             referencedColumns: ["id"]
           },
           {
@@ -240,6 +250,7 @@ export type Database = {
           company_id: string | null
           created_at: string | null
           id: string
+          is_main: boolean | null
           name: string
           order_index: number | null
           updated_at: string | null
@@ -250,6 +261,7 @@ export type Database = {
           company_id?: string | null
           created_at?: string | null
           id?: string
+          is_main?: boolean | null
           name: string
           order_index?: number | null
           updated_at?: string | null
@@ -260,6 +272,7 @@ export type Database = {
           company_id?: string | null
           created_at?: string | null
           id?: string
+          is_main?: boolean | null
           name?: string
           order_index?: number | null
           updated_at?: string | null
@@ -369,6 +382,7 @@ export type Database = {
           company_id: string | null
           cost_center_id: string | null
           created_at: string | null
+          custom_column_id: string | null
           deleted_at: string | null
           description: string
           document_number: string | null
@@ -409,6 +423,7 @@ export type Database = {
           company_id?: string | null
           cost_center_id?: string | null
           created_at?: string | null
+          custom_column_id?: string | null
           deleted_at?: string | null
           description: string
           document_number?: string | null
@@ -449,6 +464,7 @@ export type Database = {
           company_id?: string | null
           cost_center_id?: string | null
           created_at?: string | null
+          custom_column_id?: string | null
           deleted_at?: string | null
           description?: string
           document_number?: string | null
@@ -493,6 +509,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "financial_transactions_custom_column_id_fkey"
+            columns: ["custom_column_id"]
+            isOneToOne: false
+            referencedRelation: "custom_columns"
             referencedColumns: ["id"]
           },
           {
@@ -790,7 +813,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_main_column_for_user: {
+        Args: { p_company_id?: string; p_user_id: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

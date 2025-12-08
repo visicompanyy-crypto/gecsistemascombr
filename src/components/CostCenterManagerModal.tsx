@@ -9,26 +9,31 @@ import { useToast } from "@/hooks/use-toast";
 import { Pencil, Trash2, Plus, TrendingUp, TrendingDown } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { useCustomColumns } from "@/hooks/useCustomColumns";
 
 interface CostCenter {
   id: string;
   name: string;
   description?: string;
   type: 'receita' | 'despesa';
+  custom_column_id: string | null;
 }
 
 interface CostCenterManagerModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdate?: () => void;
+  columnId?: string | null;
 }
 
 export function CostCenterManagerModal({
   open,
   onOpenChange,
   onUpdate,
+  columnId,
 }: CostCenterManagerModalProps) {
   const { toast } = useToast();
+  const { columns, refetchCostCenters } = useCustomColumns();
   const [costCenters, setCostCenters] = useState<CostCenter[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -38,22 +43,32 @@ export function CostCenterManagerModal({
     type: 'despesa' as 'receita' | 'despesa',
   });
 
+  // Get the current column name
+  const currentColumn = columns.find(c => c.id === columnId);
+
   useEffect(() => {
     if (open) {
       fetchCostCenters();
     }
-  }, [open]);
+  }, [open, columnId]);
 
   const fetchCostCenters = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('cost_centers')
-        .select('id, name, description, type')
+        .select('id, name, description, type, custom_column_id')
         .is('deleted_at', null)
-        .eq('user_id', user.id)
+        .eq('user_id', user.id);
+
+      // Filter by column if specified
+      if (columnId) {
+        query = query.eq('custom_column_id', columnId);
+      }
+
+      const { data, error } = await query
         .order('type')
         .order('name');
 
@@ -89,7 +104,7 @@ export function CostCenterManagerModal({
       const typeLabel = formData.type === 'receita' ? 'Receita' : 'Despesa';
       toast({
         title: "Centro de custo já existe",
-        description: `Já existe um centro de custo "${formData.name}" do tipo ${typeLabel}. Use um nome diferente ou edite o existente.`,
+        description: `Já existe um centro de custo "${formData.name}" do tipo ${typeLabel} nesta coluna. Use um nome diferente ou edite o existente.`,
         variant: "destructive",
       });
       return;
@@ -121,6 +136,7 @@ export function CostCenterManagerModal({
             description: formData.description || null,
             type: formData.type,
             user_id: user.id,
+            custom_column_id: columnId || null,
           });
 
         if (error) throw error;
@@ -130,6 +146,7 @@ export function CostCenterManagerModal({
       setFormData({ name: '', description: '', type: 'despesa' });
       setEditingId(null);
       fetchCostCenters();
+      refetchCostCenters();
       if (onUpdate) onUpdate();
     } catch (error: any) {
       // Handle specific duplicate error from database
@@ -171,6 +188,7 @@ export function CostCenterManagerModal({
       if (error) throw error;
       toast({ title: "Centro de custo removido com sucesso" });
       fetchCostCenters();
+      refetchCostCenters();
       if (onUpdate) onUpdate();
     } catch (error: any) {
       toast({
@@ -246,6 +264,11 @@ export function CostCenterManagerModal({
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-secondary">
             Gerenciar Centros de Custo
+            {currentColumn && (
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                — Coluna: {currentColumn.name}
+              </span>
+            )}
           </DialogTitle>
         </DialogHeader>
 
