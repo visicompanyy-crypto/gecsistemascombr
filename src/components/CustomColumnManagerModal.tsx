@@ -8,8 +8,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -27,7 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Pencil, Trash2, X, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Crown } from "lucide-react";
 import { useCustomColumns, CustomColumn } from "@/hooks/useCustomColumns";
 import { cn } from "@/lib/utils";
 
@@ -53,9 +51,7 @@ export function CustomColumnManagerModal({
 }: CustomColumnManagerModalProps) {
   const {
     columns,
-    costCenters,
-    columnCostCenters,
-    getCostCenterIdsForColumn,
+    getCostCentersForColumn,
     createColumn,
     updateColumn,
     deleteColumn,
@@ -65,7 +61,6 @@ export function CustomColumnManagerModal({
   const [editingColumn, setEditingColumn] = useState<CustomColumn | null>(null);
   const [formName, setFormName] = useState("");
   const [formColor, setFormColor] = useState(AVAILABLE_COLORS[0].value);
-  const [selectedCostCenters, setSelectedCostCenters] = useState<string[]>([]);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [columnToDelete, setColumnToDelete] = useState<CustomColumn | null>(null);
   const [copyFromColumnId, setCopyFromColumnId] = useState<string>("");
@@ -75,31 +70,17 @@ export function CustomColumnManagerModal({
     if (editingColumn) {
       setFormName(editingColumn.name);
       setFormColor(editingColumn.color);
-      setSelectedCostCenters(getCostCenterIdsForColumn(editingColumn.id));
     } else {
       setFormName("");
       setFormColor(AVAILABLE_COLORS[0].value);
-      setSelectedCostCenters([]);
       setCopyFromColumnId("");
     }
-  }, [editingColumn, columnCostCenters]);
-
-  // Copy cost centers when selecting a column to copy from
-  const handleCopyFromColumn = (columnId: string) => {
-    setCopyFromColumnId(columnId);
-    if (columnId && columnId !== "none") {
-      const costCenterIds = getCostCenterIdsForColumn(columnId);
-      setSelectedCostCenters(costCenterIds);
-    } else {
-      setSelectedCostCenters([]);
-    }
-  };
+  }, [editingColumn]);
 
   const handleCreateNew = () => {
     setEditingColumn(null);
     setFormName("");
     setFormColor(AVAILABLE_COLORS[0].value);
-    setSelectedCostCenters([]);
     setCopyFromColumnId("");
     setIsEditing(true);
   };
@@ -122,13 +103,12 @@ export function CustomColumnManagerModal({
         id: editingColumn.id,
         name: formName.trim(),
         color: formColor,
-        costCenterIds: selectedCostCenters,
       });
     } else {
       await createColumn.mutateAsync({
         name: formName.trim(),
         color: formColor,
-        costCenterIds: selectedCostCenters,
+        copyFromColumnId: copyFromColumnId && copyFromColumnId !== "none" ? copyFromColumnId : null,
       });
     }
 
@@ -149,14 +129,6 @@ export function CustomColumnManagerModal({
     }
   };
 
-  const toggleCostCenter = (costCenterId: string) => {
-    setSelectedCostCenters((prev) =>
-      prev.includes(costCenterId)
-        ? prev.filter((id) => id !== costCenterId)
-        : [...prev, costCenterId]
-    );
-  };
-
   const isSaving = createColumn.isPending || updateColumn.isPending;
 
   return (
@@ -169,7 +141,7 @@ export function CustomColumnManagerModal({
                 ? editingColumn
                   ? "Editar coluna"
                   : "Nova coluna"
-                : "Gerenciar colunas personalizadas"}
+                : "Gerenciar colunas"}
             </DialogTitle>
           </DialogHeader>
 
@@ -211,9 +183,12 @@ export function CustomColumnManagerModal({
               {!editingColumn && columns.length > 0 && (
                 <div className="space-y-2">
                   <Label>Copiar centros de custo de</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Cria novos centros de custo com os mesmos nomes da coluna selecionada.
+                  </p>
                   <Select
                     value={copyFromColumnId}
-                    onValueChange={handleCopyFromColumn}
+                    onValueChange={setCopyFromColumnId}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Nenhum (começar do zero)" />
@@ -221,7 +196,7 @@ export function CustomColumnManagerModal({
                     <SelectContent>
                       <SelectItem value="none">Nenhum (começar do zero)</SelectItem>
                       {columns.map((col) => {
-                        const ccCount = getCostCenterIdsForColumn(col.id).length;
+                        const ccCount = getCostCentersForColumn(col.id).length;
                         return (
                           <SelectItem key={col.id} value={col.id}>
                             <div className="flex items-center gap-2">
@@ -230,6 +205,7 @@ export function CustomColumnManagerModal({
                                 style={{ backgroundColor: col.color }}
                               />
                               <span>{col.name}</span>
+                              {col.is_main && <Crown className="h-3 w-3 text-amber-500" />}
                               <span className="text-muted-foreground text-xs">
                                 ({ccCount} centro{ccCount !== 1 ? "s" : ""})
                               </span>
@@ -241,54 +217,6 @@ export function CustomColumnManagerModal({
                   </Select>
                 </div>
               )}
-
-              <div className="space-y-2">
-                <Label>Centros de custo</Label>
-                <p className="text-xs text-muted-foreground">
-                  Selecione quais centros de custo pertencem a esta coluna. Os
-                  lançamentos desses centros aparecerão quando esta coluna
-                  estiver selecionada.
-                </p>
-
-                {costCenters.length === 0 ? (
-                  <p className="text-sm text-muted-foreground italic py-4">
-                    Nenhum centro de custo cadastrado.
-                  </p>
-                ) : (
-                  <ScrollArea className="h-48 border rounded-lg p-3">
-                    <div className="space-y-2">
-                      {costCenters.map((cc) => (
-                        <div
-                          key={cc.id}
-                          className="flex items-center space-x-2"
-                        >
-                          <Checkbox
-                            id={`cc-${cc.id}`}
-                            checked={selectedCostCenters.includes(cc.id)}
-                            onCheckedChange={() => toggleCostCenter(cc.id)}
-                          />
-                          <label
-                            htmlFor={`cc-${cc.id}`}
-                            className="text-sm cursor-pointer flex-1"
-                          >
-                            {cc.name}
-                            <span className="text-xs text-muted-foreground ml-2">
-                              ({cc.type})
-                            </span>
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                )}
-
-                {selectedCostCenters.length === 0 && (
-                  <p className="text-xs text-amber-600">
-                    ⚠️ Esta coluna não tem centros de custo. Ela não exibirá
-                    lançamentos até que você escolha pelo menos um.
-                  </p>
-                )}
-              </div>
 
               <div className="flex justify-end gap-2 pt-4">
                 <Button variant="outline" onClick={handleCancelEdit}>
@@ -309,16 +237,13 @@ export function CustomColumnManagerModal({
               {columns.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-muted-foreground mb-4">
-                    Nenhuma coluna personalizada criada.
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Use colunas para separar obras, lojas, unidades ou projetos.
+                    Nenhuma coluna cadastrada.
                   </p>
                 </div>
               ) : (
                 <div className="space-y-2">
                   {columns.map((column) => {
-                    const ccCount = getCostCenterIdsForColumn(column.id).length;
+                    const ccCount = getCostCentersForColumn(column.id).length;
                     return (
                       <div
                         key={column.id}
@@ -330,7 +255,12 @@ export function CustomColumnManagerModal({
                             style={{ backgroundColor: column.color }}
                           />
                           <div>
-                            <p className="font-medium">{column.name}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{column.name}</p>
+                              {column.is_main && (
+                                <Crown className="h-4 w-4 text-amber-500" />
+                              )}
+                            </div>
                             <p className="text-xs text-muted-foreground">
                               {ccCount} centro{ccCount !== 1 ? "s" : ""} de custo
                             </p>
@@ -345,14 +275,16 @@ export function CustomColumnManagerModal({
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDeleteClick(column)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          {!column.is_main && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteClick(column)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
                         </div>
                       </div>
                     );
@@ -375,8 +307,8 @@ export function CustomColumnManagerModal({
             <AlertDialogTitle>Excluir coluna?</AlertDialogTitle>
             <AlertDialogDescription>
               Tem certeza que deseja excluir a coluna "{columnToDelete?.name}"?
-              Os lançamentos não serão apagados, apenas deixarão de ser
-              agrupados nesta coluna.
+              <br /><br />
+              <strong className="text-destructive">Atenção:</strong> Todos os centros de custo e lançamentos desta coluna também serão removidos.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

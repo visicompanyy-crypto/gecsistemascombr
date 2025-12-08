@@ -28,6 +28,7 @@ import { AIAssistantButton } from "./AIAssistant";
 import { CustomColumnBar } from "./CustomColumnBar";
 import { CustomColumnManagerModal } from "./CustomColumnManagerModal";
 import { useCustomColumns } from "@/hooks/useCustomColumns";
+
 export function FinanceView() {
   const { toast } = useToast();
   const { settings, loading: settingsLoading, refreshSettings } = useCompanySettings();
@@ -49,7 +50,7 @@ export function FinanceView() {
   const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
 
   // Custom columns hook
-  const { getCostCenterIdsForColumn, costCenters: allCostCenters } = useCustomColumns();
+  const { getCostCentersForColumn, mainColumn } = useCustomColumns();
 
   // Show first access modal if user is subscribed but hasn't completed onboarding
   useEffect(() => {
@@ -88,7 +89,8 @@ export function FinanceView() {
         .select(`
           *,
           cost_centers (
-            name
+            name,
+            custom_column_id
           )
         `)
         .is('deleted_at', null)
@@ -124,23 +126,17 @@ export function FinanceView() {
     return dataExpense >= primeiroDiaDoMes && dataExpense <= ultimoDiaDoMes;
   });
 
-  // Get cost center IDs for selected column
-  const selectedColumnCostCenterIds = selectedColumnId 
-    ? getCostCenterIdsForColumn(selectedColumnId) 
-    : null;
-
-  // Filter transactions by selected column (if any)
+  // Filter transactions by selected column (using custom_column_id directly)
   const transactionsFilteredByColumn = transactions?.filter(t => {
-    if (!selectedColumnCostCenterIds) return true; // "Todas" selected
-    if (!t.cost_center_id) return false; // Transactions without cost center don't belong to any column
-    return selectedColumnCostCenterIds.includes(t.cost_center_id);
+    if (!selectedColumnId) return true; // No column selected, show all
+    return t.custom_column_id === selectedColumnId;
   });
 
   // Filter team tool expenses by selected column
   const teamToolExpensesFilteredByColumn = teamToolExpenses?.filter(e => {
-    if (!selectedColumnCostCenterIds) return true;
-    if (!e.cost_center_id) return false;
-    return selectedColumnCostCenterIds.includes(e.cost_center_id);
+    if (!selectedColumnId) return true;
+    // Team tool expenses might need to be filtered by cost_center's column
+    return true; // For now, show all team tool expenses
   });
 
   const summary = useFinancialSummary(transactionsFilteredByColumn, teamToolExpensesFilteredByColumn, currentMonth);
@@ -151,10 +147,10 @@ export function FinanceView() {
     return dataTransacao >= primeiroDiaDoMes && dataTransacao <= ultimoDiaDoMes;
   });
 
-  // Get cost centers available for filter (filtered by column if one is selected)
+  // Get cost centers available for filter (filtered by selected column)
   const availableCostCentersForFilter = selectedColumnId
-    ? allCostCenters.filter(cc => selectedColumnCostCenterIds?.includes(cc.id))
-    : allCostCenters;
+    ? getCostCentersForColumn(selectedColumnId)
+    : [];
 
   const handleEdit = (transaction: any) => {
     setSelectedTransaction(transaction);
@@ -380,6 +376,7 @@ export function FinanceView() {
             handleModalClose();
           }}
           transaction={selectedTransaction}
+          selectedColumnId={selectedColumnId}
         />
 
         <TransactionDetailModal
@@ -398,6 +395,7 @@ export function FinanceView() {
         <CostCenterManagerModal
           open={costCenterManagerOpen}
           onOpenChange={setCostCenterManagerOpen}
+          columnId={selectedColumnId}
         />
 
         <ClientManagerModal

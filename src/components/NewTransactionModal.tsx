@@ -24,6 +24,7 @@ interface NewTransactionModalProps {
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   transaction?: any;
+  selectedColumnId?: string | null;
 }
 
 interface CostCenter {
@@ -38,6 +39,7 @@ export function NewTransactionModal({
   onOpenChange,
   onSuccess,
   transaction,
+  selectedColumnId,
 }: NewTransactionModalProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -120,12 +122,18 @@ export function NewTransactionModal({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('cost_centers')
         .select('id, name, code, type')
         .is('deleted_at', null)
-        .eq('user_id', user.id)
-        .order('name');
+        .eq('user_id', user.id);
+
+      // Filter by column if specified
+      if (selectedColumnId) {
+        query = query.eq('custom_column_id', selectedColumnId);
+      }
+
+      const { data, error } = await query.order('name');
 
       if (error) throw error;
       setCostCenters((data || []).map(c => ({
@@ -295,6 +303,7 @@ export function NewTransactionModal({
             first_installment_date: format(formData.payment_date, 'yyyy-MM-dd'),
             payment_method: formData.payment_method,
             cost_center_id: formData.cost_center_id || null,
+            custom_column_id: selectedColumnId || null,
             notes: formData.notes || null,
             status: 'pendente',
             is_installment: false,
@@ -332,12 +341,13 @@ export function NewTransactionModal({
               first_installment_date: format(firstDate, 'yyyy-MM-dd'),
               payment_method: formData.payment_method,
               cost_center_id: formData.cost_center_id || null,
+              custom_column_id: selectedColumnId || null,
               notes: formData.notes || null,
               status: 'pendente',
               is_installment: true,
               installment_number: 1,
               total_installments: numInstallments,
-              parent_transaction_id: null, // A primeira parcela não tem pai
+              parent_transaction_id: null,
               is_recurring: isRecurring,
               recurrence_frequency: isRecurring ? 'monthly' : null,
               ...pixData,
@@ -373,6 +383,7 @@ export function NewTransactionModal({
               first_installment_date: format(firstDate, 'yyyy-MM-dd'),
               payment_method: formData.payment_method,
               cost_center_id: formData.cost_center_id || null,
+              custom_column_id: selectedColumnId || null,
               notes: formData.notes || null,
               status: 'pendente',
               is_installment: true,
