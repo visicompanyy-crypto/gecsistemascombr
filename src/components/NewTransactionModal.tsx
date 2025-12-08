@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Settings2, AlertCircle } from "lucide-react";
+import { CalendarIcon, Settings2, AlertCircle, Crown } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format, addMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -17,6 +17,7 @@ import { cn, parseDateLocal } from "@/lib/utils";
 import CurrencyInput from 'react-currency-input-field';
 import { CostCenterManagerModal } from "./CostCenterManagerModal";
 import { ClientSelector } from "./ClientSelector";
+import { useCustomColumns } from "@/hooks/useCustomColumns";
 
 
 interface NewTransactionModalProps {
@@ -39,12 +40,16 @@ export function NewTransactionModal({
   onOpenChange,
   onSuccess,
   transaction,
-  selectedColumnId,
+  selectedColumnId: initialColumnId,
 }: NewTransactionModalProps) {
   const { toast } = useToast();
+  const { columns, mainColumn, getCostCentersForColumn } = useCustomColumns();
   const [loading, setLoading] = useState(false);
   const [costCenterModalOpen, setCostCenterModalOpen] = useState(false);
   const [costCenters, setCostCenters] = useState<CostCenter[]>([]);
+  
+  // Internal state for selected column
+  const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
   
   // PIX client state
   const [selectedClientId, setSelectedClientId] = useState('');
@@ -69,6 +74,17 @@ export function NewTransactionModal({
     date: Date;
   }>>([]);
 
+  // Initialize selected column when modal opens
+  useEffect(() => {
+    if (open) {
+      // If an initialColumnId was passed, use it; otherwise use the main column
+      if (initialColumnId) {
+        setSelectedColumnId(initialColumnId);
+      } else if (mainColumn) {
+        setSelectedColumnId(mainColumn.id);
+      }
+    }
+  }, [open, initialColumnId, mainColumn]);
 
   useEffect(() => {
     if (open) {
@@ -101,6 +117,13 @@ export function NewTransactionModal({
       }
     }
   }, [open, transaction]);
+
+  // Refetch cost centers when column changes
+  useEffect(() => {
+    if (open && selectedColumnId) {
+      fetchCostCenters();
+    }
+  }, [selectedColumnId]);
 
   // Reset client when payment method changes from PIX
   useEffect(() => {
@@ -454,6 +477,43 @@ export function NewTransactionModal({
           </DialogHeader>
           
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Column Selector */}
+            <div className="space-y-2">
+              <Label className="text-sm text-muted-foreground">Coluna *</Label>
+              <Select
+                value={selectedColumnId || ""}
+                onValueChange={(value) => {
+                  setSelectedColumnId(value);
+                  // Reset cost center when column changes
+                  setFormData(prev => ({ ...prev, cost_center_id: '' }));
+                }}
+              >
+                <SelectTrigger className="border-input bg-white focus:ring-primary">
+                  <SelectValue placeholder="Selecione a coluna" />
+                </SelectTrigger>
+                <SelectContent>
+                  {columns.map((col) => {
+                    const ccCount = getCostCentersForColumn(col.id).length;
+                    return (
+                      <SelectItem key={col.id} value={col.id}>
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: col.color }}
+                          />
+                          <span>{col.name}</span>
+                          {col.is_main && <Crown className="h-3 w-3 text-amber-500" />}
+                          <span className="text-muted-foreground text-xs">
+                            ({ccCount})
+                          </span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* Nome */}
             <div className="space-y-2">
               <Label htmlFor="description" className="text-sm text-muted-foreground">
