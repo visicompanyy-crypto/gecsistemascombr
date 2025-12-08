@@ -45,12 +45,18 @@ export function FinanceView() {
 
   // Show first access modal if user is subscribed but hasn't completed onboarding
   useEffect(() => {
+    // Só prossegue quando terminou de carregar as settings E o usuário está inscrito
     if (!settingsLoading && subscription?.subscribed) {
-      if (!settings?.onboarding_completed) {
+      // Se settings é null, significa que o usuário nunca configurou (primeiro acesso)
+      if (settings === null) {
+        setFirstAccessModalOpen(true);
+        setCanStartTour(false);
+      } else if (settings.onboarding_completed === false) {
+        // Settings existe mas onboarding não foi completado
         setFirstAccessModalOpen(true);
         setCanStartTour(false);
       } else {
-        // Onboarding already completed, tour can start
+        // Onboarding já completado - não abre modal
         setCanStartTour(true);
       }
     }
