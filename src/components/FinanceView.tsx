@@ -50,7 +50,7 @@ export function FinanceView() {
   const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
 
   // Custom columns hook
-  const { getCostCentersForColumn, mainColumn } = useCustomColumns();
+  const { getCostCentersForColumn, costCenters } = useCustomColumns();
 
   // Show first access modal if user is subscribed but hasn't completed onboarding
   useEffect(() => {
@@ -147,10 +147,10 @@ export function FinanceView() {
     return dataTransacao >= primeiroDiaDoMes && dataTransacao <= ultimoDiaDoMes;
   });
 
-  // Get cost centers available for filter (filtered by selected column)
+  // Get cost centers available for filter (filtered by selected column or all)
   const availableCostCentersForFilter = selectedColumnId
     ? getCostCentersForColumn(selectedColumnId)
-    : [];
+    : costCenters ?? [];
 
   const handleEdit = (transaction: any) => {
     setSelectedTransaction(transaction);
