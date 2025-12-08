@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Lock, ArrowLeft, Eye, EyeOff, User, Loader2, CheckCircle } from "lucide-react";
+import { Mail, Lock, ArrowLeft, Eye, EyeOff, User, Loader2, CheckCircle, Phone } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import logo from "@/assets/logo.png";
 
@@ -17,6 +17,20 @@ const formatCPF = (value: string) => {
   if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
   if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
   return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
+};
+
+// Função para formatar telefone
+const formatPhone = (value: string) => {
+  const numbers = value.replace(/\D/g, '');
+  if (numbers.length <= 2) return numbers;
+  if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+  return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+};
+
+// Função para validar telefone
+const validatePhone = (phone: string) => {
+  const numbers = phone.replace(/\D/g, '');
+  return numbers.length >= 10 && numbers.length <= 11;
 };
 
 // Função para validar CPF
@@ -62,6 +76,7 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
   const [cpf, setCpf] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -91,6 +106,13 @@ export default function Signup() {
     const formatted = formatCPF(e.target.value);
     if (formatted.length <= 14) {
       setCpf(formatted);
+    }
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhone(e.target.value);
+    if (formatted.length <= 15) {
+      setPhone(formatted);
     }
   };
 
@@ -280,6 +302,15 @@ export default function Signup() {
       return;
     }
 
+    if (!validatePhone(phone)) {
+      toast({
+        title: "Telefone inválido",
+        description: "Por favor, insira um telefone válido com DDD.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (password !== confirmPassword) {
       toast({
         title: "Senhas não conferem",
@@ -302,6 +333,7 @@ export default function Signup() {
 
     try {
       const cleanCPF = cpf.replace(/\D/g, '');
+      const cleanPhone = phone.replace(/\D/g, '');
 
       const { error } = await supabase.auth.signUp({
         email,
@@ -310,6 +342,7 @@ export default function Signup() {
           emailRedirectTo: `${window.location.origin}/`,
           data: {
             cpf: cleanCPF,
+            phone: cleanPhone,
           },
         },
       });
@@ -525,6 +558,25 @@ export default function Signup() {
                 />
               </div>
               <p className="text-xs text-[#a7a392] mt-1">Necessário para integração com pagamentos</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="signup-phone" className="text-[#252F1D] font-semibold text-sm">
+                Telefone
+              </Label>
+              <div className="relative">
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#a7a392]" />
+                <Input
+                  id="signup-phone"
+                  type="tel"
+                  placeholder="(00) 00000-0000"
+                  value={phone}
+                  onChange={handlePhoneChange}
+                  required
+                  className="pl-12 h-12 bg-[#f1f3f4]/50 border-[#e4e8eb] rounded-2xl hover:border-[#3c9247]/40 focus:border-[#3c9247] transition-colors"
+                />
+              </div>
+              <p className="text-xs text-[#a7a392] mt-1">Com DDD (será usado para contato)</p>
             </div>
             
             <div className="space-y-2">
