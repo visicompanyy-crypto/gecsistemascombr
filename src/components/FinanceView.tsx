@@ -25,6 +25,9 @@ import { CostCenterManagerModal } from "./CostCenterManagerModal";
 import { ClientManagerModal } from "./ClientManagerModal";
 import { RenewalAlert } from "./RenewalAlert";
 import { AIAssistantButton } from "./AIAssistant";
+import { CustomColumnBar } from "./CustomColumnBar";
+import { CustomColumnManagerModal } from "./CustomColumnManagerModal";
+import { useCustomColumns } from "@/hooks/useCustomColumns";
 export function FinanceView() {
   const { toast } = useToast();
   const { settings, loading: settingsLoading, refreshSettings } = useCompanySettings();
@@ -35,6 +38,7 @@ export function FinanceView() {
   const [firstAccessModalOpen, setFirstAccessModalOpen] = useState(false);
   const [costCenterManagerOpen, setCostCenterManagerOpen] = useState(false);
   const [clientManagerOpen, setClientManagerOpen] = useState(false);
+  const [customColumnManagerOpen, setCustomColumnManagerOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -42,6 +46,10 @@ export function FinanceView() {
   const [costCenterFilter, setCostCenterFilter] = useState("all");
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [canStartTour, setCanStartTour] = useState(false);
+  const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
+
+  // Custom columns hook
+  const { getCostCenterIdsForColumn, costCenters: allCostCenters } = useCustomColumns();
 
   // Show first access modal if user is subscribed but hasn't completed onboarding
   useEffect(() => {
@@ -116,13 +124,37 @@ export function FinanceView() {
     return dataExpense >= primeiroDiaDoMes && dataExpense <= ultimoDiaDoMes;
   });
 
-  const summary = useFinancialSummary(transactions, teamToolExpenses, currentMonth);
+  // Get cost center IDs for selected column
+  const selectedColumnCostCenterIds = selectedColumnId 
+    ? getCostCenterIdsForColumn(selectedColumnId) 
+    : null;
+
+  // Filter transactions by selected column (if any)
+  const transactionsFilteredByColumn = transactions?.filter(t => {
+    if (!selectedColumnCostCenterIds) return true; // "Todas" selected
+    if (!t.cost_center_id) return false; // Transactions without cost center don't belong to any column
+    return selectedColumnCostCenterIds.includes(t.cost_center_id);
+  });
+
+  // Filter team tool expenses by selected column
+  const teamToolExpensesFilteredByColumn = teamToolExpenses?.filter(e => {
+    if (!selectedColumnCostCenterIds) return true;
+    if (!e.cost_center_id) return false;
+    return selectedColumnCostCenterIds.includes(e.cost_center_id);
+  });
+
+  const summary = useFinancialSummary(transactionsFilteredByColumn, teamToolExpensesFilteredByColumn, currentMonth);
   
   // Filtrar transações para exibir apenas as do mês selecionado na tabela
-  const transactionsDoMes = transactions?.filter(t => {
+  const transactionsDoMes = transactionsFilteredByColumn?.filter(t => {
     const dataTransacao = new Date(t.transaction_date);
     return dataTransacao >= primeiroDiaDoMes && dataTransacao <= ultimoDiaDoMes;
   });
+
+  // Get cost centers available for filter (filtered by column if one is selected)
+  const availableCostCentersForFilter = selectedColumnId
+    ? allCostCenters.filter(cc => selectedColumnCostCenterIds?.includes(cc.id))
+    : allCostCenters;
 
   const handleEdit = (transaction: any) => {
     setSelectedTransaction(transaction);
@@ -276,6 +308,13 @@ export function FinanceView() {
           </div>
         </div>
 
+        {/* Custom Columns Bar */}
+        <CustomColumnBar
+          selectedColumnId={selectedColumnId}
+          onSelectColumn={setSelectedColumnId}
+          onManageColumns={() => setCustomColumnManagerOpen(true)}
+        />
+
         <Card className="p-8 space-y-6 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border-border">
           <div>
             <h2 className="text-xl font-semibold mb-6 text-foreground">Lista de Lançamentos</h2>
@@ -290,6 +329,7 @@ export function FinanceView() {
                 costCenterFilter={costCenterFilter}
                 onCostCenterFilterChange={setCostCenterFilter}
                 onClearFilters={handleClearFilters}
+                costCenters={availableCostCentersForFilter}
               />
             </div>
           </div>
@@ -363,6 +403,11 @@ export function FinanceView() {
         <ClientManagerModal
           open={clientManagerOpen}
           onOpenChange={setClientManagerOpen}
+        />
+
+        <CustomColumnManagerModal
+          open={customColumnManagerOpen}
+          onOpenChange={setCustomColumnManagerOpen}
         />
       </div>
       
