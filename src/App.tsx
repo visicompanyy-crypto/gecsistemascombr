@@ -13,6 +13,8 @@ import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
 import Pricing from "./pages/Pricing";
 import SubscriptionSuccess from "./pages/SubscriptionSuccess";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import { Navigate } from "react-router-dom";
 
 const queryClient = new QueryClient({
@@ -38,6 +40,8 @@ const App = () => (
               <Route path="/login" element={<Auth />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/checkout" element={<Navigate to="/pricing" replace />} />
               <Route path="/subscription-success" element={<SubscriptionSuccess />} />
