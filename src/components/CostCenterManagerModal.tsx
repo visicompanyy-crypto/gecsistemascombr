@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Pencil, Trash2, Plus, TrendingUp, TrendingDown } from "lucide-react";
+import { Pencil, Trash2, Plus, TrendingUp, TrendingDown, Crown } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useCustomColumns } from "@/hooks/useCustomColumns";
@@ -33,7 +33,7 @@ export function CostCenterManagerModal({
   columnId,
 }: CostCenterManagerModalProps) {
   const { toast } = useToast();
-  const { columns, refetchCostCenters } = useCustomColumns();
+  const { columns, mainColumn, refetchCostCenters, getCostCentersForColumn } = useCustomColumns();
   const [costCenters, setCostCenters] = useState<CostCenter[]>([]);
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -43,32 +43,43 @@ export function CostCenterManagerModal({
     type: 'despesa' as 'receita' | 'despesa',
   });
 
-  // Get the current column name
-  const currentColumn = columns.find(c => c.id === columnId);
+  // Internal state for selected column - defaults to columnId prop, or mainColumn if null
+  const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
 
+  // Initialize selected column when modal opens
   useEffect(() => {
     if (open) {
+      // If a columnId was passed, use it; otherwise use the main column
+      if (columnId) {
+        setSelectedColumnId(columnId);
+      } else if (mainColumn) {
+        setSelectedColumnId(mainColumn.id);
+      }
+    }
+  }, [open, columnId, mainColumn]);
+
+  // Get the current column
+  const currentColumn = columns.find(c => c.id === selectedColumnId);
+
+  useEffect(() => {
+    if (open && selectedColumnId) {
       fetchCostCenters();
     }
-  }, [open, columnId]);
+  }, [open, selectedColumnId]);
 
   const fetchCostCenters = async () => {
+    if (!selectedColumnId) return;
+    
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      let query = supabase
+      const { data, error } = await supabase
         .from('cost_centers')
         .select('id, name, description, type, custom_column_id')
         .is('deleted_at', null)
-        .eq('user_id', user.id);
-
-      // Filter by column if specified
-      if (columnId) {
-        query = query.eq('custom_column_id', columnId);
-      }
-
-      const { data, error } = await query
+        .eq('user_id', user.id)
+        .eq('custom_column_id', selectedColumnId)
         .order('type')
         .order('name');
 
@@ -136,7 +147,7 @@ export function CostCenterManagerModal({
             description: formData.description || null,
             type: formData.type,
             user_id: user.id,
-            custom_column_id: columnId || null,
+            custom_column_id: selectedColumnId,
           });
 
         if (error) throw error;
@@ -264,13 +275,41 @@ export function CostCenterManagerModal({
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-secondary">
             Gerenciar Centros de Custo
-            {currentColumn && (
-              <span className="ml-2 text-sm font-normal text-muted-foreground">
-                — Coluna: {currentColumn.name}
-              </span>
-            )}
           </DialogTitle>
         </DialogHeader>
+
+        {/* Column Selector */}
+        <div className="space-y-2 pb-4 border-b border-border">
+          <Label className="text-sm text-muted-foreground">Coluna</Label>
+          <Select
+            value={selectedColumnId || ""}
+            onValueChange={(value) => setSelectedColumnId(value)}
+          >
+            <SelectTrigger className="w-full md:w-80">
+              <SelectValue placeholder="Selecione a coluna" />
+            </SelectTrigger>
+            <SelectContent>
+              {columns.map((col) => {
+                const ccCount = getCostCentersForColumn(col.id).length;
+                return (
+                  <SelectItem key={col.id} value={col.id}>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: col.color }}
+                      />
+                      <span>{col.name}</span>
+                      {col.is_main && <Crown className="h-3 w-3 text-amber-500" />}
+                      <span className="text-muted-foreground text-xs">
+                        ({ccCount})
+                      </span>
+                    </div>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 border-b border-border pb-4">
           <div className="grid grid-cols-2 gap-4">
