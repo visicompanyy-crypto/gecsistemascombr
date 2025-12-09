@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { useAuth, PLAN_DETAILS } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Check, ArrowLeft, Loader2, CreditCard } from "lucide-react";
-import { PremiumBackground } from "@/components/landing/PremiumBackground";
+import { CheckCircle2, ArrowLeft, Loader2, CreditCard, Sparkles } from "lucide-react";
+import { NeonBackground } from "@/components/landing/NeonBackground";
 import { CPFModal } from "@/components/CPFModal";
 import {
   Dialog,
@@ -19,26 +18,32 @@ import {
 const plans = [
   {
     id: "yearly",
-    name: "Plano Anual",
+    name: "Anual",
     price: "99,90",
     totalPrice: "1.198,80",
     period: "ano",
+    billingInfo: "Cobrado R$ 1.198,80 por ano",
     badge: "Melhor custo-benefício",
     highlighted: true,
+    neonColor: "green" as const,
   },
   {
     id: "quarterly",
-    name: "Plano Trimestral",
+    name: "Trimestral",
     price: "119,90",
     totalPrice: "359,00",
     period: "trimestre",
+    billingInfo: "Cobrado R$ 359,00 por trimestre",
+    neonColor: "yellow" as const,
   },
   {
     id: "monthly",
-    name: "Plano Mensal",
+    name: "Mensal",
     price: "139,90",
     totalPrice: "139,90",
     period: "mês",
+    billingInfo: "Cobrado mensalmente",
+    neonColor: "red" as const,
   },
 ];
 
@@ -49,6 +54,36 @@ const benefits = [
   "Gestão de equipe e ferramentas",
   "Suporte prioritário",
 ];
+
+const neonStyles = {
+  green: {
+    border: "border-[#00ff88]",
+    shadow: "shadow-[0_0_30px_rgba(0,255,136,0.5)]",
+    glow: "hover:shadow-[0_0_50px_rgba(0,255,136,0.7)]",
+    badge: "bg-gradient-to-r from-[#00ff88] to-[#00cc6f]",
+    button: "bg-gradient-to-r from-[#00ff88] to-[#00cc6f] hover:from-[#00cc6f] hover:to-[#00ff88]",
+    title: "text-[#00ff88]",
+    checkColor: "text-[#00ff88]",
+  },
+  yellow: {
+    border: "border-[#ffd700]",
+    shadow: "shadow-[0_0_30px_rgba(255,215,0,0.5)]",
+    glow: "hover:shadow-[0_0_50px_rgba(255,215,0,0.7)]",
+    badge: "bg-gradient-to-r from-[#ffd700] to-[#ffaa00]",
+    button: "bg-gradient-to-r from-[#ffd700] to-[#ffaa00] hover:from-[#ffaa00] hover:to-[#ffd700]",
+    title: "text-[#ffd700]",
+    checkColor: "text-[#ffd700]",
+  },
+  red: {
+    border: "border-[#ff0055]",
+    shadow: "shadow-[0_0_30px_rgba(255,0,85,0.5)]",
+    glow: "hover:shadow-[0_0_50px_rgba(255,0,85,0.7)]",
+    badge: "bg-gradient-to-r from-[#ff0055] to-[#cc0044]",
+    button: "bg-gradient-to-r from-[#ff0055] to-[#cc0044] hover:from-[#cc0044] hover:to-[#ff0055]",
+    title: "text-[#ff0055]",
+    checkColor: "text-[#ff0055]",
+  },
+};
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -62,7 +97,6 @@ const Pricing = () => {
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Cleanup polling on unmount
   useEffect(() => {
     return () => {
       if (pollingRef.current) {
@@ -71,17 +105,13 @@ const Pricing = () => {
     };
   }, []);
 
-  // Start polling for payment status
   const startPaymentPolling = () => {
     setIsCheckingPayment(true);
-    
-    // Check every 5 seconds
     pollingRef.current = setInterval(async () => {
       await refreshSubscription();
     }, 5000);
   };
 
-  // Stop polling
   const stopPaymentPolling = () => {
     if (pollingRef.current) {
       clearInterval(pollingRef.current);
@@ -91,7 +121,6 @@ const Pricing = () => {
     setShowPaymentModal(false);
   };
 
-  // Watch subscription status and redirect when active
   useEffect(() => {
     if (subscription?.subscribed && showPaymentModal) {
       stopPaymentPolling();
@@ -111,11 +140,9 @@ const Pricing = () => {
       return;
     }
     
-    // Check if user has CPF in metadata (from signup)
     const userCpf = user.user_metadata?.cpf;
     
     if (userCpf) {
-      // User already has CPF, go directly to checkout
       setLoadingPlan(planId);
       try {
         const { data, error } = await supabase.functions.invoke("create-checkout", {
@@ -142,7 +169,6 @@ const Pricing = () => {
         setLoadingPlan(null);
       }
     } else {
-      // Old user without CPF, show modal
       setSelectedPlanId(planId);
       setShowCPFModal(true);
     }
@@ -201,137 +227,155 @@ const Pricing = () => {
   };
 
   return (
-    <PremiumBackground variant="mesh" className="min-h-screen py-12">
-      <div className="max-w-[1200px] mx-auto px-6">
-        <Button
-          variant="ghost"
-          onClick={() => navigate(-1)}
-          className="mb-8 text-white hover:text-white/80 hover:bg-white/10"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Voltar
-        </Button>
-
-        <div className="text-center mb-12">
-          <h1 
-            className="text-3xl md:text-4xl lg:text-5xl font-shrikhand text-white mb-4"
-            style={{
-              textShadow: '0 0 30px rgba(255,255,255,0.2), 0 0 2px rgba(255,255,255,0.8)'
-            }}
+    <div className="min-h-screen relative overflow-hidden">
+      <NeonBackground />
+      
+      <div className="relative z-10 py-12">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="mb-8 text-white/70 hover:text-white hover:bg-white/10 border border-white/20"
           >
-            Escolha seu plano
-          </h1>
-          <p className="text-lg md:text-xl text-white/80 font-jakarta mb-6">
-            Organize o financeiro da sua empresa com total controle
-          </p>
-          
-          {user && subscription && (
-            <div className="flex flex-col items-center gap-4">
-              {subscription.subscribed && (
-                <p className="text-green-400 font-medium">
-                  Plano atual: {getPlanName(subscription.product_id)}
-                </p>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRefreshSubscription}
-                disabled={isRefreshing}
-                className="border-white/20 text-white hover:bg-white/10 hover:text-white"
-              >
-                {isRefreshing ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Atualizando...
-                  </>
-                ) : (
-                  "Atualizar status"
-                )}
-              </Button>
-            </div>
-          )}
-        </div>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Voltar
+          </Button>
 
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {plans.map((plan, index) => {
-            const isCurrent = isCurrentPlan(plan.id);
+          <div className="text-center mb-16">
+            {/* Free Trial Badge */}
+            <div className="inline-flex items-center gap-2 bg-[#00ff88]/20 border border-[#00ff88]/50 rounded-full px-6 py-2 mb-8">
+              <Sparkles className="h-4 w-4 text-[#00ff88]" />
+              <span className="text-[#00ff88] font-semibold text-sm">5 DIAS GRÁTIS PARA TESTAR</span>
+            </div>
             
-            return (
-              <Card
-                key={plan.id}
-                className={`p-8 relative bg-white border-0 shadow-xl animate-fade-in ${
-                  plan.highlighted
-                    ? "ring-2 ring-green-400"
-                    : ""
-                } ${isCurrent ? "ring-2 ring-green-500" : ""}`}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+              Escolha seu{" "}
+              <span 
+                className="text-[#00ff88]"
                 style={{
-                  animationDelay: `${index * 0.15}s`,
-                  animationFillMode: 'both'
+                  textShadow: '0 0 30px rgba(0,255,136,0.5), 0 0 60px rgba(0,255,136,0.3)'
                 }}
               >
-                {plan.badge && (
-                  <div 
-                    className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-sm font-semibold text-white"
-                    style={{
-                      background: 'linear-gradient(135deg, #84cc16 0%, #65a30d 100%)',
-                      boxShadow: '0 4px 12px rgba(132, 204, 22, 0.4)'
-                    }}
-                  >
-                    {plan.badge}
-                  </div>
+                plano
+              </span>
+            </h1>
+            <p className="text-xl text-gray-300 font-light max-w-2xl mx-auto mb-8">
+              Organize o financeiro da sua empresa com total controle e praticidade
+            </p>
+            
+            {user && subscription && (
+              <div className="flex flex-col items-center gap-4">
+                {subscription.subscribed && (
+                  <p className="text-[#00ff88] font-medium">
+                    Plano atual: {getPlanName(subscription.product_id)}
+                  </p>
                 )}
-                
-                {isCurrent && (
-                  <div className="absolute -top-3 right-4 bg-green-500 text-white px-4 py-1 rounded-full text-sm font-semibold shadow-lg">
-                    Seu Plano
-                  </div>
-                )}
-
-                <div className="text-center mb-6 mt-2">
-                  <h3 className="text-2xl font-bold mb-2 text-gray-900">{plan.name}</h3>
-                  <div className="flex items-baseline justify-center gap-2">
-                    <span className="text-4xl font-bold text-gray-900">R$ {plan.price}</span>
-                    <span className="text-gray-600">/ mês</span>
-                  </div>
-                  {plan.id !== "monthly" && (
-                    <p className="text-sm text-gray-500 mt-1">
-                      Total: R$ {plan.totalPrice} / {plan.period}
-                    </p>
-                  )}
-                </div>
-
-                <ul className="space-y-3 mb-8">
-                  {benefits.map((benefit, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-gray-700">{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
-
                 <Button
-                  className={`w-full font-semibold ${
-                    plan.highlighted
-                      ? "bg-green-600 hover:bg-green-700 text-white"
-                      : "bg-green-700 hover:bg-green-800 text-white"
-                  }`}
-                  onClick={() => handleSubscribeClick(plan.id)}
-                  disabled={loadingPlan !== null || isCurrent}
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRefreshSubscription}
+                  disabled={isRefreshing}
+                  className="border-[#00ff88]/30 text-[#00ff88] hover:bg-[#00ff88]/10 hover:text-[#00ff88] bg-transparent"
                 >
-                  {loadingPlan === plan.id ? (
+                  {isRefreshing ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processando...
+                      Atualizando...
                     </>
-                  ) : isCurrent ? (
-                    "Plano Atual"
                   ) : (
-                    "Assinar agora"
+                    "Atualizar status"
                   )}
                 </Button>
-              </Card>
-            );
-          })}
+              </div>
+            )}
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            {plans.map((plan, index) => {
+              const isCurrent = isCurrentPlan(plan.id);
+              const styles = neonStyles[plan.neonColor];
+              
+              return (
+                <div
+                  key={plan.id}
+                  className="relative animate-fade-in"
+                  style={{
+                    animationDelay: `${index * 0.15}s`,
+                    animationFillMode: 'both'
+                  }}
+                >
+                  {/* Badge */}
+                  {plan.badge && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+                      <div className={`${styles.badge} text-[#0a0f0b] px-6 py-2 rounded-full text-sm font-bold shadow-lg whitespace-nowrap`}>
+                        {plan.badge}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {isCurrent && (
+                    <div className="absolute -top-4 right-4 z-20 bg-[#00ff88] text-[#0a0f0b] px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+                      Seu Plano
+                    </div>
+                  )}
+
+                  <div
+                    className={`rounded-2xl p-8 transition-all duration-500 hover:-translate-y-2 relative bg-[#0f1410]/80 backdrop-blur-sm border-2 ${styles.border} ${styles.shadow} ${styles.glow} ${
+                      plan.highlighted ? "scale-105" : ""
+                    }`}
+                  >
+                    {/* Glow effect background */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#00ff88]/5 to-transparent opacity-50 rounded-2xl" />
+                    
+                    <div className="relative z-10">
+                      <h3 className={`text-2xl font-bold mb-2 ${styles.title}`}>
+                        {plan.name}
+                      </h3>
+
+                      <div className="mb-6">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-2xl font-bold text-white">R$</span>
+                          <span className="text-5xl font-extrabold text-white">{plan.price}</span>
+                          <span className="text-lg text-gray-300">/mês</span>
+                        </div>
+                        {plan.billingInfo && (
+                          <p className="text-sm text-gray-400 mt-2">{plan.billingInfo}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-4 mb-8">
+                        {benefits.map((benefit, benefitIndex) => (
+                          <div key={benefitIndex} className="flex items-start gap-3">
+                            <CheckCircle2 className={`flex-shrink-0 mt-0.5 ${styles.checkColor}`} size={20} />
+                            <p className="text-base text-gray-300">{benefit}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      <Button
+                        onClick={() => handleSubscribeClick(plan.id)}
+                        disabled={loadingPlan !== null || isCurrent}
+                        className={`w-full py-6 rounded-xl text-base font-bold transition-all duration-300 hover:scale-105 text-[#0a0f0b] shadow-lg ${styles.button} disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        {loadingPlan === plan.id ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Processando...
+                          </>
+                        ) : isCurrent ? (
+                          "Plano Atual"
+                        ) : !user ? (
+                          "Começar Teste Grátis"
+                        ) : (
+                          "Assinar agora"
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -350,26 +394,26 @@ const Pricing = () => {
       <Dialog open={showPaymentModal} onOpenChange={(open) => {
         if (!open) stopPaymentPolling();
       }}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-[#0f1410] border-[#00ff88]/30">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-green-600" />
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <CreditCard className="h-5 w-5 text-[#00ff88]" />
               Aguardando pagamento
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-gray-400">
               Complete o pagamento na aba do Asaas que foi aberta.
             </DialogDescription>
           </DialogHeader>
           
           <div className="flex flex-col items-center py-6 space-y-4">
             <div className="relative">
-              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-green-600" />
+              <div className="w-16 h-16 rounded-full bg-[#00ff88]/20 flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-[#00ff88]" />
               </div>
             </div>
             
             <div className="text-center space-y-2">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-300">
                 {isCheckingPayment ? "Verificando pagamento..." : "Aguardando confirmação..."}
               </p>
               <p className="text-xs text-gray-500">
@@ -387,6 +431,7 @@ const Pricing = () => {
                 setIsRefreshing(false);
               }}
               disabled={isRefreshing}
+              className="border-[#00ff88]/30 text-[#00ff88] hover:bg-[#00ff88]/10 bg-transparent"
             >
               {isRefreshing ? (
                 <>
@@ -400,14 +445,14 @@ const Pricing = () => {
             <Button
               variant="ghost"
               onClick={stopPaymentPolling}
-              className="text-gray-500"
+              className="text-gray-400 hover:text-white hover:bg-white/10"
             >
               Cancelar
             </Button>
           </div>
         </DialogContent>
       </Dialog>
-    </PremiumBackground>
+    </div>
   );
 };
 
