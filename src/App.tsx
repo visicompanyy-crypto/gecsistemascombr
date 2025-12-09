@@ -15,6 +15,7 @@ import Pricing from "./pages/Pricing";
 import SubscriptionSuccess from "./pages/SubscriptionSuccess";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import WelcomeTrial from "./pages/WelcomeTrial";
 import { Navigate } from "react-router-dom";
 
 const queryClient = new QueryClient({
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/checkout" element={<Navigate to="/pricing" replace />} />
               <Route path="/subscription-success" element={<SubscriptionSuccess />} />
+              <Route path="/welcome-trial" element={<WelcomeTrial />} />
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Index />

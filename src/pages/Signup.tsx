@@ -395,8 +395,8 @@ export default function Signup() {
         description: "Seu período de teste de 5 dias começou. Aproveite!",
       });
 
-      // Redirect to dashboard after subscription is confirmed
-      navigate("/dashboard");
+      // Redirect to welcome trial page for first-time users
+      navigate("/welcome-trial");
     } catch (error: any) {
       let errorMessage = error.message;
       
