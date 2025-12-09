@@ -38,12 +38,6 @@ export const LandingHeader = () => {
           >
             Preços
           </button>
-          <button
-            onClick={() => scrollToSection("depoimentos")}
-            className="text-base font-medium text-gray-300 hover:text-[#00ff88] transition-colors"
-          >
-            Depoimentos
-          </button>
         </nav>
 
         <div className="flex items-center gap-3">
@@ -86,12 +80,6 @@ export const LandingHeader = () => {
               className="text-base font-medium text-gray-300 hover:text-[#00ff88] transition-colors text-left py-2"
             >
               Preços
-            </button>
-            <button
-              onClick={() => scrollToSection("depoimentos")}
-              className="text-base font-medium text-gray-300 hover:text-[#00ff88] transition-colors text-left py-2"
-            >
-              Depoimentos
             </button>
           </nav>
         </div>
