@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,6 +69,7 @@ export default function Signup() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const { refreshSubscription } = useAuth();
   
   // Step control
   const [step, setStep] = useState<SignupStep>('email');
@@ -380,6 +382,10 @@ export default function Signup() {
         if (trialError) {
           console.error("Error creating trial:", trialError);
         }
+
+        // Wait for subscription to be verified before navigating
+        await refreshSubscription();
+        
       } catch (trialErr) {
         console.error("Failed to create trial:", trialErr);
       }
@@ -389,7 +395,7 @@ export default function Signup() {
         description: "Seu período de teste de 5 dias começou. Aproveite!",
       });
 
-      // Redirect to dashboard instead of pricing
+      // Redirect to dashboard after subscription is confirmed
       navigate("/dashboard");
     } catch (error: any) {
       let errorMessage = error.message;
