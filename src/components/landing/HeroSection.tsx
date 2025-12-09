@@ -11,12 +11,12 @@ export const HeroSection = () => {
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Left Column - Text */}
           <div className="space-y-5 animate-fade-in">
-            <h1 className="font-public-sans text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
-              Controle financeiro simples e completo
+            <h1 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
+              Você sente que o dinheiro entra e some? Descubra onde sua empresa realmente está perdendo dinheiro.
             </h1>
             
             <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-              Organize receitas, despesas e projeções da sua empresa em um único lugar. Feito para a realidade do empreendedor brasileiro.
+              Organize seu financeiro e tenha clareza sobre o que pode cortar, onde investir e quando crescer. Sem planilhas, sem complicação.
             </p>
 
             <div className="pt-2 flex justify-center md:justify-start">
@@ -24,7 +24,7 @@ export const HeroSection = () => {
                 onClick={() => navigate("/signup")}
                 className="bg-landing-green hover:bg-landing-green/90 text-white px-12 py-7 rounded-2xl text-xl font-bold transition-all hover:scale-105 shadow-[0_8px_30px_rgba(0,110,93,0.3)]"
               >
-                Teste Grátis 5 Dias
+                ✅ Comece grátis por 5 dias
               </Button>
             </div>
 
