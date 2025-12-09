@@ -20,26 +20,26 @@ export const TrialBanner = () => {
   const getUrgencyStyles = () => {
     if (daysRemaining <= 1) {
       return {
-        bgClass: "bg-gradient-to-r from-red-500/20 to-red-600/20 border-red-500/50",
-        textClass: "text-red-100",
-        iconClass: "text-red-400",
-        buttonClass: "bg-red-500 hover:bg-red-600 text-white",
+        bgClass: "bg-gradient-to-r from-red-600 to-red-700 border-red-600",
+        textClass: "text-white font-semibold drop-shadow-sm",
+        iconClass: "text-white",
+        buttonClass: "bg-white hover:bg-gray-100 text-red-600 font-bold",
         animate: true,
       };
     } else if (daysRemaining <= 3) {
       return {
-        bgClass: "bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-yellow-500/50",
-        textClass: "text-yellow-100",
-        iconClass: "text-yellow-400",
-        buttonClass: "bg-yellow-500 hover:bg-yellow-600 text-black",
+        bgClass: "bg-gradient-to-r from-amber-500 to-yellow-500 border-amber-500",
+        textClass: "text-amber-950 font-semibold",
+        iconClass: "text-amber-900",
+        buttonClass: "bg-amber-900 hover:bg-amber-950 text-white font-bold",
         animate: false,
       };
     } else {
       return {
-        bgClass: "bg-gradient-to-r from-emerald-500/20 to-green-500/20 border-emerald-500/50",
-        textClass: "text-emerald-100",
-        iconClass: "text-emerald-400",
-        buttonClass: "bg-emerald-500 hover:bg-emerald-600 text-white",
+        bgClass: "bg-gradient-to-r from-emerald-600 to-green-600 border-emerald-600",
+        textClass: "text-white font-semibold drop-shadow-sm",
+        iconClass: "text-white",
+        buttonClass: "bg-white hover:bg-gray-100 text-emerald-700 font-bold",
         animate: false,
       };
     }
