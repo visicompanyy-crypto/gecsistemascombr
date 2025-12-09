@@ -173,7 +173,7 @@ export const PricingCard = ({
                 Gerando link...
               </>
             ) : (
-              buttonText
+              !user ? "Começar Teste Grátis" : buttonText
             )}
           </Button>
         </div>
