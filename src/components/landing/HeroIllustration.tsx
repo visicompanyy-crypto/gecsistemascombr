@@ -105,7 +105,7 @@ export const HeroIllustration = () => {
       >
         <div className={`relative ${showOrganized ? 'rotate-12' : 'rotate-0'} transition-transform duration-700`}>
           {/* Paper texture effect */}
-          <div className="bg-white rounded-2xl p-8 shadow-xl border border-gray-300 relative overflow-hidden">
+          <div className="bg-white rounded-2xl p-8 shadow-xl border-2 border-[#ff2d55] relative overflow-hidden">
             {/* Crumpled effect with diagonal lines */}
             <div className="absolute inset-0 opacity-30">
               <div className="absolute top-0 left-0 w-full h-full"
@@ -143,11 +143,11 @@ export const HeroIllustration = () => {
                 <X className="text-white" size={40} strokeWidth={3} />
               </div>
             </div>
-          </div>
-          
-          {/* Label ✗ Desorganizado - agora dentro do card */}
-          <div className="mt-3 text-center">
-            <p className="text-sm font-bold text-[#ff2d55]">✗ Desorganizado</p>
+
+            {/* Label ✗ Desorganizado - dentro do card */}
+            <div className="mt-3 text-center">
+              <p className="text-sm font-bold text-[#ff2d55]">✗ Desorganizado</p>
+            </div>
           </div>
         </div>
       </div>
