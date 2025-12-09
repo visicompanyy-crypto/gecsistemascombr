@@ -1,14 +1,35 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CheckCircle, Sparkles, BarChart3, Users, Bot, ArrowRight } from "lucide-react";
+import { CheckCircle, Sparkles, BarChart3, Users, Bot, ArrowRight, Loader2 } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 export default function WelcomeTrial() {
   const navigate = useNavigate();
+  const { subscription, subscriptionLoading, refreshSubscription } = useAuth();
+  const [isStarting, setIsStarting] = useState(false);
 
-  const handleStart = () => {
-    navigate("/dashboard");
+  const handleStart = async () => {
+    setIsStarting(true);
+    
+    try {
+      // If subscription not loaded or not subscribed, force refresh
+      if (subscriptionLoading || !subscription?.subscribed) {
+        await refreshSubscription();
+        
+        // Small delay to allow state to propagate
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+      
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error starting:", error);
+      navigate("/dashboard");
+    } finally {
+      setIsStarting(false);
+    }
   };
 
   const benefits = [
@@ -67,10 +88,20 @@ export default function WelcomeTrial() {
         {/* Botão CTA */}
         <Button 
           onClick={handleStart}
+          disabled={isStarting}
           className="w-full h-14 bg-gradient-to-b from-[#3c9247] to-[#2e6b38] hover:from-[#45a352] hover:to-[#357042] text-white font-semibold text-lg rounded-full shadow-[0_6px_25px_rgba(60,146,71,0.3)] hover:shadow-[0_8px_30px_rgba(60,146,71,0.4)] transition-all duration-300 group"
         >
-          Começar a usar o Saldar
-          <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          {isStarting ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              Preparando...
+            </>
+          ) : (
+            <>
+              Começar a usar o Saldar
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </>
+          )}
         </Button>
 
         <p className="text-center text-[#9ca3af] text-xs mt-4">

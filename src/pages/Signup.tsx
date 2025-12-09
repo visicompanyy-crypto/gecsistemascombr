@@ -383,8 +383,31 @@ export default function Signup() {
           console.error("Error creating trial:", trialError);
         }
 
-        // Wait for subscription to be verified before navigating
-        await refreshSubscription();
+        // Retry loop to ensure subscription is properly loaded before navigating
+        let attempts = 0;
+        const maxAttempts = 5;
+        let subscriptionVerified = false;
+
+        while (attempts < maxAttempts && !subscriptionVerified) {
+          await refreshSubscription();
+          
+          // Small delay to allow state to update
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Verify subscription directly
+          const { data: subCheck } = await supabase.functions.invoke('check-subscription', {
+            headers: {
+              Authorization: `Bearer ${signInData.session?.access_token}`,
+            },
+          });
+          
+          if (subCheck?.subscribed) {
+            subscriptionVerified = true;
+            console.log("Subscription verified successfully after", attempts + 1, "attempts");
+          }
+          
+          attempts++;
+        }
         
       } catch (trialErr) {
         console.error("Failed to create trial:", trialErr);
