@@ -6,9 +6,9 @@ export const HeroSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-10 md:py-28">
       <div className="max-w-[1320px] mx-auto px-6">
-        <div className="grid md:grid-cols-2 gap-16 items-center">
+        <div className="grid md:grid-cols-2 gap-6 md:gap-16 items-center">
           {/* Left Column - Text */}
           <div className="space-y-6 animate-fade-in">
             <h1 className="font-public-sans text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
@@ -36,7 +36,7 @@ export const HeroSection = () => {
           </div>
 
           {/* Right Column - Illustration */}
-          <div className="relative h-[450px] md:h-[600px] lg:h-[650px]">
+          <div className="relative h-[280px] sm:h-[350px] md:h-[600px] lg:h-[650px]">
             <HeroIllustration />
           </div>
         </div>
