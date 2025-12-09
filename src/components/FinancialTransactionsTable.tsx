@@ -1,8 +1,8 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Trash2, Eye, CheckCircle2, AlertTriangle } from "lucide-react";
-import { format } from "date-fns";
+import { Pencil, Trash2, Eye, CheckCircle2 } from "lucide-react";
+import { format, parseISO, isToday, isTomorrow, isPast, startOfDay, differenceInDays } from "date-fns";
 import { parseDateLocal } from "@/lib/utils";
 
 interface Transaction {
@@ -11,6 +11,7 @@ interface Transaction {
   amount: number;
   transaction_type: string;
   transaction_date: string;
+  due_date?: string | null;
   category: string | null;
   status: string;
   payment_method?: string | null;
@@ -43,13 +44,52 @@ export function FinancialTransactionsTable({
     }).format(value);
   };
 
-  const getAlertBadge = (status: string, daysOverdue: number = 0) => {
-    if (status === 'pendente' && daysOverdue > 20) {
-      return <Badge variant="danger" className="rounded-full">ATRASADO {daysOverdue}</Badge>;
+  const getAlertBadge = (transaction: Transaction) => {
+    if (transaction.status !== 'pendente') return null;
+    
+    const dueDate = transaction.due_date ? parseISO(transaction.due_date) : null;
+    if (!dueDate) return null;
+    
+    const today = startOfDay(new Date());
+    const daysDiff = differenceInDays(dueDate, today);
+    
+    // Atrasado (vermelho pulsando)
+    if (isPast(dueDate) && !isToday(dueDate)) {
+      const daysOverdue = Math.abs(daysDiff);
+      return (
+        <Badge variant="destructive" className="rounded-full animate-pulse">
+          Atrasado {daysOverdue}d
+        </Badge>
+      );
     }
-    if (status === 'pendente' && daysOverdue > 10) {
-      return <Badge variant="warning" className="rounded-full">URGENTE {daysOverdue}</Badge>;
+    
+    // Vence hoje (vermelho)
+    if (isToday(dueDate)) {
+      return (
+        <Badge variant="destructive" className="rounded-full">
+          Hoje
+        </Badge>
+      );
     }
+    
+    // Vence amanhã / 1 dia (amarelo)
+    if (isTomorrow(dueDate)) {
+      return (
+        <Badge className="rounded-full bg-amber-500 text-white hover:bg-amber-600">
+          Amanhã
+        </Badge>
+      );
+    }
+    
+    // Vence em 3 dias (verde)
+    if (daysDiff === 3) {
+      return (
+        <Badge className="rounded-full bg-emerald-500 text-white hover:bg-emerald-600">
+          3 dias
+        </Badge>
+      );
+    }
+    
     return null;
   };
 
@@ -72,11 +112,10 @@ export function FinancialTransactionsTable({
         </TableHeader>
         <TableBody>
           {transactions.map((transaction, idx) => {
-            const daysOverdue = Math.floor((new Date().getTime() - parseDateLocal(transaction.transaction_date).getTime()) / (1000 * 60 * 60 * 24));
-            const alertBadge = getAlertBadge(transaction.status, daysOverdue);
+            const alertBadge = getAlertBadge(transaction);
             
             return (
-              <TableRow 
+              <TableRow
                 key={transaction.id} 
                 className={`hover:bg-muted/50 transition-colors border-b border-border/50 ${
                   idx % 2 === 0 ? 'bg-card' : 'bg-muted/20'
