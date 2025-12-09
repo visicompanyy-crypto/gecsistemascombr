@@ -27,9 +27,11 @@ export const HeroSection = () => {
                 Comece grátis por 5 dias
               </Button>
               
-              <p className="text-gray-400 text-sm">
-                Empreender já é difícil. Seu financeiro não precisa ser também.
-              </p>
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-6 py-3 inline-block">
+                <p className="text-gray-300 text-sm text-center">
+                  Empreender já é difícil. Seu financeiro não precisa ser também.
+                </p>
+              </div>
             </div>
           </div>
 

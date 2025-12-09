@@ -91,7 +91,7 @@ export const HeroIllustration = () => {
 
         {/* Label ✓ Organizado */}
         <div className="mt-3 text-center">
-          <p className="text-sm font-bold text-landing-green">✓ Organizado</p>
+          <p className="text-lg font-bold text-landing-green">✓ Organizado</p>
         </div>
       </div>
 
@@ -146,7 +146,7 @@ export const HeroIllustration = () => {
 
             {/* Label ✗ Desorganizado - dentro do card */}
             <div className="mt-3 text-center">
-              <p className="text-sm font-bold text-[#ff2d55]">✗ Desorganizado</p>
+              <p className="text-lg font-bold text-[#ff2d55]">✗ Desorganizado</p>
             </div>
           </div>
         </div>
