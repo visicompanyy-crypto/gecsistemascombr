@@ -160,7 +160,7 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
     return data.id;
   };
 
-  const createCostCenters = async (companyId: string) => {
+  const createCostCenters = async (companyId: string, mainColumnId: string | null) => {
     if (!user) return;
 
     // First, check which cost centers already exist for this user
@@ -176,8 +176,8 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
     const allRevenueCenters = [...DEFAULT_REVENUE_COST_CENTERS, ...customRevenueCenters];
     const allExpenseCenters = [...DEFAULT_EXPENSE_COST_CENTERS, ...customExpenseCenters];
 
-    // Build list of cost centers to create
-    const costCentersToCreate: { user_id: string; company_id: string; name: string; description: string; type: string }[] = [];
+    // Build list of cost centers to create (assigned to main column)
+    const costCentersToCreate: { user_id: string; company_id: string; name: string; description: string; type: string; custom_column_id: string | null }[] = [];
 
     // Add selected revenue centers
     selectedRevenueCenters.forEach((name) => {
@@ -189,6 +189,7 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
           name,
           description: center?.description || `Centro de receita: ${name}`,
           type: 'receita',
+          custom_column_id: mainColumnId,
         });
       }
     });
@@ -203,6 +204,7 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
           name,
           description: center?.description || `Centro de despesa: ${name}`,
           type: 'despesa',
+          custom_column_id: mainColumnId,
         });
       }
     });
@@ -240,8 +242,22 @@ export function FirstAccessModal({ open, onOpenChange, onComplete }: FirstAccess
       // Create company record first
       const companyId = await createCompany(logoUrl);
 
-      // Create cost centers with company_id
-      await createCostCenters(companyId);
+      // Create default columns (Principal and Secundária)
+      await supabase.rpc('create_default_columns_for_user', {
+        p_user_id: user.id,
+        p_company_id: companyId
+      });
+
+      // Fetch the main column ID to assign cost centers
+      const { data: mainColumnData } = await supabase
+        .from('custom_columns')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('is_main', true)
+        .single();
+
+      // Create cost centers with company_id and assign to main column
+      await createCostCenters(companyId, mainColumnData?.id || null);
 
       // Save company settings with company_id reference
       await updateSettings({

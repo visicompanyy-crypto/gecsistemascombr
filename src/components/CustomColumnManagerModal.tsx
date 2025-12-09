@@ -9,13 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -25,7 +18,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Pencil, Trash2, Loader2, Crown } from "lucide-react";
+import { Pencil, Trash2, Loader2 } from "lucide-react";
 import { useCustomColumns, CustomColumn } from "@/hooks/useCustomColumns";
 import { cn } from "@/lib/utils";
 
@@ -52,18 +45,15 @@ export function CustomColumnManagerModal({
   const {
     columns,
     getCostCentersForColumn,
-    createColumn,
     updateColumn,
     deleteColumn,
   } = useCustomColumns();
 
-  const [isEditing, setIsEditing] = useState(false);
   const [editingColumn, setEditingColumn] = useState<CustomColumn | null>(null);
   const [formName, setFormName] = useState("");
   const [formColor, setFormColor] = useState(AVAILABLE_COLORS[0].value);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [columnToDelete, setColumnToDelete] = useState<CustomColumn | null>(null);
-  const [copyFromColumnId, setCopyFromColumnId] = useState<string>("");
 
   // Reset form when opening edit mode
   useEffect(() => {
@@ -73,46 +63,26 @@ export function CustomColumnManagerModal({
     } else {
       setFormName("");
       setFormColor(AVAILABLE_COLORS[0].value);
-      setCopyFromColumnId("");
     }
   }, [editingColumn]);
 
-  const handleCreateNew = () => {
-    setEditingColumn(null);
-    setFormName("");
-    setFormColor(AVAILABLE_COLORS[0].value);
-    setCopyFromColumnId("");
-    setIsEditing(true);
-  };
-
   const handleEdit = (column: CustomColumn) => {
     setEditingColumn(column);
-    setIsEditing(true);
   };
 
   const handleCancelEdit = () => {
-    setIsEditing(false);
     setEditingColumn(null);
   };
 
   const handleSave = async () => {
-    if (!formName.trim()) return;
+    if (!formName.trim() || !editingColumn) return;
 
-    if (editingColumn) {
-      await updateColumn.mutateAsync({
-        id: editingColumn.id,
-        name: formName.trim(),
-        color: formColor,
-      });
-    } else {
-      await createColumn.mutateAsync({
-        name: formName.trim(),
-        color: formColor,
-        copyFromColumnId: copyFromColumnId && copyFromColumnId !== "none" ? copyFromColumnId : null,
-      });
-    }
+    await updateColumn.mutateAsync({
+      id: editingColumn.id,
+      name: formName.trim(),
+      color: formColor,
+    });
 
-    setIsEditing(false);
     setEditingColumn(null);
   };
 
@@ -129,7 +99,7 @@ export function CustomColumnManagerModal({
     }
   };
 
-  const isSaving = createColumn.isPending || updateColumn.isPending;
+  const isSaving = updateColumn.isPending;
 
   return (
     <>
@@ -137,16 +107,12 @@ export function CustomColumnManagerModal({
         <DialogContent className="max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle>
-              {isEditing
-                ? editingColumn
-                  ? "Editar coluna"
-                  : "Nova coluna"
-                : "Gerenciar colunas"}
+              {editingColumn ? "Editar coluna" : "Gerenciar colunas"}
             </DialogTitle>
           </DialogHeader>
 
-          {isEditing ? (
-            // Edit/Create form
+          {editingColumn ? (
+            // Edit form
             <div className="flex-1 overflow-y-auto space-y-6 py-4">
               <div className="space-y-2">
                 <Label htmlFor="column-name">Nome da coluna *</Label>
@@ -179,45 +145,6 @@ export function CustomColumnManagerModal({
                 </div>
               </div>
 
-              {/* Copy from existing column - only when creating */}
-              {!editingColumn && columns.length > 0 && (
-                <div className="space-y-2">
-                  <Label>Copiar centros de custo de</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Cria novos centros de custo com os mesmos nomes da coluna selecionada.
-                  </p>
-                  <Select
-                    value={copyFromColumnId}
-                    onValueChange={setCopyFromColumnId}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Nenhum (começar do zero)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Nenhum (começar do zero)</SelectItem>
-                      {columns.map((col) => {
-                        const ccCount = getCostCentersForColumn(col.id).length;
-                        return (
-                          <SelectItem key={col.id} value={col.id}>
-                            <div className="flex items-center gap-2">
-                              <div
-                                className="w-3 h-3 rounded-full"
-                                style={{ backgroundColor: col.color }}
-                              />
-                              <span>{col.name}</span>
-                              {col.is_main && <Crown className="h-3 w-3 text-amber-500" />}
-                              <span className="text-muted-foreground text-xs">
-                                ({ccCount} centro{ccCount !== 1 ? "s" : ""})
-                              </span>
-                            </div>
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
               <div className="flex justify-end gap-2 pt-4">
                 <Button variant="outline" onClick={handleCancelEdit}>
                   Cancelar
@@ -227,7 +154,7 @@ export function CustomColumnManagerModal({
                   disabled={!formName.trim() || isSaving}
                 >
                   {isSaving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                  Salvar coluna
+                  Salvar
                 </Button>
               </div>
             </div>
@@ -236,7 +163,7 @@ export function CustomColumnManagerModal({
             <div className="flex-1 overflow-y-auto space-y-4 py-4">
               {columns.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-muted-foreground mb-4">
+                  <p className="text-muted-foreground">
                     Nenhuma coluna cadastrada.
                   </p>
                 </div>
@@ -255,12 +182,7 @@ export function CustomColumnManagerModal({
                             style={{ backgroundColor: column.color }}
                           />
                           <div>
-                            <div className="flex items-center gap-2">
-                              <p className="font-medium">{column.name}</p>
-                              {column.is_main && (
-                                <Crown className="h-4 w-4 text-amber-500" />
-                              )}
-                            </div>
+                            <p className="font-medium">{column.name}</p>
                             <p className="text-xs text-muted-foreground">
                               {ccCount} centro{ccCount !== 1 ? "s" : ""} de custo
                             </p>
@@ -275,16 +197,14 @@ export function CustomColumnManagerModal({
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
-                          {!column.is_main && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDeleteClick(column)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteClick(column)}
+                            className="text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                     );
@@ -292,10 +212,9 @@ export function CustomColumnManagerModal({
                 </div>
               )}
 
-              <Button onClick={handleCreateNew} className="w-full gap-2">
-                <Plus className="h-4 w-4" />
-                Nova coluna
-              </Button>
+              <p className="text-xs text-muted-foreground text-center pt-2">
+                Você pode editar os nomes e cores das colunas ou excluí-las se necessário.
+              </p>
             </div>
           )}
         </DialogContent>
