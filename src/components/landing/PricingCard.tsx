@@ -76,7 +76,8 @@ export const PricingCard = ({
 
   const handleClick = () => {
     if (!user) {
-      navigate(`/auth?redirect=/pricing`);
+      // Redirect to signup for trial
+      navigate("/signup");
       return;
     }
     setShowCPFModal(true);

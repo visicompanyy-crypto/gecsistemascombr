@@ -354,22 +354,43 @@ export default function Signup() {
         description: "Fazendo login...",
       });
       
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (signInError) {
-        navigate("/pricing");
+        toast({
+          title: "Erro no login",
+          description: "Cadastro feito, mas houve erro no login automático. Por favor, faça login manualmente.",
+          variant: "destructive",
+        });
+        navigate("/auth");
         return;
       }
 
-      if (redirectPath && planId) {
-        navigate(`${redirectPath}?plan=${planId}`);
-        return;
+      // Create trial subscription after successful login
+      try {
+        const { error: trialError } = await supabase.functions.invoke('create-trial', {
+          headers: {
+            Authorization: `Bearer ${signInData.session?.access_token}`,
+          },
+        });
+
+        if (trialError) {
+          console.error("Error creating trial:", trialError);
+        }
+      } catch (trialErr) {
+        console.error("Failed to create trial:", trialErr);
       }
 
-      navigate("/pricing");
+      toast({
+        title: "Bem-vindo ao Saldar!",
+        description: "Seu período de teste de 5 dias começou. Aproveite!",
+      });
+
+      // Redirect to dashboard instead of pricing
+      navigate("/dashboard");
     } catch (error: any) {
       let errorMessage = error.message;
       

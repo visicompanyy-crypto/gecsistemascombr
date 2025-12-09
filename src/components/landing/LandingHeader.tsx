@@ -58,7 +58,7 @@ export const LandingHeader = () => {
             onClick={() => navigate("/signup")}
             className="bg-landing-green hover:bg-landing-green/90 text-white px-6 py-3 rounded-xl font-bold transition-all hover:scale-105 shadow-[0_4px_15px_rgba(0,110,93,0.2)]"
           >
-            Cadastrar
+            Teste Grátis
           </Button>
 
           {/* Mobile Menu Button */}

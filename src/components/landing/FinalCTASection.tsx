@@ -23,16 +23,20 @@ export const FinalCTASection = () => {
           Organize o financeiro da sua empresa hoje
         </h2>
         
-        <p className="text-xl md:text-2xl text-[#0a0f0b]/90 mb-12 max-w-2xl mx-auto">
-          Comece agora e tenha controle total das suas finanças
+        <p className="text-xl md:text-2xl text-[#0a0f0b]/90 mb-8 max-w-2xl mx-auto">
+          Comece agora com 5 dias grátis e tenha controle total das suas finanças
         </p>
 
         <Button
-          onClick={() => navigate("/pricing")}
+          onClick={() => navigate("/signup")}
           className="bg-[#0a0f0b] hover:bg-[#0f1410] text-[#00ff88] px-16 py-8 rounded-2xl text-xl font-bold transition-all hover:scale-105 shadow-[0_15px_50px_rgba(10,15,11,0.3)]"
         >
-          Assinar plano
+          Começar Teste Grátis
         </Button>
+        
+        <p className="text-sm text-[#0a0f0b]/70 mt-4">
+          Sem necessidade de cartão de crédito
+        </p>
       </div>
     </section>
   );

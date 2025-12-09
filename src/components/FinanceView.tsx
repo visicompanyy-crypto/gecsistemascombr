@@ -28,6 +28,7 @@ import { AIAssistantButton } from "./AIAssistant";
 import { CustomColumnBar } from "./CustomColumnBar";
 import { CustomColumnManagerModal } from "./CustomColumnManagerModal";
 import { useCustomColumns } from "@/hooks/useCustomColumns";
+import { TrialBanner } from "./TrialBanner";
 
 export function FinanceView() {
   const { toast } = useToast();
@@ -268,6 +269,7 @@ export function FinanceView() {
 
   return (
     <div className="min-h-screen bg-background">
+      <TrialBanner />
       <OnboardingTour shouldRun={canStartTour && !firstAccessModalOpen} />
       <Header 
         currentMonth={currentMonth} 
