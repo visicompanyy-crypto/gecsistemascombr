@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,9 +8,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Bell, TrendingUp, TrendingDown, AlertCircle, Calendar, CheckCircle2 } from "lucide-react";
-import { format, isToday, isTomorrow, parseISO, isPast, startOfDay } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { Bell, TrendingUp, TrendingDown, AlertCircle, Calendar, CheckCircle2, Clock } from "lucide-react";
+import { format, isToday, isTomorrow, parseISO, isPast, startOfDay, differenceInDays } from "date-fns";
 import { cn } from "@/lib/utils";
 
 interface Transaction {
@@ -21,6 +20,8 @@ interface Transaction {
   due_date: string | null;
   status: string;
 }
+
+type NotificationType = 'urgent' | 'today' | 'tomorrow' | 'threeDays';
 
 export function NotificationBell() {
   const { user } = useAuth();
@@ -55,20 +56,23 @@ export function NotificationBell() {
 
     const notifications: {
       id: string;
-      type: 'urgent' | 'today' | 'tomorrow';
+      type: NotificationType;
       transactionType: 'receita' | 'despesa';
       description: string;
       amount: number;
       dueDate: Date;
     }[] = [];
 
+    const today = startOfDay(new Date());
+
     pendingTransactions.forEach(t => {
       if (!t.due_date) return;
       
       const dueDate = parseISO(t.due_date);
-      const today = startOfDay(new Date());
+      const daysDiff = differenceInDays(dueDate, today);
       
       if (isPast(dueDate) && !isToday(dueDate)) {
+        // Atrasado (passado)
         notifications.push({
           id: t.id,
           type: 'urgent',
@@ -78,6 +82,7 @@ export function NotificationBell() {
           dueDate,
         });
       } else if (isToday(dueDate)) {
+        // Vence hoje
         notifications.push({
           id: t.id,
           type: 'today',
@@ -87,9 +92,20 @@ export function NotificationBell() {
           dueDate,
         });
       } else if (isTomorrow(dueDate)) {
+        // Vence amanhã (1 dia)
         notifications.push({
           id: t.id,
           type: 'tomorrow',
+          transactionType: t.transaction_type as 'receita' | 'despesa',
+          description: t.description,
+          amount: t.amount,
+          dueDate,
+        });
+      } else if (daysDiff === 3) {
+        // Vence em 3 dias
+        notifications.push({
+          id: t.id,
+          type: 'threeDays',
           transactionType: t.transaction_type as 'receita' | 'despesa',
           description: t.description,
           amount: t.amount,
@@ -99,7 +115,7 @@ export function NotificationBell() {
     });
 
     return notifications.sort((a, b) => {
-      const order = { urgent: 0, today: 1, tomorrow: 2 };
+      const order: Record<NotificationType, number> = { urgent: 0, today: 1, tomorrow: 2, threeDays: 3 };
       return order[a.type] - order[b.type];
     });
   };
@@ -108,24 +124,30 @@ export function NotificationBell() {
   const urgentCount = notifications.filter(n => n.type === 'urgent').length;
   const todayCount = notifications.filter(n => n.type === 'today').length;
   const tomorrowCount = notifications.filter(n => n.type === 'tomorrow').length;
+  const threeDaysCount = notifications.filter(n => n.type === 'threeDays').length;
   const totalCount = notifications.length;
 
-  const getIcon = (type: string, transactionType: string) => {
+  const getIcon = (type: NotificationType, transactionType: string) => {
     if (type === 'urgent') return <AlertCircle className="h-4 w-4 text-destructive" />;
+    if (type === 'today') return <AlertCircle className="h-4 w-4 text-destructive" />;
+    if (type === 'tomorrow') return <Clock className="h-4 w-4 text-amber-500" />;
+    if (type === 'threeDays') return <Calendar className="h-4 w-4 text-emerald-500" />;
     if (transactionType === 'receita') return <TrendingUp className="h-4 w-4 text-income" />;
     return <TrendingDown className="h-4 w-4 text-destructive" />;
   };
 
-  const getLabel = (type: string) => {
+  const getLabel = (type: NotificationType) => {
     if (type === 'urgent') return 'Atrasado';
     if (type === 'today') return 'Hoje';
-    return 'Amanhã';
+    if (type === 'tomorrow') return 'Amanhã';
+    return '3 dias';
   };
 
-  const getLabelColor = (type: string) => {
+  const getLabelColor = (type: NotificationType) => {
     if (type === 'urgent') return 'bg-destructive/10 text-destructive';
-    if (type === 'today') return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
-    return 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400';
+    if (type === 'today') return 'bg-destructive/10 text-destructive';
+    if (type === 'tomorrow') return 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400';
+    return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400';
   };
 
   return (
@@ -136,9 +158,11 @@ export function NotificationBell() {
           {totalCount > 0 && (
             <span className={cn(
               "absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full text-[10px] font-bold flex items-center justify-center",
-              urgentCount > 0 
+              urgentCount > 0 || todayCount > 0
                 ? "bg-destructive text-destructive-foreground animate-pulse" 
-                : "bg-primary text-primary-foreground"
+                : tomorrowCount > 0
+                  ? "bg-amber-500 text-white"
+                  : "bg-emerald-500 text-white"
             )}>
               {totalCount > 9 ? '9+' : totalCount}
             </span>
@@ -171,7 +195,8 @@ export function NotificationBell() {
                   key={notification.id}
                   className={cn(
                     "p-3 hover:bg-muted/50 transition-colors",
-                    notification.type === 'urgent' && "bg-destructive/5"
+                    notification.type === 'urgent' && "bg-destructive/5",
+                    notification.type === 'today' && "bg-destructive/5"
                   )}
                 >
                   <div className="flex items-start gap-3">
@@ -218,14 +243,20 @@ export function NotificationBell() {
               )}
               {todayCount > 0 && (
                 <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                  <span className="w-2 h-2 rounded-full bg-destructive"></span>
                   {todayCount} hoje
                 </span>
               )}
               {tomorrowCount > 0 && (
                 <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                  <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                   {tomorrowCount} amanhã
+                </span>
+              )}
+              {threeDaysCount > 0 && (
+                <span className="flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  {threeDaysCount} em 3 dias
                 </span>
               )}
             </div>

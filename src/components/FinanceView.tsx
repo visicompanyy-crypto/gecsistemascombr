@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { format } from "date-fns";
+import { useState, useEffect, useMemo } from "react";
+import { format, parseISO, isPast, isToday, startOfDay } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -224,6 +224,33 @@ export function FinanceView() {
     return matchesSearch && matchesType && matchesPaymentMethod && matchesCostCenter;
   });
 
+  // Ordenar transações: pendentes no topo (por proximidade de vencimento), depois pagas
+  const sortedTransactions = useMemo(() => {
+    if (!filteredTransactions) return [];
+    
+    const today = startOfDay(new Date());
+    
+    // Separar pendentes e pagas
+    const pending = filteredTransactions.filter(t => t.status === 'pendente');
+    const paid = filteredTransactions.filter(t => t.status === 'pago');
+    
+    // Ordenar pendentes pela proximidade do due_date (mais próximo primeiro)
+    pending.sort((a, b) => {
+      const dateA = a.due_date ? parseISO(a.due_date) : parseISO(a.transaction_date);
+      const dateB = b.due_date ? parseISO(b.due_date) : parseISO(b.transaction_date);
+      return dateA.getTime() - dateB.getTime();
+    });
+    
+    // Ordenar pagas pela data de pagamento mais recente primeiro
+    paid.sort((a, b) => {
+      const dateA = parseISO(a.transaction_date);
+      const dateB = parseISO(b.transaction_date);
+      return dateB.getTime() - dateA.getTime();
+    });
+    
+    return [...pending, ...paid];
+  }, [filteredTransactions]);
+
   const handleClearFilters = () => {
     setSearchTerm("");
     setTypeFilter("all");
@@ -332,7 +359,7 @@ export function FinanceView() {
 
           <div data-tour="transactions-table">
             <FinancialTransactionsTable
-              transactions={filteredTransactions || []}
+              transactions={sortedTransactions}
               onEdit={handleEdit}
               onDelete={handleDelete}
               onViewDetails={handleViewDetails}
