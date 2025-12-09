@@ -15,12 +15,12 @@ export function CustomColumnBar({
   onSelectColumn,
   onManageColumns,
 }: CustomColumnBarProps) {
-  const { columns, isLoading, ensureMainColumn, getCostCentersForColumn, costCenters } = useCustomColumns();
+  const { columns, isLoading, ensureDefaultColumns, getCostCentersForColumn, costCenters } = useCustomColumns();
 
-  // Ensure main column exists
+  // Ensure default columns exist (Principal and Secundária)
   useEffect(() => {
-    if (!isLoading && columns.length === 0) {
-      ensureMainColumn.mutate();
+    if (!isLoading && columns.length < 2) {
+      ensureDefaultColumns.mutate();
     }
   }, [isLoading, columns.length]);
 

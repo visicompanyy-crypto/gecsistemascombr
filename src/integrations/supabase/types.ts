@@ -813,6 +813,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_default_columns_for_user: {
+        Args: { p_company_id?: string; p_user_id: string }
+        Returns: undefined
+      }
       create_main_column_for_user: {
         Args: { p_company_id?: string; p_user_id: string }
         Returns: string
