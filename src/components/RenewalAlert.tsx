@@ -8,8 +8,8 @@ export function RenewalAlert() {
   const { subscription } = useAuth();
   const navigate = useNavigate();
 
-  // Don't show if no subscription data or whitelisted user
-  if (!subscription || subscription.product_id === "whitelisted") {
+  // Don't show if no subscription data, whitelisted user, or during trial
+  if (!subscription || subscription.product_id === "whitelisted" || subscription.status === "TRIAL") {
     return null;
   }
 
