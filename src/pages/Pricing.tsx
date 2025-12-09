@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth, PLAN_DETAILS } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle2, ArrowLeft, Loader2, CreditCard, Sparkles } from "lucide-react";
+import { CheckCircle2, ArrowLeft, Loader2, CreditCard, Sparkles, Clock, AlertTriangle } from "lucide-react";
 import { NeonBackground } from "@/components/landing/NeonBackground";
 import { CPFModal } from "@/components/CPFModal";
 import {
@@ -241,31 +241,113 @@ const Pricing = () => {
             Voltar
           </Button>
 
-          <div className="text-center mb-16">
-            {/* Free Trial Badge */}
-            <div className="inline-flex items-center gap-2 bg-[#00ff88]/20 border border-[#00ff88]/50 rounded-full px-6 py-2 mb-8">
-              <Sparkles className="h-4 w-4 text-[#00ff88]" />
-              <span className="text-[#00ff88] font-semibold text-sm">5 DIAS GRÁTIS PARA TESTAR</span>
+          {/* Trial Expired Alert */}
+          {subscription?.status === "TRIAL" && subscription?.days_until_renewal !== undefined && subscription.days_until_renewal <= 0 && (
+            <div className="mb-12 animate-fade-in">
+              <div className="max-w-2xl mx-auto p-6 rounded-2xl bg-gradient-to-r from-[#ff0055]/20 to-[#ff0055]/10 border-2 border-[#ff0055] shadow-[0_0_30px_rgba(255,0,85,0.4)]">
+                <div className="flex items-center gap-4">
+                  <div className="flex-shrink-0 w-14 h-14 rounded-full bg-[#ff0055]/30 flex items-center justify-center animate-pulse">
+                    <AlertTriangle className="h-7 w-7 text-[#ff0055]" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-xl font-bold text-white mb-1">
+                      Seu período de teste expirou!
+                    </h3>
+                    <p className="text-gray-300">
+                      Assine agora para continuar usando o Saldar e não perder seus dados.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
+          )}
+
+          <div className="text-center mb-16">
+            {/* Dynamic Trial Badge */}
+            {(() => {
+              const isTrialActive = subscription?.status === "TRIAL";
+              const daysRemaining = subscription?.days_until_renewal;
+              const isSubscribed = subscription?.subscribed && subscription?.status !== "TRIAL";
+              
+              // Don't show badge if user is an active subscriber
+              if (isSubscribed) return null;
+              
+              // Trial expired - don't show badge (alert is shown above)
+              if (isTrialActive && daysRemaining !== undefined && daysRemaining <= 0) return null;
+              
+              // Determine badge content based on trial status
+              let badgeText = "5 DIAS GRÁTIS PARA TESTAR";
+              let badgeColor = "#00ff88";
+              let bgColor = "bg-[#00ff88]/20";
+              let borderColor = "border-[#00ff88]/50";
+              let IconComponent = Sparkles;
+              let isPulsing = false;
+              
+              if (isTrialActive && daysRemaining !== undefined) {
+                IconComponent = Clock;
+                
+                if (daysRemaining === 1) {
+                  badgeText = "ÚLTIMO DIA DE TESTE!";
+                  badgeColor = "#ff0055";
+                  bgColor = "bg-[#ff0055]/20";
+                  borderColor = "border-[#ff0055]/50";
+                  isPulsing = true;
+                } else if (daysRemaining <= 3) {
+                  badgeText = `${daysRemaining} DIAS GRÁTIS RESTANTES`;
+                  badgeColor = "#ffd700";
+                  bgColor = "bg-[#ffd700]/20";
+                  borderColor = "border-[#ffd700]/50";
+                } else {
+                  badgeText = `${daysRemaining} DIAS GRÁTIS RESTANTES`;
+                  // Keep green color for 4-5 days
+                }
+              }
+              
+              return (
+                <div className={`inline-flex items-center gap-2 ${bgColor} border ${borderColor} rounded-full px-6 py-2 mb-8 ${isPulsing ? 'animate-pulse' : ''}`}>
+                  <IconComponent className="h-4 w-4" style={{ color: badgeColor }} />
+                  <span className="font-semibold text-sm" style={{ color: badgeColor }}>{badgeText}</span>
+                </div>
+              );
+            })()}
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-              Escolha seu{" "}
-              <span 
-                className="text-[#00ff88]"
-                style={{
-                  textShadow: '0 0 30px rgba(0,255,136,0.5), 0 0 60px rgba(0,255,136,0.3)'
-                }}
-              >
-                plano
-              </span>
+              {subscription?.status === "TRIAL" && subscription?.days_until_renewal !== undefined && subscription.days_until_renewal <= 0 ? (
+                <>
+                  Desbloqueie seu{" "}
+                  <span 
+                    className="text-[#ff0055]"
+                    style={{
+                      textShadow: '0 0 30px rgba(255,0,85,0.5), 0 0 60px rgba(255,0,85,0.3)'
+                    }}
+                  >
+                    acesso
+                  </span>
+                </>
+              ) : (
+                <>
+                  Escolha seu{" "}
+                  <span 
+                    className="text-[#00ff88]"
+                    style={{
+                      textShadow: '0 0 30px rgba(0,255,136,0.5), 0 0 60px rgba(0,255,136,0.3)'
+                    }}
+                  >
+                    plano
+                  </span>
+                </>
+              )}
             </h1>
             <p className="text-xl text-gray-300 font-light max-w-2xl mx-auto mb-8">
-              Organize o financeiro da sua empresa com total controle e praticidade
+              {subscription?.status === "TRIAL" && subscription?.days_until_renewal !== undefined && subscription.days_until_renewal <= 0 
+                ? "Sua jornada não precisa parar aqui. Escolha um plano e continue crescendo!"
+                : "Organize o financeiro da sua empresa com total controle e praticidade"
+              }
             </p>
             
             {user && subscription && (
               <div className="flex flex-col items-center gap-4">
-                {subscription.subscribed && (
+                {subscription.subscribed && subscription.status !== "TRIAL" && (
                   <p className="text-[#00ff88] font-medium">
                     Plano atual: {getPlanName(subscription.product_id)}
                   </p>
@@ -366,6 +448,8 @@ const Pricing = () => {
                           "Plano Atual"
                         ) : !user ? (
                           "Começar Teste Grátis"
+                        ) : subscription?.status === "TRIAL" && subscription?.days_until_renewal !== undefined && subscription.days_until_renewal <= 0 ? (
+                          "Desbloquear Acesso"
                         ) : (
                           "Assinar agora"
                         )}
