@@ -62,9 +62,9 @@ export const FloatingCardsDisplay = ({ images, variant }: FloatingCardsDisplayPr
   const dotActiveColor = variant === "polluted" ? "bg-[#ff2d55]" : "bg-[#00ff88]";
 
   return (
-    <div className="relative w-full max-w-full md:max-w-4xl mx-auto px-0 md:px-4">
+    <div className="relative w-full max-w-full md:max-w-4xl mx-auto">
       {/* Cards container */}
-      <div className="relative h-[280px] sm:h-[320px] md:h-[400px] lg:h-[500px]">
+      <div className="relative h-[55vw] sm:h-[50vw] md:h-[400px] lg:h-[500px]">
         {images.map((image, index) => {
           const { className, style } = getCardStyles(index);
           return (
@@ -76,13 +76,12 @@ export const FloatingCardsDisplay = ({ images, variant }: FloatingCardsDisplayPr
               <img
                 src={image}
                 alt={`${variant === "polluted" ? "Sistema complexo" : "Sistema Saldar"} ${index + 1}`}
-                className="w-[85vw] sm:w-[85vw] md:w-[600px] lg:w-[800px] h-auto object-cover"
+                className="w-[95vw] sm:w-[90vw] md:w-[600px] lg:w-[800px] h-auto object-cover"
               />
             </div>
           );
         })}
       </div>
-
     </div>
   );
 };
