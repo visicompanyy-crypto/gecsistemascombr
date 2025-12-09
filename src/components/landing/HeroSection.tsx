@@ -16,7 +16,7 @@ export const HeroSection = () => {
             </h1>
             
             <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-              Descubra onde sua empresa realmente está perdendo dinheiro. Organize seu financeiro, corte gastos desnecessários e saiba quanto pode investir no próximo mês — sem planilhas e sem complicação.
+              Descubra onde sua empresa realmente está perdendo dinheiro. Organize seu financeiro, corte gastos desnecessários e saiba quanto pode investir no próximo mês. Sem planilhas e sem complicação.
             </p>
 
             <div className="pt-4 flex flex-col items-center md:items-start gap-4">
