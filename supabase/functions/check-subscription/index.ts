@@ -103,18 +103,20 @@ serve(async (req) => {
       nextDueDate: subscription.next_due_date
     });
 
-    // Check if subscription is active (only ACTIVE status, not PENDING)
+    // Check if subscription is active (ACTIVE or TRIAL status)
     const isActive = subscription.status === "ACTIVE";
+    const isTrial = subscription.status === "TRIAL";
     
     // Check if subscription is expired (next_due_date has passed)
     const daysUntilRenewal = calculateDaysUntil(subscription.next_due_date);
     const isExpired = daysUntilRenewal !== null && daysUntilRenewal < 0;
     
-    // User is subscribed only if status is ACTIVE and not expired
-    const isSubscribed = isActive && !isExpired;
+    // User is subscribed if status is ACTIVE/TRIAL and not expired
+    const isSubscribed = (isActive || isTrial) && !isExpired;
     
     logStep("Subscription status calculated", { 
       isActive, 
+      isTrial,
       isExpired, 
       isSubscribed,
       daysUntilRenewal

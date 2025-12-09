@@ -24,7 +24,7 @@ export const HeroSection = () => {
                 onClick={() => navigate("/signup")}
                 className="bg-landing-green hover:bg-landing-green/90 text-white px-12 py-7 rounded-2xl text-xl font-bold transition-all hover:scale-105 shadow-[0_8px_30px_rgba(0,110,93,0.3)]"
               >
-                Começar agora
+                Teste Grátis 5 Dias
               </Button>
             </div>
 

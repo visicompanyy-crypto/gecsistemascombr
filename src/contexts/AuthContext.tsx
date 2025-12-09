@@ -44,6 +44,11 @@ export const PLAN_DETAILS = {
     name: "Acesso Gratuito",
     value: 0,
     cycle: null
+  },
+  trial: {
+    name: "Período de Teste",
+    value: 0,
+    cycle: "TRIAL"
   }
 };
 

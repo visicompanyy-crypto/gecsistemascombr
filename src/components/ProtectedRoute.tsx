@@ -37,8 +37,16 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to="/auth" replace />;
   }
 
-  // Require active subscription to access dashboard
+  // Require active subscription or trial to access dashboard
   if (!subscription?.subscribed) {
+    // If trial expired, redirect to pricing
+    if (subscription?.status === "TRIAL" && (subscription?.days_until_renewal ?? 0) < 0) {
+      return <Navigate to="/pricing" replace />;
+    }
+    // No subscription at all
+    if (!subscription?.status) {
+      return <Navigate to="/pricing" replace />;
+    }
     return <Navigate to="/pricing" replace />;
   }
 
