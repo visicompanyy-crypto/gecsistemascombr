@@ -46,6 +46,50 @@ serve(async (req) => {
 
     if (existingSubscription) {
       logStep("User already has subscription", { status: existingSubscription.status });
+      
+      // Se a subscription existente for PENDING, converter para TRIAL
+      if (existingSubscription.status === "PENDING") {
+        const trialEndDate = new Date();
+        trialEndDate.setDate(trialEndDate.getDate() + 5);
+        const formattedEndDate = trialEndDate.toISOString().split('T')[0];
+        
+        logStep("Converting PENDING subscription to TRIAL", { 
+          subscriptionId: existingSubscription.id,
+          newEndDate: formattedEndDate 
+        });
+
+        const { data: updatedSub, error: updateError } = await supabaseClient
+          .from("subscriptions")
+          .update({
+            status: "TRIAL",
+            plan_id: "trial",
+            plan_name: "Período de Teste",
+            billing_cycle: "TRIAL",
+            value: 0,
+            next_due_date: formattedEndDate,
+          })
+          .eq("id", existingSubscription.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          logStep("Error converting to trial", { error: updateError.message });
+          throw new Error(`Failed to convert to trial: ${updateError.message}`);
+        }
+
+        logStep("Successfully converted PENDING to TRIAL", { subscriptionId: updatedSub.id });
+        
+        return new Response(JSON.stringify({ 
+          success: true, 
+          message: "Subscription converted to trial",
+          subscription: updatedSub
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+      
+      // Se já tem ACTIVE ou TRIAL, manter como está
       return new Response(JSON.stringify({ 
         success: true, 
         message: "User already has subscription",
