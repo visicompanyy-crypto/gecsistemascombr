@@ -15,11 +15,11 @@ const cleanImages = [cleanSystem1, cleanSystem2, cleanSystem3];
 
 export const StorySection = () => {
   return (
-    <section className="py-20 md:py-28 relative">
+    <section className="py-10 md:py-28 relative">
       <div className="max-w-[1320px] mx-auto px-6 relative z-10">
         
         {/* Opening narrative */}
-        <div className="text-center mb-16 max-w-4xl mx-auto">
+        <div className="text-center mb-8 md:mb-16 max-w-4xl mx-auto">
           <h2 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
             A Saldar nasceu da realidade de quem empreende no Brasil.
           </h2>
@@ -29,7 +29,7 @@ export const StorySection = () => {
         </div>
 
         {/* Problem description */}
-        <div className="text-center mb-12 max-w-3xl mx-auto">
+        <div className="text-center mb-6 md:mb-12 max-w-3xl mx-auto">
           <p className="text-lg md:text-xl text-gray-400 leading-relaxed">
             Durante anos, pequenas empresas, autônomos e MEIs enfrentaram dois problemas:{" "}
             <span className="text-white font-medium">planilhas confusas</span> ou{" "}
@@ -39,15 +39,15 @@ export const StorySection = () => {
         </div>
 
         {/* Polluted systems - Floating Cards */}
-        <div className="mb-12">
+        <div className="mb-6 md:mb-12">
           <FloatingCardsDisplay images={pollutedImages} variant="polluted" />
         </div>
 
         {/* Divider */}
-        <div className="w-24 h-1 bg-gradient-to-r from-[#00ff88] to-[#00ff88]/50 mx-auto mb-20 rounded-full" />
+        <div className="w-24 h-1 bg-gradient-to-r from-[#00ff88] to-[#00ff88]/50 mx-auto mb-10 md:mb-20 rounded-full" />
 
         {/* Solution introduction */}
-        <div className="text-center mb-12 max-w-4xl mx-auto">
+        <div className="text-center mb-6 md:mb-12 max-w-4xl mx-auto">
           <h3 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-[#00ff88] mb-6">
             A Saldar foi criada para mudar isso.
           </h3>
@@ -60,7 +60,7 @@ export const StorySection = () => {
         </div>
 
         {/* Value proposition */}
-        <div className="text-center mb-12 max-w-3xl mx-auto">
+        <div className="text-center mb-6 md:mb-12 max-w-3xl mx-auto">
           <p className="text-2xl md:text-3xl font-bold text-white">
             Tudo direto ao ponto, fácil de entender e acessível de verdade.
           </p>

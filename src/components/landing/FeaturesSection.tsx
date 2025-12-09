@@ -64,15 +64,15 @@ export const FeaturesSection = () => {
   ];
 
   return (
-    <section id="recursos" className="py-20 md:py-28">
+    <section id="recursos" className="py-10 md:py-28">
       <div ref={sectionRef} className="max-w-[1320px] mx-auto px-6">
-        <div className="text-center mb-16">
+        <div className="text-center mb-8 md:mb-16">
           <h2 className="font-public-sans text-3xl md:text-4xl lg:text-5xl font-bold text-white">
             O que você encontra na Saldar
           </h2>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
           {features.map((feature, index) => (
             <div
               key={index}
