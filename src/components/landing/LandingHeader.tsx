@@ -40,17 +40,17 @@ export const LandingHeader = () => {
           </button>
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 md:gap-3">
           <Button
             variant="ghost"
             onClick={() => navigate("/login")}
-            className="text-gray-300 hover:text-white hover:bg-white/10 px-5 py-2 rounded-xl font-medium transition-all"
+            className="hidden md:flex text-gray-300 hover:text-white hover:bg-white/10 px-5 py-2 rounded-xl font-medium transition-all"
           >
             Entrar
           </Button>
           <Button
             onClick={() => navigate("/signup")}
-            className="bg-landing-green hover:bg-landing-green/90 text-white px-6 py-3 rounded-xl font-bold transition-all hover:scale-105 shadow-[0_4px_15px_rgba(0,110,93,0.2)]"
+            className="bg-landing-green hover:bg-landing-green/90 text-white px-4 md:px-6 py-2 md:py-3 text-sm md:text-base rounded-xl font-bold transition-all hover:scale-105 shadow-[0_4px_15px_rgba(0,110,93,0.2)]"
           >
             Teste Grátis
           </Button>
@@ -81,6 +81,16 @@ export const LandingHeader = () => {
             >
               Preços
             </button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                navigate("/login");
+                setMobileMenuOpen(false);
+              }}
+              className="w-full border-[#00ff88]/30 text-white hover:bg-[#00ff88]/10"
+            >
+              Entrar
+            </Button>
           </nav>
         </div>
       )}
