@@ -87,7 +87,7 @@ export const LandingHeader = () => {
                 navigate("/login");
                 setMobileMenuOpen(false);
               }}
-              className="w-full border-[#00ff88]/30 text-white hover:bg-[#00ff88]/10"
+              className="w-full bg-white text-[#00ff88] border-white hover:bg-white/90 hover:text-[#00aa66] font-semibold"
             >
               Entrar
             </Button>
