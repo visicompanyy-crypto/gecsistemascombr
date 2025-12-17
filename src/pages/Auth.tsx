@@ -53,17 +53,33 @@ export default function Auth() {
       // Verificar assinatura e redirecionar
       const { data: session } = await supabase.auth.getSession();
       if (session?.session) {
-        const { data: subData } = await supabase.functions.invoke('check-subscription', {
-          headers: {
-            Authorization: `Bearer ${session.session.access_token}`,
-          },
-        });
-        
-        if (subData?.subscribed) {
+        try {
+          const { data: subData, error: subError } = await supabase.functions.invoke('check-subscription', {
+            headers: {
+              Authorization: `Bearer ${session.session.access_token}`,
+            },
+          });
+          
+          if (subError) {
+            console.error('Erro ao verificar assinatura:', subError);
+            // Em caso de erro, vai para dashboard e deixa o ProtectedRoute verificar
+            navigate("/dashboard");
+            return;
+          }
+          
+          if (subData?.subscribed) {
+            navigate("/dashboard");
+          } else {
+            navigate("/pricing");
+          }
+        } catch (checkError) {
+          console.error('Erro ao verificar assinatura:', checkError);
+          // Em caso de erro, vai para dashboard
           navigate("/dashboard");
-        } else {
-          navigate("/pricing");
         }
+      } else {
+        // Se não conseguiu obter sessão, vai para dashboard (será redirecionado se necessário)
+        navigate("/dashboard");
       }
     } catch (error: any) {
       let errorMessage = error.message;
