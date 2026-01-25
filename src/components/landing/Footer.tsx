@@ -4,8 +4,8 @@ export const Footer = () => {
   return (
     <footer className="bg-[#0a0f0b] border-t border-[#00ff88]/20 text-white py-12 relative">
       <div className="max-w-[1320px] mx-auto px-6">
-        {/* Layout em 3 colunas */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
+        {/* Layout em 2 colunas */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-center md:text-left">
           
           {/* Contato - Email */}
           <div>
@@ -19,42 +19,17 @@ export const Footer = () => {
             </a>
           </div>
 
-          {/* Telefones */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Suporte</h3>
-            <div className="space-y-3">
-              <a 
-                href="https://wa.me/5551842445505" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center md:justify-start gap-2 text-gray-400 hover:text-[#00ff88] transition-colors text-sm"
-              >
-                <Phone size={16} />
-                <span>Sistema: (51) 8424-4505</span>
-              </a>
-              <a 
-                href="https://wa.me/5551989772978" 
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center md:justify-start gap-2 text-gray-400 hover:text-[#00ff88] transition-colors text-sm"
-              >
-                <Phone size={16} />
-                <span>Assinaturas: (51) 98977-2978</span>
-              </a>
-            </div>
-          </div>
-
           {/* Redes Sociais */}
           <div className="md:text-right">
             <h3 className="text-lg font-semibold mb-4">Redes sociais</h3>
             <a 
-              href="https://www.instagram.com/saldar.o" 
+              href="https://www.instagram.com/gec.sistemas/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center md:justify-end gap-2 text-gray-400 hover:text-[#00ff88] transition-colors text-sm"
             >
               <Instagram size={16} />
-              @saldar.o
+              @gec.sistemas
             </a>
           </div>
         </div>
@@ -73,12 +48,12 @@ export const Footer = () => {
           <p className="text-xs text-gray-400">
             Criado por <span className="text-white font-medium">GEC SISTEMAS</span>
           </p>
-          <a 
-            href="https://www.instagram.com/saldar.o" 
+        <a 
+            href="https://www.instagram.com/gec.sistemas/" 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-gray-400 hover:text-[#00ff88] transition-colors"
-            aria-label="Instagram @saldar.o"
+            aria-label="Instagram @gec.sistemas"
           >
             <Instagram size={16} />
           </a>
