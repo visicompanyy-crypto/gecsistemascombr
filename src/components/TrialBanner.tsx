@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Clock, AlertTriangle, X } from "lucide-react";
+import { Clock, AlertTriangle, X, Gift } from "lucide-react";
 import { useState } from "react";
 
 export const TrialBanner = () => {
@@ -9,14 +9,45 @@ export const TrialBanner = () => {
   const navigate = useNavigate();
   const [dismissed, setDismissed] = useState(false);
 
-  // Only show for trial subscriptions
-  if (!subscription || subscription.status !== "TRIAL" || dismissed) {
+  // Only show for trial or free period subscriptions
+  if (!subscription || dismissed) {
+    return null;
+  }
+
+  const isFreePeriod = subscription.status === "FREE_PERIOD";
+  const isTrial = subscription.status === "TRIAL";
+
+  // Don't show banner for other statuses
+  if (!isFreePeriod && !isTrial) {
     return null;
   }
 
   const daysRemaining = subscription.days_until_renewal ?? 0;
 
-  // Determine urgency level and styling
+  // For free period, always show green/celebratory banner
+  if (isFreePeriod) {
+    return (
+      <div className="relative w-full py-3 px-4 border bg-gradient-to-r from-emerald-600 to-green-600 border-emerald-600 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <Gift className="h-5 w-5 text-white" />
+            <p className="text-sm font-medium text-white font-semibold drop-shadow-sm">
+              🎉 Acesso gratuito! Aproveite a Saldar sem custos por {daysRemaining} dias
+            </p>
+          </div>
+          
+          <button
+            onClick={() => setDismissed(true)}
+            className="p-1 hover:bg-white/10 rounded-full transition-colors"
+          >
+            <X className="h-4 w-4 text-white" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // For trial subscriptions (original logic)
   const getUrgencyStyles = () => {
     if (daysRemaining <= 1) {
       return {
