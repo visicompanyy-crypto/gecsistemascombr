@@ -7,7 +7,7 @@ export const PricingSection = () => {
         <div className="text-center mb-16">
           {/* Trial Badge */}
           <div className="inline-flex items-center gap-2 bg-[#00ff88]/20 border border-[#00ff88]/40 rounded-full px-6 py-2 mb-6">
-            <span className="text-[#00ff88] font-bold text-sm">🎉 5 DIAS GRÁTIS</span>
+            <span className="text-[#00ff88] font-bold text-sm">🎉 3 MESES GRÁTIS</span>
             <span className="text-gray-300 text-sm">para testar sem compromisso</span>
           </div>
           
@@ -15,7 +15,7 @@ export const PricingSection = () => {
             Mesma plataforma, três formas de pagar. Você escolhe.
           </h2>
           <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">
-            Comece com 5 dias grátis. Todos os planos incluem acesso completo ao sistema e suporte via WhatsApp.
+            Comece com 3 meses grátis. Todos os planos incluem acesso completo ao sistema e suporte via WhatsApp.
             A única diferença está em como você prefere pagar e quanto quer economizar.
           </p>
         </div>

@@ -24,7 +24,7 @@ export const FinalCTASection = () => {
         </h2>
         
         <p className="text-xl md:text-2xl text-[#0a0f0b]/90 mb-8 max-w-2xl mx-auto">
-          Comece agora com 5 dias grátis e tenha controle total das suas finanças
+          Comece agora com 3 meses grátis e tenha controle total das suas finanças
         </p>
 
         <Button

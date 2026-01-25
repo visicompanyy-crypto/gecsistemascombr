@@ -61,12 +61,12 @@ export default function WelcomeTrial() {
           
           <div className="bg-gradient-to-r from-[#3c9247]/10 to-[#2e6b38]/10 border border-[#3c9247]/20 rounded-2xl px-6 py-3 mb-4">
             <p className="text-center text-[#3c9247] font-semibold">
-              Seu período de teste de 5 dias começou agora!
+              Você tem 3 meses de acesso gratuito! 🎉
             </p>
           </div>
           
           <p className="text-center text-[#6b7280] text-sm">
-            Aproveite todos os recursos do sistema gratuitamente durante o teste.
+            Aproveite todos os recursos do sistema gratuitamente durante esse período.
           </p>
         </div>
 
@@ -105,7 +105,7 @@ export default function WelcomeTrial() {
         </Button>
 
         <p className="text-center text-[#9ca3af] text-xs mt-4">
-          Após o período de teste, escolha um plano para continuar usando.
+          Após os 3 meses gratuitos, escolha um plano para continuar usando.
         </p>
       </Card>
     </div>

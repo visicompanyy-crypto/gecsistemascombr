@@ -251,7 +251,7 @@ const Pricing = () => {
                   </div>
                   <div className="text-left">
                     <h3 className="text-xl font-bold text-white mb-1">
-                      Seu período de teste expirou!
+                      Seu período gratuito expirou!
                     </h3>
                     <p className="text-gray-300">
                       Assine agora para continuar usando o Saldar e não perder seus dados.
@@ -276,7 +276,7 @@ const Pricing = () => {
               if (isTrialActive && daysRemaining !== undefined && daysRemaining <= 0) return null;
               
               // Determine badge content based on trial status
-              let badgeText = "5 DIAS GRÁTIS PARA TESTAR";
+              let badgeText = "3 MESES GRÁTIS PARA TESTAR";
               let badgeColor = "#00ff88";
               let bgColor = "bg-[#00ff88]/20";
               let borderColor = "border-[#00ff88]/50";
@@ -287,19 +287,19 @@ const Pricing = () => {
                 IconComponent = Clock;
                 
                 if (daysRemaining === 1) {
-                  badgeText = "ÚLTIMO DIA DE TESTE!";
+                  badgeText = "ÚLTIMO DIA DE ACESSO GRATUITO!";
                   badgeColor = "#ff0055";
                   bgColor = "bg-[#ff0055]/20";
                   borderColor = "border-[#ff0055]/50";
                   isPulsing = true;
-                } else if (daysRemaining <= 3) {
+                } else if (daysRemaining <= 7) {
                   badgeText = `${daysRemaining} DIAS GRÁTIS RESTANTES`;
                   badgeColor = "#ffd700";
                   bgColor = "bg-[#ffd700]/20";
                   borderColor = "border-[#ffd700]/50";
                 } else {
                   badgeText = `${daysRemaining} DIAS GRÁTIS RESTANTES`;
-                  // Keep green color for 4-5 days
+                  // Keep green color for more than 7 days
                 }
               }
               
