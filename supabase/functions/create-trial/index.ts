@@ -50,7 +50,7 @@ serve(async (req) => {
       // Se a subscription existente for PENDING, converter para TRIAL
       if (existingSubscription.status === "PENDING") {
         const trialEndDate = new Date();
-        trialEndDate.setDate(trialEndDate.getDate() + 5);
+        trialEndDate.setDate(trialEndDate.getDate() + 90); // 3 meses grátis
         const formattedEndDate = trialEndDate.toISOString().split('T')[0];
         
         logStep("Converting PENDING subscription to TRIAL", { 
@@ -63,7 +63,7 @@ serve(async (req) => {
           .update({
             status: "TRIAL",
             plan_id: "trial",
-            plan_name: "Período de Teste",
+            plan_name: "Período Gratuito (3 meses)",
             billing_cycle: "TRIAL",
             value: 0,
             next_due_date: formattedEndDate,
@@ -100,9 +100,9 @@ serve(async (req) => {
       });
     }
 
-    // Calculate trial end date (5 days from now)
+    // Calculate trial end date (90 days / 3 months from now)
     const trialEndDate = new Date();
-    trialEndDate.setDate(trialEndDate.getDate() + 5);
+    trialEndDate.setDate(trialEndDate.getDate() + 90);
     const formattedEndDate = trialEndDate.toISOString().split('T')[0];
 
     logStep("Creating trial subscription", { 
@@ -117,7 +117,7 @@ serve(async (req) => {
         user_id: user.id,
         status: "TRIAL",
         plan_id: "trial",
-        plan_name: "Período de Teste",
+        plan_name: "Período Gratuito (3 meses)",
         billing_cycle: "TRIAL",
         value: 0,
         next_due_date: formattedEndDate,

@@ -415,7 +415,7 @@ export default function Signup() {
 
       toast({
         title: "Bem-vindo ao Saldar!",
-        description: "Seu período de teste de 5 dias começou. Aproveite!",
+        description: "Você tem 3 meses de acesso gratuito. Aproveite!",
       });
 
       // Redirect to welcome trial page for first-time users
