@@ -35,9 +35,6 @@ const calculateDaysUntil = (dateStr: string | null): number | null => {
   return diffDays;
 };
 
-// Data limite do período de gratuidade (3 meses a partir de 25/01/2025)
-const FREE_ACCESS_UNTIL = "2025-04-25";
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -63,29 +60,6 @@ serve(async (req) => {
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
-
-    // Check if we're in the free access period (3 months free promotion)
-    const today = new Date();
-    const freeAccessEndDate = new Date(FREE_ACCESS_UNTIL + "T23:59:59");
-    
-    if (today < freeAccessEndDate) {
-      const daysUntilEnd = calculateDaysUntil(FREE_ACCESS_UNTIL);
-      logStep("Free access period active - granting access", { 
-        until: FREE_ACCESS_UNTIL,
-        daysRemaining: daysUntilEnd,
-        email: user.email 
-      });
-      return new Response(JSON.stringify({ 
-        subscribed: true, 
-        status: "FREE_PERIOD",
-        product_id: "free_period",
-        subscription_end: FREE_ACCESS_UNTIL,
-        days_until_renewal: daysUntilEnd
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
-    }
 
     // Check if email is whitelisted
     if (WHITELISTED_EMAILS.includes(user.email.toLowerCase())) {

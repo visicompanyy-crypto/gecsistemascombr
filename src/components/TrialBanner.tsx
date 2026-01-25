@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Clock, AlertTriangle, X, Gift } from "lucide-react";
+import { Clock, AlertTriangle, X } from "lucide-react";
 import { useState } from "react";
 
 export const TrialBanner = () => {
@@ -14,40 +14,16 @@ export const TrialBanner = () => {
     return null;
   }
 
-  const isFreePeriod = subscription.status === "FREE_PERIOD";
   const isTrial = subscription.status === "TRIAL";
 
   // Don't show banner for other statuses
-  if (!isFreePeriod && !isTrial) {
+  if (!isTrial) {
     return null;
   }
 
   const daysRemaining = subscription.days_until_renewal ?? 0;
 
-  // For free period, always show green/celebratory banner
-  if (isFreePeriod) {
-    return (
-      <div className="relative w-full py-3 px-4 border bg-gradient-to-r from-emerald-600 to-green-600 border-emerald-600 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-3">
-            <Gift className="h-5 w-5 text-white" />
-            <p className="text-sm font-medium text-white font-semibold drop-shadow-sm">
-              🎉 Acesso gratuito! Aproveite a Saldar sem custos por {daysRemaining} dias
-            </p>
-          </div>
-          
-          <button
-            onClick={() => setDismissed(true)}
-            className="p-1 hover:bg-white/10 rounded-full transition-colors"
-          >
-            <X className="h-4 w-4 text-white" />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // For trial subscriptions (original logic)
+  // For trial/free period subscriptions
   const getUrgencyStyles = () => {
     if (daysRemaining <= 1) {
       return {
@@ -80,13 +56,13 @@ export const TrialBanner = () => {
 
   const getMessage = () => {
     if (daysRemaining <= 0) {
-      return "Seu período de teste expirou! Assine agora para continuar usando.";
+      return "Seu período gratuito expirou! Assine agora para continuar usando.";
     } else if (daysRemaining === 1) {
       return "⚠️ ÚLTIMO DIA! Assine agora para não perder acesso ao sistema.";
-    } else if (daysRemaining <= 3) {
-      return `Seu teste está acabando! ${daysRemaining} dias restantes - Assine agora!`;
+    } else if (daysRemaining <= 7) {
+      return `Seu acesso gratuito está acabando! ${daysRemaining} dias restantes - Assine agora!`;
     } else {
-      return `Período de teste: ${daysRemaining} dias restantes`;
+      return `🎉 Acesso gratuito: ${daysRemaining} dias restantes`;
     }
   };
 
