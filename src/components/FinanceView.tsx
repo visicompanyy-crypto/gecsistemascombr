@@ -301,8 +301,6 @@ export function FinanceView() {
             <Skeleton className="h-10 w-40 rounded-lg" />
             <Skeleton className="h-10 w-48 rounded-lg" />
           </div>
-          {/* Column Bar Skeleton */}
-          <Skeleton className="h-12 w-full rounded-lg" />
           {/* Table Skeleton */}
           <Skeleton className="h-96 w-full rounded-2xl" />
         </div>
@@ -380,12 +378,13 @@ export function FinanceView() {
           </div>
         </div>
 
-        {/* Custom Columns Bar */}
+        {/* Custom Columns Bar - Temporariamente oculto
         <CustomColumnBar
           selectedColumnId={selectedColumnId}
           onSelectColumn={setSelectedColumnId}
           onManageColumns={() => setCustomColumnManagerOpen(true)}
         />
+        */}
 
         <Card className="p-8 space-y-6 rounded-2xl shadow-[0_5px_20px_rgba(0,0,0,0.06)] border-border">
           <div>
