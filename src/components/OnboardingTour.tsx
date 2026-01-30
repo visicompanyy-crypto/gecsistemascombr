@@ -16,6 +16,12 @@ const steps: Step[] = [
     spotlightPadding: 8,
   },
   {
+    target: '[data-tour="custom-columns"]',
+    content: 'As colunas permitem organizar gastos específicos por cliente ou projeto. Por exemplo, se você está construindo um prédio, pode criar uma coluna para cada apartamento ou andar da obra, controlando exatamente quanto gastou em cada unidade.',
+    placement: 'bottom',
+    spotlightPadding: 8,
+  },
+  {
     target: '[data-tour="month-selector"]',
     content: 'Navegue entre os meses para ver o histórico ou planejar o futuro. Você pode lançar despesas e receitas com vencimento em qualquer mês.',
     placement: 'bottom',
