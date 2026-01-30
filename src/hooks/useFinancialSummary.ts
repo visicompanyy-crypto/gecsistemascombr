@@ -74,10 +74,9 @@ export function useFinancialSummary(
       0
     );
 
-    // 2️⃣ RECEITAS FUTURAS - Data maior que último dia do mês selecionado
+    // 2️⃣ RECEITAS FUTURAS - Receitas não pagas (pendentes), independente da data
     const listaReceitasFuturas = validTransactions.filter(t => {
-      const dataTransacao = new Date(t.transaction_date);
-      return t.transaction_type === 'receita' && dataTransacao > ultimoDiaDoMes;
+      return t.transaction_type === 'receita' && t.status !== 'pago';
     });
     const receitasFuturas = listaReceitasFuturas.reduce(
       (sum, t) => sum + Number(t.amount), 
@@ -94,10 +93,11 @@ export function useFinancialSummary(
       0
     );
 
-    // 4️⃣ RECEITA DO MÊS - Receitas do mês selecionado (independente de status)
+    // 4️⃣ RECEITA DO MÊS - Apenas receitas PAGAS do mês selecionado
     const listaReceitasDoMes = validTransactions.filter(t => {
       const dataTransacao = new Date(t.transaction_date);
       return t.transaction_type === 'receita' && 
+             t.status === 'pago' &&
              dataTransacao >= primeiroDiaDoMes && 
              dataTransacao <= ultimoDiaDoMes;
     });

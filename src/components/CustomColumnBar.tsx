@@ -28,7 +28,7 @@ export function CustomColumnBar({
   const totalCostCenters = costCenters?.length ?? 0;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" data-tour="custom-columns">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium text-muted-foreground">Colunas</h3>
         <Button
