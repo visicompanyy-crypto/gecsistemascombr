@@ -1,87 +1,131 @@
 
-## Plano: Ajustes no Onboarding e Lógica Financeira do Saldar
 
-### Resumo das Alterações Solicitadas
+## Plano: Otimizar Performance e Corrigir Travamentos
 
-1. **Corrigir tour que aparece toda vez** - Identificar e corrigir a causa
-2. **Editar conteúdo do tour sobre colunas** - Explicar o uso para gastos específicos por cliente
-3. **Ajustar lógica de receitas** - Lançamentos devem ir para "receita futura" e só contabilizar como "receita do mês" quando marcados como pagos
+### Diagnóstico
 
----
+Após análise do código, identifiquei os seguintes problemas que podem causar lentidão e travamento:
 
-## 1. Diagnóstico: Tour Aparecendo Toda Vez
-
-**Causa provável identificada:**
-O código já verifica `localStorage.getItem('hasSeenOnboardingTour')` na linha 71-72. Se o tour continua aparecendo, pode ser:
-- O localStorage está sendo limpo ao fazer logout/login
-- O modal `FirstAccessModal` está resetando o estado
-
-**Solução:**
-Verificar se o `FirstAccessModal` precisa ser fechado corretamente e se o `onboarding_completed` do banco está sincronizado com o localStorage do tour.
+1. **Múltiplas queries executando simultaneamente** - O `FinanceView.tsx` dispara várias queries ao mesmo tempo (transactions, teamToolExpenses, costCenters, columns) sem controle adequado de cache
+2. **Recálculos excessivos no `useFinancialSummary`** - O hook recalcula todos os dados a cada mudança, mesmo quando não necessário
+3. **Queries duplicadas** - O hook `useCustomColumns` é chamado em múltiplos componentes, causando requisições duplicadas
+4. **Falta de debounce nos filtros** - Cada digitação no campo de busca causa re-renderização completa
+5. **Ausência de paginação na tabela** - Carrega todas as transações de uma vez
 
 ---
 
-## 2. Editar Conteúdo do Tour - Arquivo: `src/components/OnboardingTour.tsx`
+## Alterações Propostas
 
-Adicionar um novo step após o step de "Novo Lançamento" explicando as colunas personalizadas:
+### 1. Otimizar Cache das Queries
+
+**Arquivo:** `src/components/FinanceView.tsx`
+
+- Adicionar `staleTime` e `gcTime` nas queries para evitar refetch desnecessário
+- Usar `placeholderData` para manter dados anteriores enquanto carrega
 
 ```typescript
-// Novo step a ser adicionado (após o step do new-transaction)
-{
-  target: '[data-tour="custom-columns"]', // Precisamos adicionar esse data-tour no CustomColumnBar
-  content: 'As colunas permitem organizar gastos específicos por cliente ou projeto. Por exemplo, se você está construindo um prédio, pode criar uma coluna para cada apartamento ou andar da obra, controlando exatamente quanto gastou em cada unidade.',
-  placement: 'bottom',
-  spotlightPadding: 8,
-},
-```
-
-**Também alterar:** `src/components/CustomColumnBar.tsx` para adicionar `data-tour="custom-columns"` no container principal.
-
----
-
-## 3. Ajustar Lógica de Receitas - Arquivo: `src/hooks/useFinancialSummary.ts`
-
-### Lógica Atual:
-- **Receita do Mês**: Todas as receitas com `transaction_date` dentro do mês (independente de status)
-- **Receita Futura**: Receitas com `transaction_date` maior que o último dia do mês
-
-### Nova Lógica Desejada:
-- **Receita do Mês**: Apenas receitas com `status === 'pago'` E `transaction_date` dentro do mês
-- **Receita Futura**: Receitas com `status !== 'pago'` (pendentes), independente da data
-
-**Alterações no cálculo:**
-
-```typescript
-// ANTES - linha 97-107:
-const listaReceitasDoMes = validTransactions.filter(t => {
-  const dataTransacao = new Date(t.transaction_date);
-  return t.transaction_type === 'receita' && 
-         dataTransacao >= primeiroDiaDoMes && 
-         dataTransacao <= ultimoDiaDoMes;
-});
-
-// DEPOIS:
-const listaReceitasDoMes = validTransactions.filter(t => {
-  const dataTransacao = new Date(t.transaction_date);
-  return t.transaction_type === 'receita' && 
-         t.status === 'pago' &&  // <-- NOVA CONDIÇÃO
-         dataTransacao >= primeiroDiaDoMes && 
-         dataTransacao <= ultimoDiaDoMes;
+const { data: transactions, refetch: refetchTransactions } = useQuery({
+  queryKey: ['financial-transactions', user?.id],
+  queryFn: async () => { ... },
+  enabled: !!user?.id,
+  staleTime: 2 * 60 * 1000, // 2 minutos
+  gcTime: 5 * 60 * 1000,    // 5 minutos
+  placeholderData: (previousData) => previousData, // Manter dados anteriores
 });
 ```
 
-```typescript
-// ANTES - linha 77-85:
-const listaReceitasFuturas = validTransactions.filter(t => {
-  const dataTransacao = new Date(t.transaction_date);
-  return t.transaction_type === 'receita' && dataTransacao > ultimoDiaDoMes;
-});
+### 2. Adicionar Debounce no Campo de Busca
 
-// DEPOIS:
-const listaReceitasFuturas = validTransactions.filter(t => {
-  return t.transaction_type === 'receita' && t.status !== 'pago';
-  // Receitas não pagas são futuras, independente da data
+**Arquivo:** `src/components/FinanceView.tsx`
+
+- Criar um estado separado para o termo de busca com debounce
+- Evitar re-renderizações a cada caractere digitado
+
+```typescript
+// Novo estado com debounce
+const [inputSearchTerm, setInputSearchTerm] = useState("");
+const debouncedSearchTerm = useDebouncedValue(inputSearchTerm, 300);
+
+// Usar o valor com debounce nos filtros
+const filteredTransactions = transactionsDoMes?.filter(transaction => {
+  const matchesSearch = transaction.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
+  // ...
 });
+```
+
+**Novo arquivo:** `src/hooks/useDebouncedValue.ts`
+
+```typescript
+import { useState, useEffect } from 'react';
+
+export function useDebouncedValue<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+```
+
+### 3. Otimizar useFinancialSummary com useMemo Granular
+
+**Arquivo:** `src/hooks/useFinancialSummary.ts`
+
+- Separar cálculos em múltiplos `useMemo` menores para evitar recalcular tudo
+- Adicionar verificação de igualdade para evitar recálculos desnecessários
+
+### 4. Adicionar Loading State Visual
+
+**Arquivo:** `src/components/FinanceView.tsx`
+
+- Mostrar skeleton/loading enquanto carrega dados
+- Evitar tela em branco que parece travamento
+
+```typescript
+if (isLoadingTransactions || isLoadingExpenses) {
+  return (
+    <div className="min-h-screen bg-background">
+      <Header ... />
+      <div className="max-w-[1320px] mx-auto px-6 py-8 space-y-8 mt-8">
+        {/* Skeleton loading */}
+        <div className="grid gap-4 md:grid-cols-4">
+          {[1,2,3,4].map(i => (
+            <Skeleton key={i} className="h-32 rounded-xl" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+```
+
+### 5. Limitar Transações Exibidas na Tabela
+
+**Arquivo:** `src/components/FinanceView.tsx`
+
+- Implementar paginação virtual ou "load more" para tabelas grandes
+- Inicialmente mostrar apenas 50 transações
+
+```typescript
+const [displayLimit, setDisplayLimit] = useState(50);
+
+const displayedTransactions = sortedTransactions.slice(0, displayLimit);
+
+// Botão "Carregar mais" se houver mais transações
+{sortedTransactions.length > displayLimit && (
+  <Button 
+    variant="outline" 
+    onClick={() => setDisplayLimit(prev => prev + 50)}
+  >
+    Carregar mais ({sortedTransactions.length - displayLimit} restantes)
+  </Button>
+)}
 ```
 
 ---
@@ -90,15 +134,16 @@ const listaReceitasFuturas = validTransactions.filter(t => {
 
 | Arquivo | Alteração |
 |---------|-----------|
-| `src/components/OnboardingTour.tsx` | Adicionar novo step sobre colunas com exemplo de construção |
-| `src/components/CustomColumnBar.tsx` | Adicionar `data-tour="custom-columns"` |
-| `src/hooks/useFinancialSummary.ts` | Ajustar lógica de receitas (só conta quando pago) |
+| `src/hooks/useDebouncedValue.ts` | **NOVO** - Hook de debounce |
+| `src/components/FinanceView.tsx` | Otimizar queries, adicionar debounce, skeleton loading, paginação |
+| `src/hooks/useFinancialSummary.ts` | Otimizar useMemo |
 
 ---
 
 ## Resultado Esperado
 
-- O tour explicará claramente que as colunas são para organizar gastos por cliente/projeto (exemplo: apartamentos em uma obra)
-- Receitas lançadas irão para "Receitas Futuras" até serem marcadas como pagas
-- Ao marcar como pago, a receita move para "Receita do Mês" automaticamente
-- O tour só aparecerá uma vez para cada usuário
+- Menos requisições ao banco de dados
+- Interface mais responsiva durante digitação
+- Feedback visual durante carregamento (sem parecer travado)
+- Melhor performance com muitas transações
+
