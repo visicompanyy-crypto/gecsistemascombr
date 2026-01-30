@@ -27,73 +27,87 @@ export interface TeamToolExpense {
   entity_name: string;
 }
 
+// Empty state object - extracted to avoid recreating on each render
+const EMPTY_STATE = {
+  resultadoDoMes: 0,
+  receitaTotalRecebida: 0,
+  receitasFuturas: 0,
+  despesasFuturas: 0,
+  receitasDoMes: 0,
+  totalAPagarNoMes: 0,
+  transactionsByCategory: {},
+  transactionsByCategoryDoMes: {},
+  receitaTotalRecebidaDoMes: 0,
+  listaReceitaTotalRecebidaDoMes: [] as Transaction[],
+  transactionsByMonth: [] as { month: string; receitas: number; despesas: number }[],
+  listaReceitaTotalRecebida: [] as Transaction[],
+  listaReceitasFuturas: [] as Transaction[],
+  listaDespesasFuturas: [] as Transaction[],
+  listaReceitasDoMes: [] as Transaction[],
+  listaDespesasDoMes: [] as Transaction[],
+};
+
 export function useFinancialSummary(
   transactions: Transaction[] | undefined,
   teamToolExpenses: TeamToolExpense[] | undefined,
   currentMonth: Date
 ) {
-  return useMemo(() => {
-    if (!transactions || transactions.length === 0) {
-      return {
-        resultadoDoMes: 0,
-        receitaTotalRecebida: 0,
-        receitasFuturas: 0,
-        despesasFuturas: 0,
-        receitasDoMes: 0,
-        totalAPagarNoMes: 0,
-        transactionsByCategory: {},
-        transactionsByCategoryDoMes: {},
-        receitaTotalRecebidaDoMes: 0,
-        listaReceitaTotalRecebidaDoMes: [],
-        transactionsByMonth: [],
-        // Listas detalhadas para os modais
-        listaReceitaTotalRecebida: [],
-        listaReceitasFuturas: [],
-        listaDespesasFuturas: [],
-        listaReceitasDoMes: [],
-        listaDespesasDoMes: [],
-      };
-    }
+  // Memoize date boundaries separately - they only change when month changes
+  const { primeiroDiaDoMes, ultimoDiaDoMes } = useMemo(() => ({
+    primeiroDiaDoMes: startOfMonth(currentMonth),
+    ultimoDiaDoMes: endOfMonth(currentMonth),
+  }), [currentMonth]);
 
-    // Usar currentMonth passado como parâmetro
-    const primeiroDiaDoMes = startOfMonth(currentMonth);
-    const ultimoDiaDoMes = endOfMonth(currentMonth);
-
-    // Filtrar apenas transações válidas (evitar duplicação de "pais fictícios")
-    const validTransactions = transactions.filter(t => 
+  // Memoize valid transactions filter - only recalculates when transactions change
+  const validTransactions = useMemo(() => {
+    if (!transactions || transactions.length === 0) return [];
+    return transactions.filter(t => 
       t.is_installment === true || 
       (t.is_installment === false && (t.total_installments === null || t.total_installments === 1))
     );
+  }, [transactions]);
 
-    // 1️⃣ RECEITA TOTAL RECEBIDA - Todas as receitas com status "pago" (histórico completo)
+  // Memoize team tool expenses for the month
+  const teamToolExpensesDoMes = useMemo(() => {
+    if (!teamToolExpenses || teamToolExpenses.length === 0) return [];
+    return teamToolExpenses.filter(e => {
+      const dataExpense = new Date(e.expense_date);
+      return dataExpense >= primeiroDiaDoMes && dataExpense <= ultimoDiaDoMes;
+    });
+  }, [teamToolExpenses, primeiroDiaDoMes, ultimoDiaDoMes]);
+
+  // Calculate all revenue-related metrics
+  const revenueMetrics = useMemo(() => {
+    if (validTransactions.length === 0) {
+      return {
+        listaReceitaTotalRecebida: [],
+        receitaTotalRecebida: 0,
+        listaReceitasFuturas: [],
+        receitasFuturas: 0,
+        listaReceitasDoMes: [],
+        receitasDoMes: 0,
+        listaReceitaTotalRecebidaDoMes: [],
+        receitaTotalRecebidaDoMes: 0,
+      };
+    }
+
+    // All paid revenues (complete history)
     const listaReceitaTotalRecebida = validTransactions.filter(
       t => t.transaction_type === 'receita' && t.status === 'pago'
     );
     const receitaTotalRecebida = listaReceitaTotalRecebida.reduce(
-      (sum, t) => sum + Number(t.amount), 
-      0
+      (sum, t) => sum + Number(t.amount), 0
     );
 
-    // 2️⃣ RECEITAS FUTURAS - Receitas não pagas (pendentes), independente da data
-    const listaReceitasFuturas = validTransactions.filter(t => {
-      return t.transaction_type === 'receita' && t.status !== 'pago';
-    });
+    // Future revenues - unpaid, regardless of date
+    const listaReceitasFuturas = validTransactions.filter(
+      t => t.transaction_type === 'receita' && t.status !== 'pago'
+    );
     const receitasFuturas = listaReceitasFuturas.reduce(
-      (sum, t) => sum + Number(t.amount), 
-      0
+      (sum, t) => sum + Number(t.amount), 0
     );
 
-    // 3️⃣ DESPESAS FUTURAS - Data maior que último dia do mês selecionado
-    const listaDespesasFuturas = validTransactions.filter(t => {
-      const dataTransacao = new Date(t.transaction_date);
-      return t.transaction_type === 'despesa' && dataTransacao > ultimoDiaDoMes;
-    });
-    const despesasFuturas = listaDespesasFuturas.reduce(
-      (sum, t) => sum + Number(t.amount), 
-      0
-    );
-
-    // 4️⃣ RECEITA DO MÊS - Apenas receitas PAGAS do mês selecionado
+    // Monthly revenues - paid in selected month
     const listaReceitasDoMes = validTransactions.filter(t => {
       const dataTransacao = new Date(t.transaction_date);
       return t.transaction_type === 'receita' && 
@@ -102,37 +116,77 @@ export function useFinancialSummary(
              dataTransacao <= ultimoDiaDoMes;
     });
     const receitasDoMes = listaReceitasDoMes.reduce(
-      (sum, t) => sum + Number(t.amount), 
-      0
+      (sum, t) => sum + Number(t.amount), 0
     );
 
-    // 5️⃣ TOTAL A PAGAR NO MÊS - Despesas + team_tool_expenses do mês selecionado
+    return {
+      listaReceitaTotalRecebida,
+      receitaTotalRecebida,
+      listaReceitasFuturas,
+      receitasFuturas,
+      listaReceitasDoMes,
+      receitasDoMes,
+      listaReceitaTotalRecebidaDoMes: listaReceitasDoMes,
+      receitaTotalRecebidaDoMes: receitasDoMes,
+    };
+  }, [validTransactions, primeiroDiaDoMes, ultimoDiaDoMes]);
+
+  // Calculate all expense-related metrics
+  const expenseMetrics = useMemo(() => {
+    if (validTransactions.length === 0) {
+      return {
+        listaDespesasFuturas: [],
+        despesasFuturas: 0,
+        listaDespesasDoMes: [],
+        totalAPagarNoMes: 0,
+      };
+    }
+
+    // Future expenses
+    const listaDespesasFuturas = validTransactions.filter(t => {
+      const dataTransacao = new Date(t.transaction_date);
+      return t.transaction_type === 'despesa' && dataTransacao > ultimoDiaDoMes;
+    });
+    const despesasFuturas = listaDespesasFuturas.reduce(
+      (sum, t) => sum + Number(t.amount), 0
+    );
+
+    // Monthly expenses
     const listaDespesasDoMes = validTransactions.filter(t => {
       const dataTransacao = new Date(t.transaction_date);
       return t.transaction_type === 'despesa' && 
              dataTransacao >= primeiroDiaDoMes && 
              dataTransacao <= ultimoDiaDoMes;
     });
-    
     const despesasTransacoesDoMes = listaDespesasDoMes.reduce(
-      (sum, t) => sum + Number(t.amount), 
-      0
+      (sum, t) => sum + Number(t.amount), 0
     );
 
-    const despesasEquipeFerramentasDoMes = (teamToolExpenses || [])
-      .filter(e => {
-        const dataExpense = new Date(e.expense_date);
-        return dataExpense >= primeiroDiaDoMes && dataExpense <= ultimoDiaDoMes;
-      })
-      .reduce((sum, e) => sum + Number(e.amount), 0);
+    const despesasEquipeFerramentasDoMes = teamToolExpensesDoMes.reduce(
+      (sum, e) => sum + Number(e.amount), 0
+    );
 
     const totalAPagarNoMes = despesasTransacoesDoMes + despesasEquipeFerramentasDoMes;
 
-    // 💰 RESULTADO DO MÊS - Apenas receitas e despesas do mês atual (sem projeções futuras)
-    const resultadoDoMes = receitasDoMes - totalAPagarNoMes;
+    return {
+      listaDespesasFuturas,
+      despesasFuturas,
+      listaDespesasDoMes,
+      totalAPagarNoMes,
+    };
+  }, [validTransactions, primeiroDiaDoMes, ultimoDiaDoMes, teamToolExpensesDoMes]);
 
-    // Agrupar por centro de custo (histórico completo)
-    const transactionsByCategory = validTransactions.reduce((acc: any, t) => {
+  // Calculate category groupings
+  const categoryMetrics = useMemo(() => {
+    if (validTransactions.length === 0) {
+      return {
+        transactionsByCategory: {},
+        transactionsByCategoryDoMes: {},
+      };
+    }
+
+    // Complete history by cost center
+    const transactionsByCategory = validTransactions.reduce((acc: Record<string, { receitas: number; despesas: number }>, t) => {
       const costCenterName = t.cost_centers?.name || 'Sem centro de custo';
       if (!acc[costCenterName]) {
         acc[costCenterName] = { receitas: 0, despesas: 0 };
@@ -145,7 +199,7 @@ export function useFinancialSummary(
       return acc;
     }, {});
 
-    // 🆕 Agrupar por centro de custo APENAS do mês selecionado (para gráficos dinâmicos)
+    // Monthly by cost center (for dynamic charts)
     const transactionsByCategoryDoMes = validTransactions
       .filter(t => {
         const dataTransacao = new Date(t.transaction_date);
@@ -153,7 +207,7 @@ export function useFinancialSummary(
                dataTransacao <= ultimoDiaDoMes &&
                t.status === 'pago';
       })
-      .reduce((acc: any, t) => {
+      .reduce((acc: Record<string, { receitas: number; despesas: number }>, t) => {
         const costCenterName = t.cost_centers?.name || 'Sem centro de custo';
         if (!acc[costCenterName]) {
           acc[costCenterName] = { receitas: 0, despesas: 0 };
@@ -166,21 +220,14 @@ export function useFinancialSummary(
         return acc;
       }, {});
 
-    // 🆕 Receita total recebida do mês selecionado (apenas pagas no mês)
-    const listaReceitaTotalRecebidaDoMes = validTransactions.filter(t => {
-      const dataTransacao = new Date(t.transaction_date);
-      return t.transaction_type === 'receita' && 
-             t.status === 'pago' &&
-             dataTransacao >= primeiroDiaDoMes && 
-             dataTransacao <= ultimoDiaDoMes;
-    });
-    const receitaTotalRecebidaDoMes = listaReceitaTotalRecebidaDoMes.reduce(
-      (sum, t) => sum + Number(t.amount), 
-      0
-    );
+    return { transactionsByCategory, transactionsByCategoryDoMes };
+  }, [validTransactions, primeiroDiaDoMes, ultimoDiaDoMes]);
 
-    // Agrupar por mês
-    const transactionsByMonth = validTransactions.reduce((acc: any[], t) => {
+  // Calculate monthly groupings
+  const transactionsByMonth = useMemo(() => {
+    if (validTransactions.length === 0) return [];
+
+    const monthlyData = validTransactions.reduce((acc: { month: string; receitas: number; despesas: number }[], t) => {
       const date = new Date(t.transaction_date);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       
@@ -199,27 +246,33 @@ export function useFinancialSummary(
       return acc;
     }, []);
 
-    transactionsByMonth.sort((a, b) => a.month.localeCompare(b.month));
+    return monthlyData.sort((a, b) => a.month.localeCompare(b.month));
+  }, [validTransactions]);
 
-    return {
-      resultadoDoMes,
-      receitaTotalRecebida,
-      receitasFuturas,
-      despesasFuturas,
-      receitasDoMes,
-      totalAPagarNoMes,
-      transactionsByCategory,
-      transactionsByMonth,
-      // 🆕 Dados filtrados por mês para gráficos dinâmicos
-      transactionsByCategoryDoMes,
-      receitaTotalRecebidaDoMes,
-      listaReceitaTotalRecebidaDoMes,
-      // Listas detalhadas para os modais
-      listaReceitaTotalRecebida,
-      listaReceitasFuturas,
-      listaDespesasFuturas,
-      listaReceitasDoMes,
-      listaDespesasDoMes,
-    };
-  }, [transactions, teamToolExpenses, currentMonth]);
+  // Return early if no transactions
+  if (!transactions || transactions.length === 0) {
+    return EMPTY_STATE;
+  }
+
+  // Calculate final result
+  const resultadoDoMes = revenueMetrics.receitasDoMes - expenseMetrics.totalAPagarNoMes;
+
+  return {
+    resultadoDoMes,
+    receitaTotalRecebida: revenueMetrics.receitaTotalRecebida,
+    receitasFuturas: revenueMetrics.receitasFuturas,
+    despesasFuturas: expenseMetrics.despesasFuturas,
+    receitasDoMes: revenueMetrics.receitasDoMes,
+    totalAPagarNoMes: expenseMetrics.totalAPagarNoMes,
+    transactionsByCategory: categoryMetrics.transactionsByCategory,
+    transactionsByMonth,
+    transactionsByCategoryDoMes: categoryMetrics.transactionsByCategoryDoMes,
+    receitaTotalRecebidaDoMes: revenueMetrics.receitaTotalRecebidaDoMes,
+    listaReceitaTotalRecebidaDoMes: revenueMetrics.listaReceitaTotalRecebidaDoMes,
+    listaReceitaTotalRecebida: revenueMetrics.listaReceitaTotalRecebida,
+    listaReceitasFuturas: revenueMetrics.listaReceitasFuturas,
+    listaDespesasFuturas: expenseMetrics.listaDespesasFuturas,
+    listaReceitasDoMes: revenueMetrics.listaReceitasDoMes,
+    listaDespesasDoMes: expenseMetrics.listaDespesasDoMes,
+  };
 }

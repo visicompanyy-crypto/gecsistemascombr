@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { format, parseISO, isPast, isToday, startOfDay } from "date-fns";
+import { format, parseISO, startOfDay } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,8 @@ import { CustomColumnBar } from "./CustomColumnBar";
 import { CustomColumnManagerModal } from "./CustomColumnManagerModal";
 import { useCustomColumns } from "@/hooks/useCustomColumns";
 import { TrialBanner } from "./TrialBanner";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function FinanceView() {
   const { toast } = useToast();
@@ -42,13 +44,15 @@ export function FinanceView() {
   const [clientManagerOpen, setClientManagerOpen] = useState(false);
   const [customColumnManagerOpen, setCustomColumnManagerOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [inputSearchTerm, setInputSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebouncedValue(inputSearchTerm, 300);
   const [typeFilter, setTypeFilter] = useState("all");
   const [paymentMethodFilter, setPaymentMethodFilter] = useState("all");
   const [costCenterFilter, setCostCenterFilter] = useState("all");
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [canStartTour, setCanStartTour] = useState(false);
   const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
+  const [displayLimit, setDisplayLimit] = useState(50);
 
   // Custom columns hook
   const { getCostCentersForColumn, costCenters } = useCustomColumns();
@@ -82,7 +86,7 @@ export function FinanceView() {
 
   const { user } = useAuth();
 
-  const { data: transactions, refetch: refetchTransactions } = useQuery({
+  const { data: transactions, refetch: refetchTransactions, isLoading: isLoadingTransactions } = useQuery({
     queryKey: ['financial-transactions', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -101,9 +105,12 @@ export function FinanceView() {
       return data;
     },
     enabled: !!user?.id,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    placeholderData: (previousData) => previousData,
   });
 
-  const { data: teamToolExpenses, refetch: refetchTeamToolExpenses } = useQuery({
+  const { data: teamToolExpenses, refetch: refetchTeamToolExpenses, isLoading: isLoadingExpenses } = useQuery({
     queryKey: ['team-tool-expenses', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -116,6 +123,9 @@ export function FinanceView() {
       return data;
     },
     enabled: !!user?.id,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    placeholderData: (previousData) => previousData,
   });
 
 
@@ -218,7 +228,7 @@ export function FinanceView() {
   };
 
   const filteredTransactions = transactionsDoMes?.filter(transaction => {
-    const matchesSearch = transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = transaction.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
     const matchesType = typeFilter === "all" || transaction.transaction_type === typeFilter;
     const matchesPaymentMethod = paymentMethodFilter === "all" || transaction.payment_method === paymentMethodFilter;
     const matchesCostCenter = costCenterFilter === "all" || transaction.cost_center_id === costCenterFilter;
@@ -253,7 +263,7 @@ export function FinanceView() {
   }, [filteredTransactions]);
 
   const handleClearFilters = () => {
-    setSearchTerm("");
+    setInputSearchTerm("");
     setTypeFilter("all");
     setPaymentMethodFilter("all");
     setCostCenterFilter("all");
@@ -266,6 +276,43 @@ export function FinanceView() {
     // Allow tour to start after onboarding is complete
     setCanStartTour(true);
   };
+
+  // Show skeleton loading while initial data loads
+  if (isLoadingTransactions || isLoadingExpenses) {
+    return (
+      <div className="min-h-screen bg-background">
+        <TrialBanner />
+        <Header 
+          currentMonth={currentMonth} 
+          onOpenCompanySettings={() => setFirstAccessModalOpen(true)}
+          onOpenCostCenterManager={() => setCostCenterManagerOpen(true)}
+          onNewTransaction={() => setModalOpen(true)}
+          onManageClients={() => setClientManagerOpen(true)}
+        />
+        <div className="max-w-[1320px] mx-auto px-6 py-8 space-y-8 mt-8">
+          {/* Summary Cards Skeleton */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {[1, 2, 3, 4].map(i => (
+              <Skeleton key={i} className="h-32 rounded-xl" />
+            ))}
+          </div>
+          {/* Button and Month Selector Skeleton */}
+          <div className="flex items-center gap-6">
+            <Skeleton className="h-10 w-40 rounded-lg" />
+            <Skeleton className="h-10 w-48 rounded-lg" />
+          </div>
+          {/* Column Bar Skeleton */}
+          <Skeleton className="h-12 w-full rounded-lg" />
+          {/* Table Skeleton */}
+          <Skeleton className="h-96 w-full rounded-2xl" />
+        </div>
+      </div>
+    );
+  }
+
+  // Limit displayed transactions for performance
+  const displayedTransactions = sortedTransactions.slice(0, displayLimit);
+  const hasMoreTransactions = sortedTransactions.length > displayLimit;
 
   return (
     <div className="min-h-screen bg-background">
@@ -345,8 +392,8 @@ export function FinanceView() {
             <h2 className="text-xl font-semibold mb-6 text-foreground">Lista de Lançamentos</h2>
             <div data-tour="filters">
               <FinancialFilters
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
+                searchTerm={inputSearchTerm}
+                onSearchChange={setInputSearchTerm}
                 typeFilter={typeFilter}
                 onTypeFilterChange={setTypeFilter}
                 paymentMethodFilter={paymentMethodFilter}
@@ -361,12 +408,23 @@ export function FinanceView() {
 
           <div data-tour="transactions-table">
             <FinancialTransactionsTable
-              transactions={sortedTransactions}
+              transactions={displayedTransactions}
               onEdit={handleEdit}
               onDelete={handleDelete}
               onViewDetails={handleViewDetails}
               onMarkAsPaid={handleMarkAsPaid}
             />
+            {hasMoreTransactions && (
+              <div className="mt-4 flex justify-center">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setDisplayLimit(prev => prev + 50)}
+                  className="gap-2"
+                >
+                  Carregar mais ({sortedTransactions.length - displayLimit} restantes)
+                </Button>
+              </div>
+            )}
           </div>
         </Card>
 
