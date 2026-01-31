@@ -51,6 +51,7 @@ export function FinanceView() {
   const [costCenterFilter, setCostCenterFilter] = useState("all");
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [canStartTour, setCanStartTour] = useState(false);
+  const [forceTourRun, setForceTourRun] = useState(false);
   const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
   const [displayLimit, setDisplayLimit] = useState(50);
 
@@ -288,6 +289,7 @@ export function FinanceView() {
           onOpenCostCenterManager={() => setCostCenterManagerOpen(true)}
           onNewTransaction={() => setModalOpen(true)}
           onManageClients={() => setClientManagerOpen(true)}
+          onRestartTour={() => setForceTourRun(true)}
         />
         <div className="max-w-[1320px] mx-auto px-6 py-8 space-y-8 mt-8">
           {/* Summary Cards Skeleton */}
@@ -315,13 +317,18 @@ export function FinanceView() {
   return (
     <div className="min-h-screen bg-background">
       <TrialBanner />
-      <OnboardingTour shouldRun={canStartTour && !firstAccessModalOpen} />
+      <OnboardingTour 
+        shouldRun={canStartTour && !firstAccessModalOpen} 
+        forceRun={forceTourRun}
+        onComplete={() => setForceTourRun(false)}
+      />
       <Header 
         currentMonth={currentMonth} 
         onOpenCompanySettings={() => setFirstAccessModalOpen(true)}
         onOpenCostCenterManager={() => setCostCenterManagerOpen(true)}
         onNewTransaction={() => setModalOpen(true)}
         onManageClients={() => setClientManagerOpen(true)}
+        onRestartTour={() => setForceTourRun(true)}
       />
       
       <div className="max-w-[1320px] mx-auto px-6 py-8 space-y-8 mt-8">

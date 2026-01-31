@@ -1,6 +1,7 @@
 import { CompanyMenu } from "./header/CompanyMenu";
 import { UserMenu } from "./header/UserMenu";
 import { NotificationBell } from "./NotificationBell";
+import { HeaderControls } from "./header/HeaderControls";
 import logo from "@/assets/logo.png";
 
 interface HeaderProps {
@@ -9,6 +10,7 @@ interface HeaderProps {
   onOpenCostCenterManager?: () => void;
   onNewTransaction?: () => void;
   onManageClients?: () => void;
+  onRestartTour?: () => void;
 }
 
 export function Header({ 
@@ -17,6 +19,7 @@ export function Header({
   onOpenCostCenterManager,
   onNewTransaction,
   onManageClients,
+  onRestartTour,
 }: HeaderProps) {
   return (
     <header className="bg-background border-b border-border/20 h-[72px] sticky top-0 z-50 backdrop-blur-sm">
@@ -35,8 +38,9 @@ export function Header({
           <span className="text-xl font-semibold text-foreground">Saldar</span>
         </div>
 
-        {/* Direita - Notificações + Usuário */}
+        {/* Direita - Controles + Notificações + Usuário */}
         <div className="flex items-center gap-3">
+          <HeaderControls onRestartTour={onRestartTour} />
           <NotificationBell />
           <UserMenu />
         </div>
