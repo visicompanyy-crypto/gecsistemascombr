@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useRef, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -59,6 +59,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [subscriptionLoading, setSubscriptionLoading] = useState(false);
   const { toast } = useToast();
+  const isCheckingRef = useRef(false);
 
   const checkSubscription = async (currentSession: Session | null) => {
     if (!currentSession) {
@@ -66,6 +67,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSubscriptionLoading(false);
       return;
     }
+
+    if (isCheckingRef.current) return;
+    isCheckingRef.current = true;
 
     setSubscriptionLoading(true);
     try {
@@ -87,6 +91,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         days_until_renewal: null
       });
     } finally {
+      isCheckingRef.current = false;
       setSubscriptionLoading(false);
     }
   };

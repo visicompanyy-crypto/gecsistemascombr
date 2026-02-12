@@ -224,6 +224,8 @@ export function NewTransactionModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    if (loading) return;
     
     if (!formData.amount || totalAmount <= 0) {
       toast({
