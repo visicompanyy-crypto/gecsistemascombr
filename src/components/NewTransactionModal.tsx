@@ -35,6 +35,14 @@ interface CostCenter {
   type: 'receita' | 'despesa';
 }
 
+// Helper to format dates as YYYY-MM-DD using local time (avoids UTC shift)
+function formatLocalDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 export function NewTransactionModal({
   open,
   onOpenChange,
@@ -269,12 +277,12 @@ export function NewTransactionModal({
 
       if (transaction) {
         // Edit mode - payment_date vai para DB transaction_date, launch_date vai para DB purchase_date
-        const updateData: any = {
+         const updateData: any = {
           description: formData.description,
           amount: totalAmount,
           transaction_type: formData.transaction_type,
-          transaction_date: format(formData.payment_date, 'yyyy-MM-dd'),   // form payment_date → DB transaction_date
-          purchase_date: format(formData.launch_date, 'yyyy-MM-dd'),       // form launch_date → DB purchase_date
+          transaction_date: formatLocalDate(formData.payment_date),
+          purchase_date: formatLocalDate(formData.launch_date),
           payment_method: formData.payment_method || null,
           notes: formData.notes || null,
           cost_center_id: formData.cost_center_id || null,
@@ -305,7 +313,7 @@ export function NewTransactionModal({
       } else {
         // Create mode
         const firstDate = formData.payment_date;
-        const purchaseDate = format(formData.launch_date, 'yyyy-MM-dd');
+        const purchaseDate = formatLocalDate(formData.launch_date);
 
         // Build PIX data if applicable
         const pixData = formData.payment_method === 'pix' && selectedClientId ? {
@@ -321,9 +329,9 @@ export function NewTransactionModal({
             description: formData.description,
             amount: totalAmount,
             transaction_type: formData.transaction_type,
-            transaction_date: format(formData.payment_date, 'yyyy-MM-dd'),
+            transaction_date: formatLocalDate(formData.payment_date),
             purchase_date: purchaseDate,
-            first_installment_date: format(formData.payment_date, 'yyyy-MM-dd'),
+            first_installment_date: formatLocalDate(formData.payment_date),
             payment_method: formData.payment_method,
             cost_center_id: formData.cost_center_id || null,
             custom_column_id: selectedColumnId || null,
@@ -359,9 +367,9 @@ export function NewTransactionModal({
               description: formData.description,
               amount: firstInstallmentAmount,
               transaction_type: formData.transaction_type,
-              transaction_date: format(firstDate, 'yyyy-MM-dd'),
+              transaction_date: formatLocalDate(firstDate),
               purchase_date: purchaseDate,
-              first_installment_date: format(firstDate, 'yyyy-MM-dd'),
+              first_installment_date: formatLocalDate(firstDate),
               payment_method: formData.payment_method,
               cost_center_id: formData.cost_center_id || null,
               custom_column_id: selectedColumnId || null,
@@ -401,9 +409,9 @@ export function NewTransactionModal({
               description: formData.description,
               amount: installmentAmountValue,
               transaction_type: formData.transaction_type,
-              transaction_date: format(installmentDate, 'yyyy-MM-dd'),
+              transaction_date: formatLocalDate(installmentDate),
               purchase_date: purchaseDate,
-              first_installment_date: format(firstDate, 'yyyy-MM-dd'),
+              first_installment_date: formatLocalDate(firstDate),
               payment_method: formData.payment_method,
               cost_center_id: formData.cost_center_id || null,
               custom_column_id: selectedColumnId || null,
@@ -468,8 +476,14 @@ export function NewTransactionModal({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-[720px] max-h-[90vh] overflow-y-auto bg-[#f6f7f8] rounded-[18px] shadow-[0_8px_20px_rgba(0,0,0,0.06)]">
+      <Dialog open={open} onOpenChange={(isOpen) => {
+        // Prevent ESC from closing if cost center modal is open
+        if (!isOpen && costCenterModalOpen) return;
+        onOpenChange(isOpen);
+      }}>
+        <DialogContent className="max-w-[720px] max-h-[90vh] overflow-y-auto bg-[#f6f7f8] rounded-[18px] shadow-[0_8px_20px_rgba(0,0,0,0.06)]" onEscapeKeyDown={(e) => {
+          if (costCenterModalOpen) e.preventDefault();
+        }}>
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold text-secondary">
               {transaction ? 'Editar Lançamento' : 'Novo Lançamento'}
@@ -634,13 +648,13 @@ export function NewTransactionModal({
                     {format(formData.payment_date, "dd/MM/yyyy", { locale: ptBR })}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 z-[9999]" align="start">
                   <Calendar
                     mode="single"
                     selected={formData.payment_date}
                     onSelect={(date) => date && setFormData({ ...formData, payment_date: date })}
                     initialFocus
-                    className="pointer-events-auto"
+                    className="p-3 pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>
@@ -691,7 +705,7 @@ export function NewTransactionModal({
                                   {format(inst.date, "dd/MM/yyyy", { locale: ptBR })}
                                 </Button>
                               </PopoverTrigger>
-                              <PopoverContent className="w-auto p-0" align="start">
+                              <PopoverContent className="w-auto p-0 z-[9999]" align="start">
                                 <Calendar
                                   mode="single"
                                   selected={inst.date}
@@ -703,7 +717,7 @@ export function NewTransactionModal({
                                     }
                                   }}
                                   initialFocus
-                                  className="pointer-events-auto"
+                                  className="p-3 pointer-events-auto"
                                 />
                               </PopoverContent>
                             </Popover>
@@ -832,13 +846,13 @@ export function NewTransactionModal({
                     {format(formData.launch_date, "dd/MM/yyyy", { locale: ptBR })}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 z-[9999]" align="start">
                   <Calendar
                     mode="single"
                     selected={formData.launch_date}
                     onSelect={(date) => date && setFormData({ ...formData, launch_date: date })}
                     initialFocus
-                    className="pointer-events-auto"
+                    className="p-3 pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>
