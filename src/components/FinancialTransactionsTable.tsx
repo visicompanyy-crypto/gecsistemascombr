@@ -28,6 +28,7 @@ interface FinancialTransactionsTableProps {
   onDelete: (id: string) => void;
   onViewDetails: (transaction: Transaction) => void;
   onMarkAsPaid: (id: string) => void;
+  actionLoadingId?: string | null;
 }
 
 export function FinancialTransactionsTable({
@@ -36,6 +37,7 @@ export function FinancialTransactionsTable({
   onDelete,
   onViewDetails,
   onMarkAsPaid,
+  actionLoadingId,
 }: FinancialTransactionsTableProps) {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -179,6 +181,7 @@ export function FinancialTransactionsTable({
                       size="icon"
                       className="h-8 w-8 rounded-full hover:bg-primary/10"
                       onClick={() => onEdit(transaction)}
+                      disabled={actionLoadingId === transaction.id}
                       title="Editar transação"
                     >
                       <Pencil className="h-4 w-4 text-primary" />
@@ -189,6 +192,7 @@ export function FinancialTransactionsTable({
                         size="icon"
                         className="h-8 w-8 rounded-full hover:bg-success/10"
                         onClick={() => onMarkAsPaid(transaction.id)}
+                        disabled={actionLoadingId === transaction.id}
                         title="Marcar como pago"
                       >
                         <CheckCircle2 className="h-4 w-4 text-success" />
@@ -199,6 +203,7 @@ export function FinancialTransactionsTable({
                       size="icon"
                       className="h-8 w-8 rounded-full hover:bg-destructive/10"
                       onClick={() => onDelete(transaction.id)}
+                      disabled={actionLoadingId === transaction.id}
                       title="Deletar transação"
                     >
                       <Trash2 className="h-4 w-4 text-destructive" />

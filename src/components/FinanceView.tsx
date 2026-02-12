@@ -54,6 +54,7 @@ export function FinanceView() {
   const [forceTourRun, setForceTourRun] = useState(false);
   const [selectedColumnId, setSelectedColumnId] = useState<string | null>(null);
   const [displayLimit, setDisplayLimit] = useState(50);
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
   // Custom columns hook
   const { getCostCentersForColumn, costCenters } = useCustomColumns();
@@ -170,6 +171,8 @@ export function FinanceView() {
   };
 
   const handleDelete = async (id: string) => {
+    if (actionLoadingId) return;
+    setActionLoadingId(id);
     try {
       const { error } = await supabase
         .from('financial_transactions')
@@ -189,6 +192,8 @@ export function FinanceView() {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
@@ -198,6 +203,8 @@ export function FinanceView() {
   };
 
   const handleMarkAsPaid = async (id: string) => {
+    if (actionLoadingId) return;
+    setActionLoadingId(id);
     try {
       const now = new Date();
       const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -222,6 +229,8 @@ export function FinanceView() {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setActionLoadingId(null);
     }
   };
 
@@ -421,6 +430,7 @@ export function FinanceView() {
               onDelete={handleDelete}
               onViewDetails={handleViewDetails}
               onMarkAsPaid={handleMarkAsPaid}
+              actionLoadingId={actionLoadingId}
             />
             {hasMoreTransactions && (
               <div className="mt-4 flex justify-center">
