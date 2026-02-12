@@ -1,50 +1,133 @@
 
-## Plano: Adicionar Google Analytics (gtag.js)
 
-### O que será feito
+## Plano: Correção de Bugs Criticos no Sistema
 
-Adicionar o código de rastreamento do Google Analytics (Google Tag) ao site com o ID **G-F03PGF91L4**, conforme mostrado na imagem.
+### Problemas Identificados
 
-### Alteração Necessária
+#### 1. Tour de Onboarding Travando o Sistema (CRITICO)
+O `OnboardingTour` tem um passo (step 2) que busca o elemento `[data-tour="custom-columns"]`, mas o `CustomColumnBar` foi **comentado/removido** na ultima alteracao. Quando o Joyride nao encontra o elemento alvo, ele pode travar toda a interface, causando a **tela branca**.
 
-**Arquivo:** `index.html`
+**Arquivo:** `src/components/OnboardingTour.tsx` (linha 19-22)
+- Remover o step que referencia `[data-tour="custom-columns"]`
 
-Adicionar o código do Google Tag logo após a abertura do `<head>`, antes dos outros scripts. O código será inserido na seguinte ordem:
+#### 2. Chamadas Duplicadas ao Verificar Assinatura
+Os logs mostram que `check-subscription` esta sendo chamado **3-4 vezes simultaneamente** (visivel nos logs das 18:17:31). Isso acontece porque:
+- `onAuthStateChange` dispara `checkSubscription`
+- `getSession` tambem dispara `checkSubscription`
+- Ambos rodam ao mesmo tempo sem controle
 
-1. Script externo do gtag.js
-2. Script de configuração com o ID de medição
+**Arquivo:** `src/contexts/AuthContext.tsx`
+- Adicionar flag `isCheckingRef` para evitar chamadas duplicadas simultaneas
+- Garantir que apenas uma verificacao rode por vez
 
-#### Código a ser adicionado (após linha 5, antes das meta tags):
+#### 3. Cliques Duplicados em Acoes da Tabela
+Os botoes de "Marcar como pago", "Excluir" e "Editar" nao tem protecao contra cliques rapidos/duplos. Isso pode causar:
+- Duplicacao de acoes no banco de dados
+- Travamento enquanto duas requisicoes concorrem
 
-```html
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-F03PGF91L4"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-F03PGF91L4');
-</script>
+**Arquivo:** `src/components/FinanceView.tsx`
+- Adicionar estados de loading para `handleDelete` e `handleMarkAsPaid`
+- Desabilitar botoes durante operacoes
+
+**Arquivo:** `src/components/FinancialTransactionsTable.tsx`
+- Receber props de loading e desabilitar botoes de acao
+
+#### 4. Modal de Transacao - Problemas de Estado
+O formulario do `NewTransactionModal` nao reseta corretamente quando o modal e fechado sem salvar, e o submit nao previne duplo clique adequadamente.
+
+**Arquivo:** `src/components/NewTransactionModal.tsx`
+- Garantir reset completo do form ao fechar modal
+- Adicionar `e.stopPropagation()` no submit para evitar propagacao
+
+---
+
+## Detalhes Tecnicos das Alteracoes
+
+### OnboardingTour.tsx
+Remover o step 2 (custom-columns) do array de steps, ja que o componente foi ocultado:
+
+```typescript
+// REMOVER este step:
+{
+  target: '[data-tour="custom-columns"]',
+  content: 'As colunas permitem organizar...',
+  placement: 'bottom',
+  spotlightPadding: 8,
+},
 ```
 
-### Estrutura Final do Head
+### AuthContext.tsx
+Adicionar controle de concorrencia:
 
+```typescript
+const isCheckingRef = useRef(false);
+
+const checkSubscription = async (currentSession: Session | null) => {
+  if (!currentSession) {
+    setSubscription(null);
+    setSubscriptionLoading(false);
+    return;
+  }
+  
+  if (isCheckingRef.current) return; // Evitar chamadas duplicadas
+  isCheckingRef.current = true;
+  
+  // ... logica existente ...
+  
+  finally {
+    isCheckingRef.current = false;
+    setSubscriptionLoading(false);
+  }
+};
 ```
-<head>
-  ├── Meta charset e viewport
-  ├── Title
-  ├── 🆕 Google Analytics (gtag.js) - G-F03PGF91L4
-  ├── Meta description e author
-  ├── Favicon
-  ├── Google Fonts
-  ├── Open Graph / Twitter meta tags
-  ├── Meta Pixel (Facebook) - já existente
-</head>
+
+### FinanceView.tsx
+Adicionar estados de loading para acoes:
+
+```typescript
+const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+const handleDelete = async (id: string) => {
+  if (actionLoading) return;
+  setActionLoading(id);
+  try { ... } finally { setActionLoading(null); }
+};
+
+const handleMarkAsPaid = async (id: string) => {
+  if (actionLoading) return;
+  setActionLoading(id);
+  try { ... } finally { setActionLoading(null); }
+};
 ```
+
+### FinancialTransactionsTable.tsx
+Receber e usar prop de loading:
+
+```typescript
+interface Props {
+  // ... existente
+  actionLoadingId?: string | null;
+}
+
+// Desabilitar botoes quando actionLoadingId corresponde
+<Button disabled={actionLoadingId === transaction.id} ...>
+```
+
+---
+
+## Resumo dos Arquivos
+
+| Arquivo | Alteracao |
+|---------|-----------|
+| `src/components/OnboardingTour.tsx` | Remover step de custom-columns |
+| `src/contexts/AuthContext.tsx` | Evitar chamadas duplicadas de subscription |
+| `src/components/FinanceView.tsx` | Adicionar loading guards nas acoes |
+| `src/components/FinancialTransactionsTable.tsx` | Desabilitar botoes durante acoes |
+| `src/components/NewTransactionModal.tsx` | Melhorar reset e prevenir duplo submit |
 
 ### Resultado Esperado
+- Sistema nao trava mais ao navegar (tour corrigido)
+- Cliques nao duplicam acoes
+- Modal funciona corretamente ao abrir/fechar
+- Chamadas de API nao se repetem desnecessariamente
 
-- Google Analytics ativo em todas as páginas do site
-- Rastreamento automático de PageViews
-- Dados disponíveis no Google Analytics 4 (GA4) com o ID G-F03PGF91L4
-- Funciona junto com o Meta Pixel já existente (não há conflito)
