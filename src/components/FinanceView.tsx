@@ -387,6 +387,8 @@ export function FinanceView() {
 
           <ExportExcelButton
             transactions={transactionsDoMes}
+            allTransactions={transactionsFilteredByColumn}
+            teamToolExpenses={teamToolExpensesFilteredByColumn}
             currentMonth={currentMonth}
           />
 
