@@ -45,6 +45,7 @@ export function FinanceView() {
   const [costCenterManagerOpen, setCostCenterManagerOpen] = useState(false);
   const [clientManagerOpen, setClientManagerOpen] = useState(false);
   const [customColumnManagerOpen, setCustomColumnManagerOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
   const [inputSearchTerm, setInputSearchTerm] = useState("");
   const debouncedSearchTerm = useDebouncedValue(inputSearchTerm, 300);
