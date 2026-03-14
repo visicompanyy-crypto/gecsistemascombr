@@ -95,7 +95,7 @@ const Pricing = () => {
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
-  const pollingRef = useRef<NodeJS.Timeout | null>(null);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     return () => {

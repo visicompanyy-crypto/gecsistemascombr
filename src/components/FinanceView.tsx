@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, Upload } from "lucide-react";
 import { FinancialSummaryCards } from "./FinancialSummaryCards";
 import { FinanceChartSection } from "./FinanceChartSection";
 import { FinancePieCharts } from "./FinancePieCharts";
@@ -12,6 +12,8 @@ import { FinancialTransactionsTable } from "./FinancialTransactionsTable";
 import { FinancialFilters } from "./FinancialFilters";
 import { NewTransactionModal } from "./NewTransactionModal";
 import { TransactionDetailModal } from "./TransactionDetailModal";
+import { ExportExcelButton } from "./ExportExcelButton";
+import { ImportExcelModal } from "./ImportExcelModal";
 import { FirstAccessModal } from "./FirstAccessModal";
 import { WelcomeCard } from "./WelcomeCard";
 import { DailyReminder } from "./DailyReminder";
@@ -43,6 +45,7 @@ export function FinanceView() {
   const [costCenterManagerOpen, setCostCenterManagerOpen] = useState(false);
   const [clientManagerOpen, setClientManagerOpen] = useState(false);
   const [customColumnManagerOpen, setCustomColumnManagerOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
   const [inputSearchTerm, setInputSearchTerm] = useState("");
   const debouncedSearchTerm = useDebouncedValue(inputSearchTerm, 300);
@@ -363,7 +366,7 @@ export function FinanceView() {
           />
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center gap-3">
           <Button 
             data-tour="new-transaction"
             onClick={() => setModalOpen(true)} 
@@ -372,6 +375,20 @@ export function FinanceView() {
             <Plus className="h-4 w-4" />
             Novo Lançamento
           </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => setImportModalOpen(true)}
+            className="gap-2 rounded-[10px] px-4 py-2.5 font-medium"
+          >
+            <Upload className="h-4 w-4" />
+            Importar Excel
+          </Button>
+
+          <ExportExcelButton
+            transactions={transactionsDoMes}
+            currentMonth={currentMonth}
+          />
 
           <div data-tour="month-selector" className="flex items-center gap-3 bg-card border border-border rounded-lg px-5 py-2.5 shadow-sm">
             <Button 
@@ -511,6 +528,14 @@ export function FinanceView() {
         <CustomColumnManagerModal
           open={customColumnManagerOpen}
           onOpenChange={setCustomColumnManagerOpen}
+        />
+
+        <ImportExcelModal
+          open={importModalOpen}
+          onOpenChange={setImportModalOpen}
+          onSuccess={() => {
+            refetchTransactions();
+          }}
         />
       </div>
       
