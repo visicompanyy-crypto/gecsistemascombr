@@ -529,6 +529,14 @@ export function FinanceView() {
           open={customColumnManagerOpen}
           onOpenChange={setCustomColumnManagerOpen}
         />
+
+        <ImportExcelModal
+          open={importModalOpen}
+          onOpenChange={setImportModalOpen}
+          onSuccess={() => {
+            refetchTransactions();
+          }}
+        />
       </div>
       
       {/* Daily reminder popup */}
