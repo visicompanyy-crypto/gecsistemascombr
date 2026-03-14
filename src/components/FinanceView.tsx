@@ -366,7 +366,7 @@ export function FinanceView() {
           />
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center gap-3">
           <Button 
             data-tour="new-transaction"
             onClick={() => setModalOpen(true)} 
@@ -375,6 +375,20 @@ export function FinanceView() {
             <Plus className="h-4 w-4" />
             Novo Lançamento
           </Button>
+
+          <Button
+            variant="outline"
+            onClick={() => setImportModalOpen(true)}
+            className="gap-2 rounded-[10px] px-4 py-2.5 font-medium"
+          >
+            <Upload className="h-4 w-4" />
+            Importar Excel
+          </Button>
+
+          <ExportExcelButton
+            transactions={transactionsDoMes}
+            currentMonth={currentMonth}
+          />
 
           <div data-tour="month-selector" className="flex items-center gap-3 bg-card border border-border rounded-lg px-5 py-2.5 shadow-sm">
             <Button 
