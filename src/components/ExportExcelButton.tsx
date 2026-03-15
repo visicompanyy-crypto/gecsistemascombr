@@ -157,8 +157,8 @@ export function ExportExcelButton({ transactions, allTransactions, teamToolExpen
       if (isAllMode && userId) {
         // Fetch ALL data from database with pagination
         const [allTx, allTte] = await Promise.all([
-          fetchAllFromDb('financial_transactions', 'transaction_date', '*, cost_centers(name)'),
-          fetchAllFromDb('team_tool_expenses', 'expense_date', '*'),
+          fetchAllTransactionsFromDb(),
+          fetchAllTeamToolFromDb(),
         ]);
         filteredTransactions = allTx as Transaction[];
         filteredTeamTool = allTte as TeamToolExpense[];
