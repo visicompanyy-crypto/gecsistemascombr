@@ -8,9 +8,11 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Download, CalendarIcon, FileSpreadsheet } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Download, CalendarIcon, FileSpreadsheet, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Transaction {
   description: string;
@@ -51,6 +53,7 @@ interface ExportExcelButtonProps {
   allTransactions: Transaction[] | undefined;
   teamToolExpenses: TeamToolExpense[] | undefined;
   currentMonth: Date;
+  userId?: string;
 }
 
 const paymentMethodLabels: Record<string, string> = {
@@ -63,12 +66,13 @@ const paymentMethodLabels: Record<string, string> = {
   cheque: "Cheque",
 };
 
-export function ExportExcelButton({ transactions, allTransactions, teamToolExpenses, currentMonth }: ExportExcelButtonProps) {
+export function ExportExcelButton({ transactions, allTransactions, teamToolExpenses, currentMonth, userId }: ExportExcelButtonProps) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [exporting, setExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
 
   // Sheets to include
   const [includeTransactions, setIncludeTransactions] = useState(true);
@@ -77,6 +81,8 @@ export function ExportExcelButton({ transactions, allTransactions, teamToolExpen
   const [includeTeamToolExpenses, setIncludeTeamToolExpenses] = useState(true);
   const [includeSummary, setIncludeSummary] = useState(true);
   const [includeByCostCenter, setIncludeByCostCenter] = useState(true);
+
+  const isAllMode = !startDate && !endDate;
 
   const handleOpen = () => {
     // Default to current month range
@@ -101,19 +107,72 @@ export function ExportExcelButton({ transactions, allTransactions, teamToolExpen
     });
   };
 
-  const handleExport = () => {
-    const source = allTransactions || transactions || [];
-    const filteredTransactions = filterByDateRange(source, "transaction_date");
-    const filteredTeamTool = filterByDateRange(teamToolExpenses, "expense_date");
-
-    if (filteredTransactions.length === 0 && filteredTeamTool.length === 0) {
-      toast({ title: "Nenhum dado", description: "Não há dados no período selecionado.", variant: "destructive" });
-      return;
+  const fetchAllTransactionsFromDb = async () => {
+    const allData: any[] = [];
+    let from = 0;
+    const pageSize = 1000;
+    while (true) {
+      setExportProgress(allData.length);
+      const { data, error } = await supabase
+        .from('financial_transactions')
+        .select('*, cost_centers(name)')
+        .is('deleted_at', null)
+        .range(from, from + pageSize - 1)
+        .order('transaction_date', { ascending: false });
+      if (error || !data || data.length === 0) break;
+      allData.push(...data);
+      if (data.length < pageSize) break;
+      from += pageSize;
     }
+    return allData;
+  };
 
+  const fetchAllTeamToolFromDb = async () => {
+    const allData: any[] = [];
+    let from = 0;
+    const pageSize = 1000;
+    while (true) {
+      const { data, error } = await supabase
+        .from('team_tool_expenses')
+        .select('*')
+        .is('deleted_at', null)
+        .range(from, from + pageSize - 1)
+        .order('expense_date', { ascending: false });
+      if (error || !data || data.length === 0) break;
+      allData.push(...data);
+      if (data.length < pageSize) break;
+      from += pageSize;
+    }
+    return allData;
+  };
+
+  const handleExport = async () => {
     setExporting(true);
+    setExportProgress(0);
 
     try {
+      let filteredTransactions: Transaction[];
+      let filteredTeamTool: TeamToolExpense[];
+
+      if (isAllMode && userId) {
+        // Fetch ALL data from database with pagination
+        const [allTx, allTte] = await Promise.all([
+          fetchAllTransactionsFromDb(),
+          fetchAllTeamToolFromDb(),
+        ]);
+        filteredTransactions = allTx as Transaction[];
+        filteredTeamTool = allTte as TeamToolExpense[];
+      } else {
+        const source = allTransactions || transactions || [];
+        filteredTransactions = filterByDateRange(source, "transaction_date");
+        filteredTeamTool = filterByDateRange(teamToolExpenses, "expense_date");
+      }
+
+      if (filteredTransactions.length === 0 && filteredTeamTool.length === 0) {
+        toast({ title: "Nenhum dado", description: "Não há dados no período selecionado.", variant: "destructive" });
+        return;
+      }
+
       const wb = XLSX.utils.book_new();
 
       // 1. All Transactions sheet
@@ -389,10 +448,19 @@ export function ExportExcelButton({ transactions, allTransactions, teamToolExpen
             </div>
 
             {/* Actions */}
+            {exporting && exportProgress > 0 && (
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground flex items-center gap-2">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Buscando dados... {exportProgress.toLocaleString()} registros carregados
+                </p>
+                <Progress value={undefined} className="h-1.5" />
+              </div>
+            )}
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={exporting}>Cancelar</Button>
               <Button onClick={handleExport} disabled={exporting} className="gap-2">
-                <Download className="h-4 w-4" />
+                {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
                 {exporting ? "Exportando..." : "Exportar"}
               </Button>
             </div>
