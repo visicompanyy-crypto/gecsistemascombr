@@ -107,18 +107,37 @@ export function ExportExcelButton({ transactions, allTransactions, teamToolExpen
     });
   };
 
-  const fetchAllFromDb = async (table: string, dateField: string, selectQuery: string) => {
+  const fetchAllTransactionsFromDb = async () => {
     const allData: any[] = [];
     let from = 0;
     const pageSize = 1000;
     while (true) {
       setExportProgress(allData.length);
       const { data, error } = await supabase
-        .from(table)
-        .select(selectQuery)
+        .from('financial_transactions')
+        .select('*, cost_centers(name)')
         .is('deleted_at', null)
         .range(from, from + pageSize - 1)
-        .order(dateField, { ascending: false });
+        .order('transaction_date', { ascending: false });
+      if (error || !data || data.length === 0) break;
+      allData.push(...data);
+      if (data.length < pageSize) break;
+      from += pageSize;
+    }
+    return allData;
+  };
+
+  const fetchAllTeamToolFromDb = async () => {
+    const allData: any[] = [];
+    let from = 0;
+    const pageSize = 1000;
+    while (true) {
+      const { data, error } = await supabase
+        .from('team_tool_expenses')
+        .select('*')
+        .is('deleted_at', null)
+        .range(from, from + pageSize - 1)
+        .order('expense_date', { ascending: false });
       if (error || !data || data.length === 0) break;
       allData.push(...data);
       if (data.length < pageSize) break;
