@@ -387,9 +387,10 @@ export function FinanceView() {
 
           <ExportExcelButton
             transactions={transactionsDoMes}
-            allTransactions={transactionsFilteredByColumn}
-            teamToolExpenses={teamToolExpensesFilteredByColumn}
+            allTransactions={transactions}
+            teamToolExpenses={teamToolExpenses}
             currentMonth={currentMonth}
+            userId={user?.id}
           />
 
           <div data-tour="month-selector" className="flex items-center gap-3 bg-card border border-border rounded-lg px-5 py-2.5 shadow-sm">
