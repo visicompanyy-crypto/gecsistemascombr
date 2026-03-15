@@ -53,6 +53,7 @@ interface ExportExcelButtonProps {
   allTransactions: Transaction[] | undefined;
   teamToolExpenses: TeamToolExpense[] | undefined;
   currentMonth: Date;
+  userId?: string;
 }
 
 const paymentMethodLabels: Record<string, string> = {
