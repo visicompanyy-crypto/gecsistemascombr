@@ -107,19 +107,47 @@ export function ExportExcelButton({ transactions, allTransactions, teamToolExpen
     });
   };
 
-  const handleExport = () => {
-    const source = allTransactions || transactions || [];
-    const filteredTransactions = filterByDateRange(source, "transaction_date");
-    const filteredTeamTool = filterByDateRange(teamToolExpenses, "expense_date");
-
-    if (filteredTransactions.length === 0 && filteredTeamTool.length === 0) {
-      toast({ title: "Nenhum dado", description: "Não há dados no período selecionado.", variant: "destructive" });
-      return;
+  const fetchAllFromDb = async (table: string, dateField: string, selectQuery: string) => {
+    const allData: any[] = [];
+    let from = 0;
+    const pageSize = 1000;
+    while (true) {
+      setExportProgress(allData.length);
+      const { data, error } = await supabase
+        .from(table)
+        .select(selectQuery)
+        .is('deleted_at', null)
+        .range(from, from + pageSize - 1)
+        .order(dateField, { ascending: false });
+      if (error || !data || data.length === 0) break;
+      allData.push(...data);
+      if (data.length < pageSize) break;
+      from += pageSize;
     }
+    return allData;
+  };
 
+  const handleExport = async () => {
     setExporting(true);
+    setExportProgress(0);
 
     try {
+      let filteredTransactions: Transaction[];
+      let filteredTeamTool: TeamToolExpense[];
+
+      if (isAllMode && userId) {
+        // Fetch ALL data from database with pagination
+        const [allTx, allTte] = await Promise.all([
+          fetchAllFromDb('financial_transactions', 'transaction_date', '*, cost_centers(name)'),
+          fetchAllFromDb('team_tool_expenses', 'expense_date', '*'),
+        ]);
+        filteredTransactions = allTx as Transaction[];
+        filteredTeamTool = allTte as TeamToolExpense[];
+      } else {
+        const source = allTransactions || transactions || [];
+        filteredTransactions = filterByDateRange(source, "transaction_date");
+        filteredTeamTool = filterByDateRange(teamToolExpenses, "expense_date");
+      }
       const wb = XLSX.utils.book_new();
 
       // 1. All Transactions sheet
