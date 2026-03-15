@@ -167,6 +167,12 @@ export function ExportExcelButton({ transactions, allTransactions, teamToolExpen
         filteredTransactions = filterByDateRange(source, "transaction_date");
         filteredTeamTool = filterByDateRange(teamToolExpenses, "expense_date");
       }
+
+      if (filteredTransactions.length === 0 && filteredTeamTool.length === 0) {
+        toast({ title: "Nenhum dado", description: "Não há dados no período selecionado.", variant: "destructive" });
+        return;
+      }
+
       const wb = XLSX.utils.book_new();
 
       // 1. All Transactions sheet
