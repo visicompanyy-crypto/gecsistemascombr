@@ -66,12 +66,13 @@ const paymentMethodLabels: Record<string, string> = {
   cheque: "Cheque",
 };
 
-export function ExportExcelButton({ transactions, allTransactions, teamToolExpenses, currentMonth }: ExportExcelButtonProps) {
+export function ExportExcelButton({ transactions, allTransactions, teamToolExpenses, currentMonth, userId }: ExportExcelButtonProps) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
   const [exporting, setExporting] = useState(false);
+  const [exportProgress, setExportProgress] = useState(0);
 
   // Sheets to include
   const [includeTransactions, setIncludeTransactions] = useState(true);
@@ -80,6 +81,8 @@ export function ExportExcelButton({ transactions, allTransactions, teamToolExpen
   const [includeTeamToolExpenses, setIncludeTeamToolExpenses] = useState(true);
   const [includeSummary, setIncludeSummary] = useState(true);
   const [includeByCostCenter, setIncludeByCostCenter] = useState(true);
+
+  const isAllMode = !startDate && !endDate;
 
   const handleOpen = () => {
     // Default to current month range
