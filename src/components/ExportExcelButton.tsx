@@ -448,10 +448,19 @@ export function ExportExcelButton({ transactions, allTransactions, teamToolExpen
             </div>
 
             {/* Actions */}
+            {exporting && exportProgress > 0 && (
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground flex items-center gap-2">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Buscando dados... {exportProgress.toLocaleString()} registros carregados
+                </p>
+                <Progress value={undefined} className="h-1.5" />
+              </div>
+            )}
             <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={exporting}>Cancelar</Button>
               <Button onClick={handleExport} disabled={exporting} className="gap-2">
-                <Download className="h-4 w-4" />
+                {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
                 {exporting ? "Exportando..." : "Exportar"}
               </Button>
             </div>
