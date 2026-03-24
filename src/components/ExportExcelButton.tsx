@@ -212,15 +212,16 @@ export function ExportExcelButton({ transactions, allTransactions, teamToolExpen
           const totalRecebido = receitasPagas.reduce((s, t) => s + Number(t.amount), 0);
           const totalPendente = receitasPendentes.reduce((s, t) => s + Number(t.amount), 0);
 
+          const emptyRow = { "Descrição": "", "Valor (R$)": null, "Data": "", "Vencimento": "", "Status": "", "Categoria": "", "Centro de Custo": "", "Forma de Pagamento": "" };
           const data = [
-            { "": "RESUMO DE RECEITAS", " ": "" },
-            { "": "Total Recebido", " ": totalRecebido },
-            { "": "Total Pendente", " ": totalPendente },
-            { "": "Total Geral", " ": totalRecebido + totalPendente },
-            { "": "", " ": "" },
+            { ...emptyRow, "Descrição": "RESUMO DE RECEITAS" },
+            { ...emptyRow, "Descrição": "Total Recebido", "Valor (R$)": totalRecebido },
+            { ...emptyRow, "Descrição": "Total Pendente", "Valor (R$)": totalPendente },
+            { ...emptyRow, "Descrição": "Total Geral", "Valor (R$)": totalRecebido + totalPendente },
+            emptyRow,
             ...receitas.map((t) => ({
               "Descrição": t.description,
-              "Valor (R$)": t.amount,
+              "Valor (R$)": Number(t.amount),
               "Data": t.transaction_date,
               "Vencimento": t.due_date || "",
               "Status": t.status === "pago" ? "Pago" : "Pendente",
@@ -244,15 +245,16 @@ export function ExportExcelButton({ transactions, allTransactions, teamToolExpen
           const totalPago = despesasPagas.reduce((s, t) => s + Number(t.amount), 0);
           const totalPendente = despesasPendentes.reduce((s, t) => s + Number(t.amount), 0);
 
+          const emptyRowD = { "Descrição": "", "Valor (R$)": null, "Data": "", "Vencimento": "", "Status": "", "Categoria": "", "Centro de Custo": "", "Forma de Pagamento": "" };
           const data = [
-            { "": "RESUMO DE DESPESAS", " ": "" },
-            { "": "Total Pago", " ": totalPago },
-            { "": "Total Pendente", " ": totalPendente },
-            { "": "Total Geral", " ": totalPago + totalPendente },
-            { "": "", " ": "" },
+            { ...emptyRowD, "Descrição": "RESUMO DE DESPESAS" },
+            { ...emptyRowD, "Descrição": "Total Pago", "Valor (R$)": totalPago },
+            { ...emptyRowD, "Descrição": "Total Pendente", "Valor (R$)": totalPendente },
+            { ...emptyRowD, "Descrição": "Total Geral", "Valor (R$)": totalPago + totalPendente },
+            emptyRowD,
             ...despesas.map((t) => ({
               "Descrição": t.description,
-              "Valor (R$)": t.amount,
+              "Valor (R$)": Number(t.amount),
               "Data": t.transaction_date,
               "Vencimento": t.due_date || "",
               "Status": t.status === "pago" ? "Pago" : "Pendente",
@@ -295,7 +297,7 @@ export function ExportExcelButton({ transactions, allTransactions, teamToolExpen
         const teamToolTotal = filteredTeamTool.reduce((s, e) => s + Number(e.amount), 0);
 
         const summaryData = [
-          { "Indicador": "RELATÓRIO FINANCEIRO", "Valor (R$)": "" },
+          { "Indicador": "RELATÓRIO FINANCEIRO", "Valor (R$)": null },
           { "Indicador": `Período: ${startDate ? format(startDate, "dd/MM/yyyy") : "—"} a ${endDate ? format(endDate, "dd/MM/yyyy") : "—"}`, "Valor (R$)": "" },
           { "Indicador": "", "Valor (R$)": "" },
           { "Indicador": "Receitas Recebidas", "Valor (R$)": receitasRecebidas },
